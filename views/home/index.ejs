@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Jogo do Ultimato</title>
+  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+  <link href="stylesheets/home.css" rel="stylesheet">
+  <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div>
+ <nav class="navbar navbar-default">
+   <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    
+ <ul>
+    <li id="titulo" class="navbar-header">
+      <h2 class="label label-danger">Jogo do Ultimato</h2>
+    </li>
+    <li>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      
+      <form action="/login" method="post" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" name="usuario[login]" placeholder="Login">
+        </div>&nbsp;
+        <div class="form-group">
+          <input type="password" class="form-control" name="usuario[senha]"placeholder="Senha">
+        </div>&nbsp;
+        <button type="submit" class="btn btn-default">Entrar</button>
+      </form>
+    </div><!-- /.navbar-collapse -->
+    </li>
+    </ul>
+  </div><!-- /.container-fluid -->
+  </nav>
+  </div>
+
+  <div id="cadastrar">
+  	<label>
+  		<h4>Não possui conta?</h4>
+  	</label>
+  	<a href="/criar_conta">Clique aqui</a>
+  </div>
+  <h3><%= mensagem %></h3>
+</body>
+</html>

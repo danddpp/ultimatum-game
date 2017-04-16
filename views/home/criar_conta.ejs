@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Jogo do ultimato</title>
+
+    <!-- Bootstrap -->
+    <link href='/stylesheets/bootstrap.min.css' rel='stylesheet'/>
+    <link href="stylesheets/criar_conta.css" rel="stylesheet">
+    <script src='/javascripts/jquery-1.11.3.min.js'></script>
+    <script src='/javascripts/bootstrap.min.js'></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+        
+<div>
+ <nav class="navbar navbar-default">
+   <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    
+    <ul>
+     <li id="titulo" class="navbar-header">
+       <a href="/">
+         <h2 class="label label-danger">Jogo do Ultimato</h2>
+       </a>
+     </li>
+     
+     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      
+      <form action="/login" method="post" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="hidden" class="form-control" name="usuario[login]" placeholder="Login">
+        </div>&nbsp;
+        <div class="form-group">
+          <input type="hidden" class="form-control" name="usuario[senha]" placeholder="Senha">
+        </div>&nbsp;
+       </form>
+    </div><!-- /.navbar-collapse -->
+    </li>
+    </ul>
+  </div><!-- /.container-fluid -->
+  </nav>
+  </div>
+
+
+
+   </ul>
+  </div><!-- /.container-fluid -->
+ </nav>
+</div>
+
+<div id="wrapper" class="container"> 
+<form class="form-horizontal" action="/cadastrar_usuario" method="POST">
+
+  <fieldset>
+    <legend>Criar uma conta</legend>
+    <div class="form-group">
+      <label for="inputNome" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputNome" placeholder="Nome" name="usuario[nome]">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputSobreNome" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputSobrenome" placeholder="Sobrenome" name="usuario[sobrenome]">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputEmail" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputEmail" placeholder="E-mail" name="usuario[email]">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputCurso" class="col-lg-2 control-label" style="margin-left: 70px;">Curso</label>
+        <select class="form-control" name="usuario[curso]" style="width: 249px;">
+          <option>Análise de Sistemas</option>
+          <option>Licenciatura em Matemática</option>
+          <option>Processos Gerênciais</option>
+          <option>Técnico em Edificações</option>
+          <option>Técnico em informática (Web)</option>
+        </select>
+    </div>
+    <div class="form-group">
+      <label for="inputModulo" class="col-lg-2 control-label" style="margin-left: 70px;">Modulo</label>
+      <select class="form-control" name="usuario[modulo]" style="width: 70px;">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="inputLogin" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputLogin" placeholder="Login" name="usuario[login]">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputSenha" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="password" class="form-control" id="inputSenha" placeholder="Senha" name="usuario[senha]">
+      </div>
+    </div>    
+    <div class="form-group">
+      <div class="col-lg-10 col-lg-offset-2">
+        <!--<button type="reset" class="btn btn-default">Cancel</button>-->
+        <button type="submit" class="btn btn-primary">Criar conta</button>
+      </div>
+    </div>
+  </fieldset>
+</form>
+</div>
+<h3><%= mensagem %></h3>
+</body>
+</html>

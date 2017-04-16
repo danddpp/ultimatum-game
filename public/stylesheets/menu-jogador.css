@@ -1,0 +1,9 @@
+h3 { text-align: center;  }
+
+#jogador input {width: 100px;}
+
+#jogador { margin-top: 30px; }
+
+#adversarios input {width: 100px;}
+
+#adversarios { margin-top: 100px; }

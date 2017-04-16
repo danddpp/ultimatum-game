@@ -1,0 +1,51 @@
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+    <ul ul class="nav navbar-nav">
+
+         <li>
+          <a href="/menu-jogador">Home<b class="caret"></b></a> 
+         </li>
+
+        <li class="menu-item dropdown">
+         <a href="#" class="dropdown-toggle" data-toggle="dropdown">O jogo<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li class="menu-item dropdown dropdown-submenu">
+                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">História</a>
+                  <ul class="dropdown-menu">
+                      <li class="menu-item ">
+                         <a href="/teoria_dos_jogos">Teoria dos jogos</a>
+                      </li>
+                      <li class="menu-item ">
+                         <a href="/jogo_do_ultimato">Jogo do Ultimato</a>
+                      </li>
+                  </ul>
+                </li>
+                <li class="menu-item dropdown dropdown-submenu">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Partida</a>
+                  <ul class="dropdown-menu">
+                     <li class="menu-item" >
+                       <a href="/menu_partida">Iniciar</a>
+                     </li>
+                  </ul>
+                </li>
+            </ul>
+        </li>
+       </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="https://www.ifspcaraguatatuba.edu.br/">IFSP-Caraguatatuba</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%= nome_jogador%> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><% include exit %></li>
+          </ul>
+        </li>
+      </ul>
+    
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<!--<link href="stylesheets/menu-partida.css" rel="stylesheet">--> 
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+ 
+ <script>
+   $(document).ready(function() {
+       $('#cursos').find('option').each(function() {
+          if($('#curso').val() == $(this).text()){
+        	$(this).prop('disabled', false);
+          }
+       }); 
+
+       if($('#cursos').val() == 'Livre') {
+      	$('#modulos').find('option').each(function() {
+      		$(this).prop('disabled', true);
+      	}); 
+       } 
+
+     $('#cursos').click(function() {
+          if($('#cursos').val() == 'Livre') {
+         	$('#modulos').find('option').each(function() {
+         		$(this).prop('disabled', true);
+         	}); 
+         } else {
+           $('#cursos').find('option').each(function() {
+             if($('#curso').val() == $(this).text()){
+           	$('#modulos').find('option').each(function() {
+                  if($(this).text() != $('#modulo').val()){
+                   $(this).prop('disabled', true);
+                  } else {
+                  	$(this).prop('disabled', false);
+                  }
+           	});
+             }
+          });            
+         }
+     });
+
+     $('#tabela').find('tr').each(function () {
+        var qtde = Number($(this).find('.qtde').text());
+        var capacidade = Number($(this).find('.capacidade').text());
+        if (qtde != 0) {
+        	if (qtde == capacidade) {
+        		$(this).find('#btEntrar').prop('disabled', true);
+        		$(this).children().children('#linkJogar').prop('disabled', false);
+        	}
+        		                                
+        }
+     });
+
+   });		
+ </script>
+
+</head>
+<body>
+<% include ../barraMenu %>
+<div class="container">
+<input type="hidden" id="curso" value="<%= curso %>">
+<input type="hidden" id="modulo" value="<%= modulo %>">
+<div>
+   <legend>Iniciar nova partida</legend>
+	<fieldset>
+	 <form action="/criar_partida" method="POST" class="navbar-form navbar-left" role="search">
+	 <h5 style="font-weight:bold;"><%= mensagem %></h5>
+	   <div class="form-group"> 
+	      <label>Capacidade da sala</label>
+	      <input type="text" class="form-control" name="partida[capacidade]" 
+	      style="width:50px;">&nbsp;&nbsp;&nbsp;
+       </div>
+	   <div class="form-group">
+		 <label>Curso</label>
+		  <select class="form-control" name="partida[curso]" style="width:235px;"
+		           id="cursos">
+		   <option disabled="true">Análise de Sistemas</option>
+		   <option disabled="true">Licenciatura em Matemática</option>
+		   <option disabled="true">Processos Gerênciais</option>
+		   <option disabled="true">Técnico em Edificações</option>
+		   <option disabled="true">Técnico em informática (Web)</option>
+		   <option>Livre</option>
+		  </select>
+	   </div>&nbsp;&nbsp;&nbsp;
+	      <div class="form-group">
+	   	 <label>Módulo</label>
+	   	  <select class="form-control" name="partida[modulo]" style="width:60px;"
+	   	          id="modulos">
+	   	   <option disabled="true">1</option>
+	   	   <option disabled="true">2</option>
+	   	   <option disabled="true">3</option>
+	   	   <option disabled="true">4</option>
+	   	   <option disabled="true">5</option>
+	   	   <option disabled="true">6</option>
+	   	  </select>
+	      </div><br>
+	   <div class="form-group">      
+		 <button type="submit" id="bt_cadastrarSala" class="btn btn-default" style="margin-left: 620px;
+		 position: absolute; margin-top: -38px;">Criar nova sala</button><br><br>
+	   </div>
+	 </form>
+	</fieldset>
+</div>
+<br><br><br>
+<div id="menu-partidas-rodando">  
+   <legend>partidas</legend>
+    <table id="tabela" class="table table-striped table-hover">
+    <thead>
+      <tr>
+         <th>Nº</th>
+         <th>Curso</th>
+         <th>Modulo</th>
+         <th>Status</th>
+         <th>Jogadores</th>
+         <th>Cap. da Sala</th>
+         <th>Ação</th>
+      </tr>
+  
+    </thead>
+    <tbody>
+       <% if(partidas !== null) {  
+          partidas.forEach(function(partida, index) { %> 
+        <tr>
+         <form action="/entrar_sala" method="POST">
+          <td><%- (index + 1) %></td>
+          <td><%- partida.tipo_sala.curso %></td>
+          <td><%- partida.tipo_sala.modulo %></td>
+          <td><%- partida.status %></td>
+          <td class="qtde" value="<%= partida.num_jogadores %>"><%- partida.num_jogadores %></td>
+          <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
+          <td><button type="submit" id="btEntrar" class="btn btn-default">Entrar</button></td>
+          <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
+          <td><input type="hidden" name="params[tipoCurso]" value="<%- partida.tipo_sala.curso %>"></td>
+         </form>
+         <form action="/iniciar_partida" method="POST">
+         <td>
+             <button type="submit" class="btn btn-success"  disabled="true" id="linkJogar">Jogar</button>
+               <input type="hidden" name="idPartida" value="<%- partida._id %>">
+         </td>
+         </form>
+        </tr>
+        <% }) 
+        } %>
+    </tbody>
+   </table>
+  </div>
+ </div>
+</body>
+</html>
