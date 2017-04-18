@@ -87,7 +87,7 @@ module.exports = function(req, res, next) {
           });
       	});
       } else {
-      	console.log('here now');
+      	//console.log('here now');
       	next();
       }
     }

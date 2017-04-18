@@ -435,14 +435,15 @@ passport.use(new LocalStrategy({
                         socket.broadcast.emit('iniciar_nova_rodada', data);
                       } else {
                         var id_painel = data_.id_painel;
+                        
                         Estado_Painel.findById(id_painel).exec(function(err, painel) {
                             if(err) {
                              console.log(err);
                             } else {
                             //console.log('here SMDF');
-                            var num_round = data_.num_round-1;
-                            var num_rodada = data_.num_rodada-1;   
-                            painel.rodadas[num_rodada].rounds[num_round].bt_prox_rodada_click = true;
+                            var aux_rodada = painel.rodadas.length-1;
+                            var aux_round = painel.rodadas[aux_rodada].rounds.length-1;   
+                            painel.rodadas[aux_rodada].rounds[aux_round].bt_prox_rodada_click = true;
                             painel.save();
                             }
                         });
@@ -1269,6 +1270,6 @@ passport.use(new LocalStrategy({
 
 
 //initialize server
-server.listen(process.env.PORT || 3000, function(){
+app.listen(process.env.PORT || 3000, function(){
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });

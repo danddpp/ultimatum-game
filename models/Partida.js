@@ -21,7 +21,7 @@ var Round = {
 
 var Rodada = {
     numero_rodada: Number,
-    rounds: [Round]
+    rounds: [Round],
 };
 
 
