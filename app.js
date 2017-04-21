@@ -157,7 +157,7 @@ passport.use(new LocalStrategy({
 
 
   io.sockets.on('connection', function(socket) {
-     //console.log('notify-onlines');
+     console.log('notify-onlines');
      //armazena a sessao do usuario compartilhada com o socket
      var session = socket.handshake.session;
      //armazena os dados do jogador (vindos da sessao/socket )que acabou de se conectar ao socket
@@ -1270,6 +1270,6 @@ passport.use(new LocalStrategy({
 
 
 //initialize server
-app.listen(process.env.PORT || 3000, function(){
+server.listen(process.env.PORT || 3000, function(){
   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });

@@ -301,10 +301,10 @@ router.post('/iniciar_partida', function(req, res) {
                         var id_painel = painel._id;
                         var id_rodada = painel.rodadas[0].id_rodada;
                         var p_round = painel.rodadas[0].rounds[0];
-                        var aux_id_partida = painel.aux_id_partida;
-                        var aux_num_round = painel.aux_num_round;
-                        var aux_num_rodada = painel.aux_num_rodada;
-                        var aux_indice_valor = painel.aux_indice_valor;
+                        var aux_id_partida = partida._id;
+                        var aux_num_round = 0;
+                        var aux_num_rodada = 0;
+                        var aux_indice_valor = 0;
                         
                         var painel_round = {
                             id_painel: id_painel,
@@ -330,13 +330,13 @@ router.post('/iniciar_partida', function(req, res) {
                              indice_valor: 0,
                              painel: painel_round
                          };
+                        console.log(params); 
                         res.render('menu-jogador/painel_jogador', {params: params});
                      }
                   });
               } else {
                 
-                Estado_Painel.find().where('id_jogador').equals(meu_id_jogador)
-                .exec(function(err, painel) {
+                Estado_Painel.find().where('id_jogador').equals(meu_id_jogador).exec(function(err, painel) {
                    
                    var id_painel = painel[0]._id;
                    var id_rodada = painel[0].rodadas[0].id_rodada;

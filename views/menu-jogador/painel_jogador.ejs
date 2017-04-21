@@ -11,7 +11,7 @@
   <!--Socket.io client-->
 <script src="/socket.io/socket.io.js"></script>
   <script>
-   var client = io();
+   var client = io(); 
    
    $(document).ready(function() {
     $('#mudar_round').hide();
@@ -180,7 +180,7 @@
               num_round: data.num_round,
               num_rodada: data.num_rodada,
               indice_valor: data.indice_valor,
-              id_painel: '<%- params.painel.id_painel %>',
+              id_painel: '<%- params.painel.id_painel %>'
           };
 
           client.emit('salvar_dados_bt_mudar_round', data_);
