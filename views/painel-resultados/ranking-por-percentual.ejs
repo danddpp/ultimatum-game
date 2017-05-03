@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ranking</title>
+</head>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+<body>
+<% include ../barraMenu %>
+
+<div class="container">
+  
+   <div class="container" id="menu-partidas-resultados">
+    <legend>Ranking</legend>
+     <table id="tabela" class="table table-striped table-hover">
+     <thead>
+      <tr>
+        <th>Colocação</th>
+      	<th>Nome</th>
+      	<th>Curso</th>
+      	<th>Modulo</th>
+      	<th>Ofertas Aceitas</th>
+      	<th>Ofertas Recusadas</th>
+      	<th>Pontuação Final</th>
+        <th>Percentual de Ganho</th>
+      </tr>	
+     </thead>
+     <tbody>
+     	<% if(jogadores !== null) {  
+         jogadores.forEach(function(jogador, index) { %> 
+         <tr>
+          <td><%- (index + 1) %>º</td>
+          <td><%- jogador.usuario.nome %></td>
+          <td><%- jogador.usuario.curso %></td>
+          <td><%- jogador.usuario.modulo %></td>
+          <td><%- jogador.num_ofertas_aceitou %></td>
+          <td><%- jogador.num_ofertas_recusou %></td>
+          <td><%- jogador.pontuacao_max %></td>
+          <td><%- jogador.percentual_ganho %></td> 
+         </tr>
+        <% }) 
+        } %>
+     </tbody>
+     </table>   
+   </div>
+</div>
+
+</body>
+</html>

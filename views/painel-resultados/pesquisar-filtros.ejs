@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Painel de resultados</title>
+</head>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+<body>
+<% include ../barraMenu %>
+
+<div class="container">
+  <div>
+  	<legend>Painel de resultados</legend>
+    <fieldset>
+      <form action="/pesquisar" method="POST" class="navbar-form navbar-left" role="search">
+       <h5 style="font-weight:bold;"><%= mensagem %></h5>
+       <div class="form-group">
+        <label>Curso</label>
+        <select class="form-control" name="pesquisa[curso]" style="width:235px;" id="cursos">
+        <option></option>        
+        <option>Análise de Sistemas</option>
+        <option>Licenciatura em Matemática</option>
+        <option>Processos Gerênciais</option>
+        <option>Técnico em Edificações</option>
+        <option>Técnico em informática (Web)</option>
+        <option>Livre</option>
+        </select>
+       </div>&nbsp;&nbsp;&nbsp;
+       <div class="form-group">
+        <label>Módulo</label>
+        <select class="form-control" name="pesquisa[modulo]" style="width:60px;" id="modulos">
+        <option></option>       
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+        </select>
+       </div>
+       <div class="form-group">&nbsp;&nbsp; 
+        <label>Data da partida</label>
+       	<input type="date" class="form-control" name="pesquisa[data_partida]" style="width:160px;">&nbsp;&nbsp;&nbsp;
+       </div>
+       <div class="form-group">      
+   		 <button type="submit" id="bt_pesquisar" class="btn btn-default" style="margin-left: 20px;
+   		 position: absolute; margin-top: 2px;">Pesquisar</button><br><br>
+   	   </div>    
+       </div>		
+      </form>
+    </fieldset>
+  </div>
+  <br><br><br>
+   <div class="container" id="menu-partidas-resultados">
+    <legend>Partidas</legend>
+     <table id="tabela" class="table table-striped table-hover">
+     <thead>
+      <tr>
+      	<th>Nº</th>
+      	<th>Curso</th>
+      	<th>Modulo</th>
+      	<th>Status</th>
+      	<th>Capacidade da Sala</th>
+      	<th>Visualizar resultados</th>
+      </tr>	
+     </thead>
+     <tbody>
+     	<% if(partidas !== null) {  
+         partidas.forEach(function(partida, index) { %> 
+         <tr>
+          <form action="/visualizar_resultados_por_partida" method="POST">
+          <td><%- (index + 1) %></td>
+          <td><%- partida.tipo_sala.curso %></td>
+          <td><%- partida.tipo_sala.modulo %></td>
+          <td><%- partida.status %></td>
+          <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
+          <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
+          <td><button type="submit" id="btEntrar" class="btn btn-default">Resultados</button></td>
+          </form> 
+         </tr>
+        <% }) 
+        } %>
+     </tbody>
+     </table>   
+   </div>
+</div>
+
+</body>
+</html>

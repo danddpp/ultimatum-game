@@ -4,6 +4,7 @@ var routesHome = require('./routes/home');
 var routesLogin = require('./routes/autenticacao');
 var routesMenuJogador = require('./routes/menu-jogador');
 var routesMenuPartida = require('./routes/menu-partida');
+var routesPesquisar = require('./routes/pesquisar');
 var mongoose = require('mongoose');
 var path = require('path');
 var express = require('express');
@@ -73,6 +74,12 @@ app.post('/iniciar_partida', routesMenuJogador);
 app.post('/entrar_sala', routesMenuJogador);
 app.post('/iniciar_novoRound', routesMenuJogador);
 app.post('/iniciar_novaRodada', routesMenuJogador);
+
+
+//config rotas pesquisar
+app.get('/pesquisar_filtros', routesPesquisar);
+app.post('/visualizar_resultados_por_partida', routesPesquisar);
+
 
 //configuração do passport
 var Usuario = require('./models/Usuario');
