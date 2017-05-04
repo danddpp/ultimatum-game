@@ -12,6 +12,7 @@ module.exports = function(req, res, next) {
        var nome_jogador = req.user.nome;
        var curso = req.user.curso;
        var modulo = req.user.modulo;
+       var nivel = req.user.nivel;
        
        var query = 'Em andamento';
       
@@ -21,12 +22,14 @@ module.exports = function(req, res, next) {
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: 'A qtde de jogadores deve ser maior ou igual a dois!',
+                                           nivel_usuario: nivel,
                                            partidas: partidas });
        } else {
         res.render('menu-partida/index', { nome_jogador: nome_jogador,
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: 'A qtde de jogadores deve ser maior ou igual a dois!',
+                                           nivel_usuario: nivel,
                                            partidas: null }); 
        }
     });
@@ -38,17 +41,20 @@ module.exports = function(req, res, next) {
         var nome_jogador = req.user.nome;
         var curso = req.user.curso;
         var modulo = req.user.modulo;
+        var nivel = req.user.nivel;
 
         res.render('menu-partida/index', { nome_jogador: nome_jogador,
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: 'É necessário informar qual o modulo que vc está cursando!',
+                                           nivel_usuario: nivel,
                                            partidas: partidas });
        } else {
         res.render('menu-partida/index', { nome_jogador: nome_jogador,
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: 'É necessário informar qual o modulo que vc está cursando!',
+                                           nivel_usuario: nivel,
                                            partidas: null }); 
        }
     });

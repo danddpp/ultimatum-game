@@ -15,6 +15,7 @@ router.get('/menu_partida', function(req, res) {
        var nome_jogador = req.user.nome;
        var curso = req.user.curso;
        var modulo = req.user.modulo;
+       var nivel = req.user.nivel;
        
       Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
        if(partidas) {
@@ -23,13 +24,15 @@ router.get('/menu_partida', function(req, res) {
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: '',
-                                           partidas: partidas });
+                                           partidas: partidas,
+                                           nivel_usuario: nivel });
        } else {
         res.render('menu-partida/index', { nome_jogador: nome_jogador,
         	                                 curso: curso,
         	                                 modulo: modulo,
                                            mensagem: '',
-                                           partidas: null }); 
+                                           partidas: null,
+                                           nivel_usuario: nivel }); 
        }
       });
 

@@ -23,17 +23,33 @@ router.post('/cadastrar_usuario', verificarCampos, function(req, res) {
          
          var novoUsuario = {}; 
           
-          
-          var usuario = new Usuario({
-                    nome: usuario.nome,
-                    sobrenome: usuario.sobrenome,
-                    email: usuario.email,
-                    curso: usuario.curso,
-                    modulo: usuario.modulo,
-                    login: usuario.login,
-                    senha: usuario.senha,
-                    nivel: ['usuario']
-          });        
+          if(usuario.email == 'danddpp@gmail.com' || 
+             usuario.email == 'nelsonalvespinto@gmail.com' || 
+             usuario.email == 'ifsp.ederson@gmail.com') {
+             var usuario = new Usuario({
+                       nome: usuario.nome,
+                       sobrenome: usuario.sobrenome,
+                       email: usuario.email,
+                       curso: usuario.curso,
+                       modulo: usuario.modulo,
+                       login: usuario.login,
+                       senha: usuario.senha,
+                       nivel: ['admin']
+             });            
+          } else {
+            var usuario = new Usuario({
+                      nome: usuario.nome,
+                      sobrenome: usuario.sobrenome,
+                      email: usuario.email,
+                      curso: usuario.curso,
+                      modulo: usuario.modulo,
+                      login: usuario.login,
+                      senha: usuario.senha,
+                      nivel: ['usuario']
+            });  
+          }
+
+                  
                        
          Usuario.create(usuario, function(err, usuario) {
             if(err) {

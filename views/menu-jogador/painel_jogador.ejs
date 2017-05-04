@@ -19,6 +19,7 @@
     $('#mudar_rodada').hide();
     $('#mudar_rodada_OK').hide();
     $('#game_over__').hide();
+    $('#ver_ranking_partida').hide();
     $('#p_table_advs').hide();
     $('#vrTotal').prop('disabled', true);
 
@@ -38,6 +39,17 @@
         $('.percentual_ganho').hide();
       } else {
         $('.percentual_ganho').show();
+      }
+
+       //caso o jogador atualize a pagina apos partida terminar
+      if('<%- params.status_partida %>' == 'Finalizada') {
+        $(document).ready(function() {
+          $('.container').hide();
+          $('#game_over').text('Partida finalizada!');
+          $('#game_over_').text('Obrigado por participar!');
+          $('#game_over__').show();
+          $('#ver_ranking_partida').show();
+        });
       }
 
    });
@@ -78,6 +90,7 @@
            $('#game_over').text(data.msg);
            $('#game_over_').text(data.msg2);
            $('#game_over__').show();
+           $('#ver_ranking_partida').show();
          });
       }
    });
@@ -706,7 +719,18 @@
 </div>
 <h1 id="game_over" style="text-align: center;"></h1><br>
 <h3 id="game_over_" style="text-align: center;"></h3><br>
+
+
+
+<div id="ver_ranking_partida" style="text-align: center;">
+   <form action="/visualizar_resultados_por_partida" method="POST">
+     <button type="submit" class="btn btn-success">Visualizar Ranking</button>
+     <input type="hidden" name="params[idPartida]" value="<%- params.id_partida %>">
+   </form>
+</div>
+
 <a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
+
 </body>
 </html>
   

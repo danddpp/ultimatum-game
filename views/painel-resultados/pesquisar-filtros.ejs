@@ -76,8 +76,8 @@
           <td><%- partida.tipo_sala.modulo %></td>
           <td><%- partida.status %></td>
           <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
-          <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
           <td><button type="submit" id="btEntrar" class="btn btn-default">Resultados</button></td>
+          <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
           </form> 
          </tr>
         <% }) 

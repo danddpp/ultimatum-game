@@ -35,7 +35,7 @@
             </ul>
         </li>
         <li class="menu-item dropdown">
-         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resultados<b class="caret"></b></a>
+         <a href="#" class="dropdown-toggle" id="resultados" data-toggle="dropdown">Resultados<b class="caret"></b></a>
          <ul class="dropdown-menu">
              <li class="menu-item dropdown dropdown-submenu">
                 <a href="/pesquisar_filtros">Painel de resultados</a>
@@ -65,3 +65,13 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+
+<script>
+  $(document).ready(function() {
+      if('<%=nivel_usuario%>' == 'admin') {
+        $('#resultados').prop('disabled', false);
+      } else {
+        $('#resultados').prop('disabled', true);
+      }
+  });
+</script>

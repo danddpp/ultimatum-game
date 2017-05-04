@@ -15,10 +15,12 @@ var mudar_rodada_painel = require('./../middlewares/mudar_rodada_painel');
 router.get('/menu-jogador', function(req, res) {
     if(req.isAuthenticated()) {
         var nome_jogador = req.user.nome;
+        var nivel = req.user.nivel;
         //console.log(req.user);
         //console.log(req.session);
         res.render('menu-jogador/index', {nome_jogador: nome_jogador,
-        	mensagem: 'Bem vindo '+ nome_jogador +'!'});
+                                          nivel_usuario: nivel,
+        	                                mensagem: 'Bem vindo '+ nome_jogador +'!'});
     } else {
     	res.redirect('/');
     }
@@ -328,7 +330,8 @@ router.post('/iniciar_partida', function(req, res) {
                              num_rodada: partida.rodadas[0].numero_rodada,
                              num_round: partida.rodadas[0].rounds[0].numero,
                              indice_valor: 0,
-                             painel: painel_round
+                             painel: painel_round,
+                             status_partida: partida.status
                          };
                         console.log(params); 
                         res.render('menu-jogador/painel_jogador', {params: params});
@@ -370,7 +373,8 @@ router.post('/iniciar_partida', function(req, res) {
                         num_rodada: partida.rodadas[0].numero_rodada,
                         num_round: partida.rodadas[0].rounds[0].numero,
                         indice_valor: 0,
-                        painel: painel_round
+                        painel: painel_round,
+                        status_partida: partida.status
                     };
                    res.render('menu-jogador/painel_jogador', {params: params}); 
                 });
@@ -523,7 +527,8 @@ router.post('/iniciar_novoRound', function(req, res) {
                             num_rodada: partida.rodadas[aux].numero_rodada,
                             num_round: partida.rodadas[aux].rounds[num_round].numero,
                             indice_valor: indice_valor,
-                            painel: painel_round
+                            painel: painel_round,
+                            status_partida: partida.status
                         }; 
                         
                         res.render('menu-jogador/painel_jogador', {params: params});
@@ -680,7 +685,8 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                            num_rodada: nova_rodada.numero_rodada,
                            num_round: nova_rodada.rounds[0].numero,
                            indice_valor: indice_valor,
-                           painel: painel_round
+                           painel: painel_round,
+                           status_partida: partida.status
                         };  
                         
                         //console.log(params.painel);
