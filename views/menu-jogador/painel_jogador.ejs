@@ -5,9 +5,14 @@
 <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
 <link href="stylesheets/menu-jogador.css" rel="stylesheet"> 
 <link href='/stylesheets/submenu.css' rel='stylesheet'>
+<link href="stylesheets/chat.css" rel="stylesheet">
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
-
+<style type="text/css">
+ul , li {
+      list-style-type: none;
+}  
+</style>
   <!--Socket.io client-->
 <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -22,6 +27,9 @@
     $('#ver_ranking_partida').hide();
     $('#p_table_advs').hide();
     $('#vrTotal').prop('disabled', true);
+    //$('#chat').hide();
+    //$('#header_chat').hide();
+      
 
       if('<%- params.num_rodada %>' < 2) {
         $('.vtotal').hide();
@@ -78,7 +86,116 @@
      notify({id: id, msg: 'Offline'});
   });
 
+    client.on('send-client', function(message) {
+     
+    if('<%- params.eu._id %>' == message.id_destinatario) {   
+      var aux = '#';
+      aux += message.meu_id_painel_adversario;
+     
+     $('#tabela').find('tr').each(function(index) {
+       if(index > 0) {
+        if(message.meu_id_painel_adversario == $(this).children().attr('id')) {
+         var element = $(this).children().next().next().next().next()
+         .next().next().next().next().next();
+         var e = element.children().children().children().children()
+         .children().next().children().children().children();
+         e.append(message.msg);      
+        } 
+       }
+     });
 
+    }
+  });
+
+  
+var tag = 0; 
+var abrir_chat = function() {
+ $('#tabela').on('click',"#drop_down", function() {
+    var id_chat_advs = $(this).parent().attr('id');
+    
+    $('#tabela').find('tr').each(function(index) {
+      if(index > 0) {
+       if(id_chat_advs == $(this).children().attr('id')) {
+          //alert($(this).children().attr('id'));
+          var element = $(this).children().next().next().next().next().next().next().next().next().next();
+          //alert(element.children().children().children().children().next().attr('id'));
+        
+          if(tag == 0) {
+            element.children().children().children().children().children().next().collapse('show');
+          }
+          
+          
+          if(tag == 1) {
+            element.children().children().children().children().children().next().collapse('hide');
+          }
+          
+          if(tag >= 1 ) {
+            tag = 0;
+          } else {
+            tag++;
+          }
+          
+
+
+
+       }//var id_adv_row = $(this).val();
+      }
+    });
+
+ $('#tabela').on('click','#btn-chat').off();    
+ }); 
+};
+ 
+
+
+var mensagem = '';
+  var enviar_msg_chat = function() {     
+     $('#tabela').on('click','#btn-chat', function(event) {
+          if($(this).html() == 'Send') {
+             //alert($(this).html());
+             var temp = [];
+             temp = $(this).val().split(',');
+             
+              $('#tabela').find('tr').each(function(index) {
+                  if(index > 0) {
+                    if(temp[1] == $(this).children().attr('id')) {
+                      var element = $(this).children().next().next().next().next().next().next().next().next().next();
+                     
+                     var e = element.children().children().children().children().children().next().children().children().children();
+                     alert(e.html());
+                     var mensagem = e.parent().parent().next().children().children().val();  
+                   
+                   //alert(mensagem);
+
+                   var data = {
+                       nome: temp[0],
+                       id_destinatario: temp[1],
+                       meu_id_painel_adversario: '<%- params.eu._id %>',
+                       msg: mensagem
+
+                   };
+
+                  var msg =  "<li class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+">"+
+                      "<div class="+"'chat-body clearfix'"+">"+
+                       "<div class="+"'header'"+">"+
+                        "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                         "<small class="+"'pull-right text-muted'"+">"+
+                       "</div>"+
+                         "<p>"+data.msg+"</p>"+
+                      "</div>"+
+                     "</li>";
+                       
+                     e.append(msg);  
+                     
+                   $('#tabela').on('click','#btn-chat').off();
+                     e.parent().parent().next().children().children().val("");
+                     client.emit('send-server', data);      
+                    }
+                  } 
+              });
+          }
+     });
+  };
 
 
 
@@ -332,42 +449,45 @@
     
     $(document).ready(function() {
         $('#tabela button').on('click', function(event) {
-         var dadosAceite = [];
-         dadosAceite = $(this).val().split(','); 
-         var meu_id = '<%- params.eu._id %>';
-         var aceite = dadosAceite[0];
-         var id_adversario = dadosAceite[1];
-         var id_partida = dadosAceite[2];
-         var id_rodada = dadosAceite[3];
-         var num_round = dadosAceite[4];
-         var valor_total = $(this).next().val();
-         var oferta = $(this).next().next().val();   
          
-         var data = {
-           aceite: aceite,
-           meu_id: meu_id,
-           id_adversario: id_adversario,
-           id_partida: id_partida,
-           id_rodada: id_rodada,
-           id_round: '<%- params.id_round %>',
-           num_rodada: '<%- params.num_rodada %>',
-           num_round: num_round,
-           valor_total: valor_total,
-           oferta: oferta,
-           indice_valor: '<%- params.indice_valor %>',
-           id_painel: '<%- params.painel.id_painel %>'
-         };
-         
-         
-         var id = "#"+id_adversario;
-         $('#tabela').find('tr').each(function() {
-            $(this).find('td').each(function() {
-               $(this).children(id).prop('disabled', true); 
+         if($(this).html() == 'Aceitar' || $(this).html() == 'Não aceitar') {
+            var dadosAceite = [];
+            dadosAceite = $(this).val().split(','); 
+            var meu_id = '<%- params.eu._id %>';
+            var aceite = dadosAceite[0];
+            var id_adversario = dadosAceite[1];
+            var id_partida = dadosAceite[2];
+            var id_rodada = dadosAceite[3];
+            var num_round = dadosAceite[4];
+            var valor_total = $(this).next().val();
+            var oferta = $(this).next().next().val();   
+            
+            var data = {
+              aceite: aceite,
+              meu_id: meu_id,
+              id_adversario: id_adversario,
+              id_partida: id_partida,
+              id_rodada: id_rodada,
+              id_round: '<%- params.id_round %>',
+              num_rodada: '<%- params.num_rodada %>',
+              num_round: num_round,
+              valor_total: valor_total,
+              oferta: oferta,
+              indice_valor: '<%- params.indice_valor %>',
+              id_painel: '<%- params.painel.id_painel %>'
+            };
+            
+            
+            var id = "#"+id_adversario;
+            $('#tabela').find('tr').each(function() {
+               $(this).find('td').each(function() {
+                  $(this).children(id).prop('disabled', true); 
+               });
             });
-         });
+            
+             client.emit('enviar_aceite', data);
+         } 
          
-          client.emit('enviar_aceite', data);
-
         }); 
     });      
   </script>
@@ -573,6 +693,9 @@
 <h2 id="informar_fim_de_round"></h2>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+
+
+
 <div id="mudar_round">
  <form><!-- action="/iniciar_novoRound" method="POST"-->
   <div class="form-group">
@@ -643,8 +766,8 @@
             </select>
         </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        
-       <div class="form-group">      
-       <button type="button" id="bt_envOferta" class="btn btn-default" onclick="enviarOferta();">Ofertar</button><br><br>
+       <div class="form-group" style="margin-top: 20px;">      
+       <button type="button" id="bt_envOferta" class="btn btn-default" onclick="enviarOferta();" style="width: 102px;">Ofertar</button><br><br>
        </div>
       </form>
        <fieldset>
@@ -665,6 +788,9 @@
          <th class="pontuacao">Pontuação</th>
          <th class="percentual_ganho">Ganho %</th>
          <th>Oferta</th>
+         <th>Aceitar Oferta</th>
+         <th>Não Aceitar Oferta</th>
+         <th id="header_chat">Chat</th>
       </tr>
   
     </thead>
@@ -672,15 +798,53 @@
        <% if(params.adversarios !== null) {  
           params.adversarios.forEach(function(adversario, index) { %> 
         <tr>
-         <td><label id="<%- adversario.usuario._id %>">Offline</label></td>
+         <td id="<%- adversario.usuario._id %>"><label id="<%- adversario.usuario._id %>">Offline</label></td>
          <td><%- (index + 1) %></td>
          <td><%- adversario.usuario.nome %></td>
          <td class="vtotal"><label id="vrTotal<%- adversario.usuario._id %>"></label></td>
          <td class="pontuacao"><label><%- adversario.pontuacao_max %></label></td>
          <td class="percentual_ganho"><label><%-adversario.percentual_ganho%></label></td>
          <td><input disabled="true" type="text" id="ofertaRecebida" class="<%- adversario.usuario._id %>"></td>
-         <td><button type="button" value="sim,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-success" disabled="true">Aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
+         <td><button type="button" value="sim,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-success" disabled="true" style="width:102px;">Aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
          <td id="btn<%- adversario.usuario._id %>"><button type="button" value="nao,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-danger" disabled="true">Não aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
+         <td id="chat_">
+         <div class="container-fluid">
+          <div class="row">
+           <div class="col-md-5" style="width: 300px;">
+            <div class="panel panel-primary">
+
+             <div class="panel-heading" id="accordion">
+              <span class="glyphicon glyphicon-comment"></span> Chat
+               <div class="btn-group pull-right" id="<%- adversario.usuario._id %>">
+                <a type="button" onclick="abrir_chat()" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" id="drop_down"  href="#collapseOne">
+                 <span class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+               </div>
+              </div>
+
+              <div class="panel-collapse collapse" style="overflow:auto;" id="<%- adversario.usuario._id %>">
+               <div class="panel-body">
+                <div class="panel">
+                    <ul id="chat_id" class="chat">
+
+                    </ul>
+                </div>
+                </div>
+                 <div class="panel-footer">
+                  <div class="input-group">
+                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                   <span class="input-group-btn">
+                   <button onclick="enviar_msg_chat()" class="btn btn-warning btn-sm" id="btn-chat" value="<%- params.eu.nome %>,<%- adversario.usuario._id %>">Send</button>
+                   </span>
+                  </div>
+                 </div>
+               </div>
+
+              </div>
+              </div>
+             </div>
+             </div>
+         </td>
         </tr>
         <% }) 
         } %>
@@ -734,3 +898,4 @@
 </body>
 </html>
   
+

@@ -190,6 +190,33 @@ passport.use(new LocalStrategy({
        });
 
 
+  //inicio rotinas socket chat//////////////////
+  socket.on('send-server', function(data) {
+    console.log('1');
+    var msg =  "<li class="+"'left clearfix'"+"><span class="+"'chat-img pull-left'"+">"+
+       "<div class="+"'chat-body clearfix'"+">"+
+        "<div class="+"'header'"+">"+
+         "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+          "<small class="+"'pull-left text-muted'"+">"+
+        "</div>"+
+          "<p>"+data.msg+"</p>"+
+       "</div>"+
+      "</li>";
+      //console.log(msg);
+      var message = {
+         id_destinatario: data.id_destinatario,
+         nome: data.nome,
+         meu_id_painel_adversario: data.meu_id_painel_adversario,     
+         msg: msg
+      };
+
+      socket.emit('send-client', message);
+      socket.broadcast.emit('send-client', message);    
+  });
+//fim rotinas socket chat//////////////////
+
+
+// rotinas socket jogo  ///////////////////////////////////
         //var length = onlines.length;
         //recebe do cliente a oferta
         socket.on('send-server-oferta', function(ofertaAdv) {
