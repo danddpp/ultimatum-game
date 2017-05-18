@@ -12,6 +12,16 @@
 ul , li {
       list-style-type: none;
 }  
+#chat_id {
+     width: 17em;
+     height: 9em;
+     line-height: 1.5em;
+     border: 1px solid #ccc;
+     padding: 0;
+     margin: 0;
+     overflow: auto;
+     overflow-x: hidden;
+}
 </style>
   <!--Socket.io client-->
 <script src="/socket.io/socket.io.js"></script>
@@ -86,6 +96,8 @@ ul , li {
      notify({id: id, msg: 'Offline'});
   });
 
+
+var tag = 0;
     client.on('send-client', function(message) {
      
     if('<%- params.eu._id %>' == message.id_destinatario) {   
@@ -97,9 +109,37 @@ ul , li {
         if(message.meu_id_painel_adversario == $(this).children().attr('id')) {
          var element = $(this).children().next().next().next().next()
          .next().next().next().next().next();
+          
+          var new_message = element.children().children().children().children()
+         .children();
+
+         new_message.children().each(function() {
+            if ($(this).attr('id') == 'lb' && tag == 0) {
+                $(this).text('Nova mensagem!'); 
+            }
+         });
+          
          var e = element.children().children().children().children()
          .children().next().children().children().children();
-         e.append(message.msg);      
+        
+         e.append(message.msg);
+         e.animate({ scrollTop: e.offset().top }, 2000);
+
+         var x = element.children().children().children().children().children().next().children().next().children();
+
+
+         x.children().each(function() {
+            if($(this).attr('id') == 'flag') {
+               $(this).children().each(function() {
+                  if($(this).attr('id') == 'del') {
+                     $(this).remove();
+                  }
+               });
+
+            }
+         });
+
+           
         } 
        }
      });
@@ -107,8 +147,7 @@ ul , li {
     }
   });
 
-  
-var tag = 0; 
+   
 var abrir_chat = function() {
  $('#tabela').on('click',"#drop_down", function() {
     var id_chat_advs = $(this).parent().attr('id');
@@ -120,7 +159,14 @@ var abrir_chat = function() {
           var element = $(this).children().next().next().next().next().next().next().next().next().next();
           //alert(element.children().children().children().children().next().attr('id'));
         
+
           if(tag == 0) {
+             var new_message = element.children().children().children().children().children();
+              new_message.children().each(function() {
+               if ($(this).attr('id') == 'lb') {
+                   $(this).text('Chat'); 
+               }
+            });            
             element.children().children().children().children().children().next().collapse('show');
           }
           
@@ -162,10 +208,10 @@ var mensagem = '';
                       var element = $(this).children().next().next().next().next().next().next().next().next().next();
                      
                      var e = element.children().children().children().children().children().next().children().children().children();
-                     alert(e.html());
+                     //alert(e.html());
                      var mensagem = e.parent().parent().next().children().children().val();  
                    
-                   //alert(mensagem);
+                    var x = element.children().children().children().children().children().next().children().next().children();
 
                    var data = {
                        nome: temp[0],
@@ -175,7 +221,7 @@ var mensagem = '';
 
                    };
 
-                  var msg =  "<li class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+">"+
+                  var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+">"+
                       "<div class="+"'chat-body clearfix'"+">"+
                        "<div class="+"'header'"+">"+
                         "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
@@ -184,9 +230,27 @@ var mensagem = '';
                          "<p>"+data.msg+"</p>"+
                       "</div>"+
                      "</li>";
-                       
-                     e.append(msg);  
+                       //alert(x.html());
                      
+                     e.append(msg);
+                     e.animate({ scrollTop: e.offset().top }, 20000); 
+
+                     x.children().each(function() {
+                        if($(this).attr('id') == 'flag') {
+                           $(this).children().each(function() {
+                              if($(this).attr('id') == 'del') {
+                                 $(this).remove();
+                              }
+                           });
+                        }
+                     });
+
+                     
+                   
+                  //alert(e.parent().html());
+                  
+
+
                    $('#tabela').on('click','#btn-chat').off();
                      e.parent().parent().next().children().children().val("");
                      client.emit('send-server', data);      
@@ -814,7 +878,7 @@ var mensagem = '';
             <div class="panel panel-primary">
 
              <div class="panel-heading" id="accordion">
-              <span class="glyphicon glyphicon-comment"></span> Chat
+              <span class="glyphicon glyphicon-comment"></span> <label id="lb">Chat</label> 
                <div class="btn-group pull-right" id="<%- adversario.usuario._id %>">
                 <a type="button" onclick="abrir_chat()" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" id="drop_down"  href="#collapseOne">
                  <span class="glyphicon glyphicon-chevron-down"></span>
@@ -822,7 +886,7 @@ var mensagem = '';
                </div>
               </div>
 
-              <div class="panel-collapse collapse" style="overflow:auto;" id="<%- adversario.usuario._id %>">
+              <div class="panel-collapse collapse" id="<%- adversario.usuario._id %>">
                <div class="panel-body">
                 <div class="panel">
                     <ul id="chat_id" class="chat">
@@ -832,8 +896,8 @@ var mensagem = '';
                 </div>
                  <div class="panel-footer">
                   <div class="input-group">
-                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." />
-                   <span class="input-group-btn">
+                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." style="width:170px;" />
+                   <span class="input-group-btn" id="flag">
                    <button onclick="enviar_msg_chat()" class="btn btn-warning btn-sm" id="btn-chat" value="<%- params.eu.nome %>,<%- adversario.usuario._id %>">Send</button>
                    </span>
                   </div>

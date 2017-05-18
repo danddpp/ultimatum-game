@@ -192,8 +192,9 @@ passport.use(new LocalStrategy({
 
   //inicio rotinas socket chat//////////////////
   socket.on('send-server', function(data) {
-    console.log('1');
-    var msg =  "<li class="+"'left clearfix'"+"><span class="+"'chat-img pull-left'"+">"+
+
+    var msg =  "<li id="+"'del'" +"class="+"'left clearfix'"+"><span class="+
+            "'chat-img pull-left'"+">"+
        "<div class="+"'chat-body clearfix'"+">"+
         "<div class="+"'header'"+">"+
          "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
