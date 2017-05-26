@@ -7,9 +7,11 @@
 <link href='/stylesheets/submenu.css' rel='stylesheet'>
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
- 
+<script src="/socket.io/socket.io.js"></script>
  <script>
    $(document).ready(function() {
+    var client = io();
+
        $('#cursos').find('option').each(function() {
           if($('#curso').val() == $(this).text()){
         	$(this).prop('disabled', false);
@@ -42,17 +44,50 @@
          }
      });
 
-     $('#tabela').find('tr').each(function () {
+
+     $('#tabela').find('tr').each(function(index) {
+       if(index) {
         var qtde = Number($(this).find('.qtde').text());
         var capacidade = Number($(this).find('.capacidade').text());
         if (qtde != 0) {
-        	if (qtde == capacidade) {
-        		$(this).find('#btEntrar').prop('disabled', true);
-        		$(this).children().children('#linkJogar').prop('disabled', false);
-        	}
-        		                                
+        	var id_partida = $(this).children().attr('id');
+          
+          data = {
+            id_partida: id_partida,
+            qtde_jogadores: qtde
+          };
+
+          if (qtde == capacidade) {
+            client.emit('habilitar_bt_jogar', data);
+        	} else {
+            client.emit('qtde_atual_jogadores', data);
+          }
         }
+       }
      });
+
+
+     client.on('qtde_atual_jogadores_send', function(data) {
+        $('#tabela').find('tr').each(function(index) {
+           if(index > 0) {
+              var id_partida = $(this).children().attr('id');
+              if(id_partida == data.id_partida) {
+                $(this).find('.qtde').text(data.qtde_jogadores);
+              } 
+           }
+        });
+     });
+
+     client.on('habilitar_bt_jogar_ok', function(data) {
+        $('#tabela').find('tr').each(function() {
+            var id_partida_line = $(this).children().attr('id');
+            if(id_partida_line == data.id_partida) {
+                $(this).find('.qtde').text(data.qtde_jogadores);
+                $(this).find('#btEntrar').prop('disabled', true);
+                $(this).children().children('#linkJogar').prop('disabled', false);
+            }
+        });
+     }); 
 
    });		
  </script>
@@ -124,7 +159,7 @@
        <% if(partidas !== null) {  
           partidas.forEach(function(partida, index) { %> 
         <tr>
-         <form action="/entrar_sala" method="POST">
+         <form id="<%- partida._id %>" action="/entrar_sala" method="POST">
           <td><%- (index + 1) %></td>
           <td><%- partida.tipo_sala.curso %></td>
           <td><%- partida.tipo_sala.modulo %></td>

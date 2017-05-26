@@ -16,7 +16,7 @@ router.post('/cadastrar_usuario', verificarCampos, function(req, res) {
     var query = {nome: req.body.usuario.email};
 
     Usuario.findOne(query).select('nome').exec(function(err, jogador) {
-       if(jogador) {
+       if(jogador) {  
          res.render('home/criar_conta', {mensagem: 'Login já cadastrado'});
        } else {
          var usuario = req.body.usuario;

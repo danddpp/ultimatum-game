@@ -190,6 +190,18 @@ passport.use(new LocalStrategy({
        });
 
 
+      socket.on('qtde_atual_jogadores', function(data) {
+         socket.emit('qtde_atual_jogadores_send', data);
+         socket.broadcast.emit('qtde_atual_jogadores_send', data);
+      });   
+
+
+      socket.on('habilitar_bt_jogar', function(data) {
+        socket.emit('habilitar_bt_jogar_ok', data);
+        socket.broadcast.emit('habilitar_bt_jogar_ok', data);
+      });
+
+
   //inicio rotinas socket chat//////////////////
   socket.on('send-server', function(data) {
 
@@ -200,7 +212,7 @@ passport.use(new LocalStrategy({
          "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
           "<small class="+"'pull-left text-muted'"+">"+
         "</div>"+
-          "<p>"+data.msg+"</p>"+
+          "<p>"+"<strong>"+data.msg+"</strong>"+"</p>"+
        "</div>"+
       "</li>";
       //console.log(msg);

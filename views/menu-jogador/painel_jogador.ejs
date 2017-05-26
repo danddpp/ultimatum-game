@@ -22,6 +22,10 @@ ul , li {
      overflow: auto;
      overflow-x: hidden;
 }
+#texto_chat {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 15px;
+}
 </style>
   <!--Socket.io client-->
 <script src="/socket.io/socket.io.js"></script>
@@ -160,7 +164,7 @@ var abrir_chat = function() {
           //alert(element.children().children().children().children().next().attr('id'));
         
 
-          if(tag == 0) {
+            if(tag == 0) {
              var new_message = element.children().children().children().children().children();
               new_message.children().each(function() {
                if ($(this).attr('id') == 'lb') {
@@ -227,7 +231,7 @@ var mensagem = '';
                         "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
                          "<small class="+"'pull-right text-muted'"+">"+
                        "</div>"+
-                         "<p>"+data.msg+"</p>"+
+                         "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
                       "</div>"+
                      "</li>";
                        //alert(x.html());
