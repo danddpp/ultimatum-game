@@ -473,44 +473,59 @@ var mensagem = '';
 
    var enviarOferta = function() {
        
-       var vrTotal = document.getElementById('vrTotal').value;
+       var vrTotal = Number(document.getElementById('vrTotal').value);
        var minhaOferta = document.getElementById('minha_oferta').value;
        var subtotal = 0;
        var e = document.getElementById('meus-adversarios');
-       var id_adversario = e.options[e.selectedIndex].value;//
+       var id_adversario = e.options[e.selectedIndex].value;
        var meu_id = '<%- params.eu._id %>'
-      
-       if(Number(minhaOferta) > 0){
-         if(Number(minhaOferta) <= Number(vrTotal)) {
-           subtotal = vrTotal - minhaOferta;
-           document.getElementById('subtotal').innerHTML = subtotal;
-           document.getElementById('subtotal').value = subtotal;
-           
-           var oferta = {
-               vrTotal: vrTotal,
-               minhaOferta: minhaOferta,
-               meu_id: meu_id, 
-               adversario: id_adversario,
-               aceite: null,
-               num_p_round: '<%- params.painel.p_round.numero %>',
-               id_painel: '<%- params.painel.id_painel %>',
-               nome_adversario: e.options[e.selectedIndex].text,
-               subtotal: document.getElementById('subtotal').value 
-           };
 
-           //alert(oferta.subtotal)
-           client.emit('send-server-oferta', oferta);
-           //$(document).ready(function() {
-              $('#minha_oferta').prop('disabled', true);
-              $('#bt_envOferta').prop('disabled', true);
-           //});
-         } else {
-           alert('Oferta não pode ser maior que o valor total!');
-         }
+       if(!isNaN(minhaOferta)) {
+          if(minhaOferta % 1 != 0 && !isNaN(minhaOferta % 1)) {
+           alert('O valor ofertado deve ser um número inteiro maior que zero');
+           $('#minha_oferta').val('');
+          } else {
+
+              if(minhaOferta > 0){
+                if(minhaOferta <= vrTotal) {
+                  subtotal = vrTotal - minhaOferta;
+                  document.getElementById('subtotal').innerHTML = subtotal;
+                  document.getElementById('subtotal').value = subtotal;
+                  
+                  var oferta = {
+                      vrTotal: vrTotal,
+                      minhaOferta: minhaOferta,
+                      meu_id: meu_id, 
+                      adversario: id_adversario,
+                      aceite: null,
+                      num_p_round: '<%- params.painel.p_round.numero %>',
+                      id_painel: '<%- params.painel.id_painel %>',
+                      nome_adversario: e.options[e.selectedIndex].text,
+                      subtotal: document.getElementById('subtotal').value 
+                  };
+
+                  //alert(oferta.subtotal)
+                  client.emit('send-server-oferta', oferta);
+                  //$(document).ready(function() {
+                     $('#minha_oferta').prop('disabled', true);
+                     $('#bt_envOferta').prop('disabled', true);
+                  //});
+                } else {
+                  alert('Oferta não pode ser maior que o valor total!');
+                  $('#minha_oferta').val('');
+                }
+              } else {
+                  alert('Oferta não pode ser nula ou menor que zero!');
+                  $('#minha_oferta').val('');
+              }
+          }
        } else {
-           alert('Oferta não pode ser nula ou menor que zero!');
+        alert('O valor ofertado deve ser um número inteiro maior que zero');
+        $('#minha_oferta').val('');
        }
-     
+       
+       
+       
     };
 
     
@@ -671,7 +686,6 @@ var mensagem = '';
                $(document).ready(function() {
                 $('#bt_iniciar_novoRound').prop('disabled', true);
                });
-               alert('suck this orange ass hole');
                 client.emit('carregar_jogadores', data_);
              };     
 
@@ -881,7 +895,7 @@ var mensagem = '';
            <div class="col-md-5" style="width: 300px;">
             <div class="panel panel-primary">
 
-             <div class="panel-heading" id="accordion">
+             <div class="panel-heading" id="accordion" style="height:40px;">
               <span class="glyphicon glyphicon-comment"></span> <label id="lb">Chat</label> 
                <div class="btn-group pull-right" id="<%- adversario.usuario._id %>">
                 <a type="button" onclick="abrir_chat()" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" id="drop_down"  href="#collapseOne">
