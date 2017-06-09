@@ -16,7 +16,7 @@ ul , li {
      width: 17em;
      height: 9em;
      line-height: 1.5em;
-     border: 1px solid #ccc;
+     border: 2px solid #ccc;
      padding: 0;
      margin: 0;
      overflow: auto;
@@ -127,7 +127,8 @@ var tag = 0;
          .children().next().children().children().children();
         
          e.append(message.msg);
-         e.animate({ scrollTop: e.offset().top }, 2000);
+         e.animate({scrollTop: e.prop("scrollHeight")}, 500);
+         //e.animate({ scrollTop: e.offset().top }, 2000);
 
          var x = element.children().children().children().children().children().next().children().next().children();
 
@@ -216,12 +217,28 @@ var mensagem = '';
                      var mensagem = e.parent().parent().next().children().children().val();  
                    
                     var x = element.children().children().children().children().children().next().children().next().children();
+                    
+                   var _msg = ""; 
+                   if(mensagem.length > 30) {
+                       var m = mensagem.split(" ");
+                       for(var i = 0; i < m.length; i++) {
+                           if(i > 0 && i % 3 == 0) {
+                             _msg += m[i]+"<br>";
+                           } else {
+                             _msg += m[i]+" ";
+                           }
+                       }    
+                   } else {
+                    _msg = mensagem;
+                   }
+
+
 
                    var data = {
                        nome: temp[0],
                        id_destinatario: temp[1],
                        meu_id_painel_adversario: '<%- params.eu._id %>',
-                       msg: mensagem
+                       msg: _msg
 
                    };
 
@@ -232,12 +249,13 @@ var mensagem = '';
                          "<small class="+"'pull-right text-muted'"+">"+
                        "</div>"+
                          "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
-                      "</div>"+
+                      "</div>"+''
                      "</li>";
                        //alert(x.html());
                      
                      e.append(msg);
-                     e.animate({ scrollTop: e.offset().top }, 20000); 
+                     e.animate({scrollTop: e.prop("scrollHeight")}, 500);
+                     //e.animate({ scrollTop: e.offset().top }, 20000); 
 
                      x.children().each(function() {
                         if($(this).attr('id') == 'flag') {
@@ -906,7 +924,7 @@ var mensagem = '';
 
               <div class="panel-collapse collapse" id="<%- adversario.usuario._id %>">
                <div class="panel-body">
-                <div class="panel">
+                <div class="panel" style="height:100px;">
                     <ul id="chat_id" class="chat">
 
                     </ul>
@@ -914,7 +932,7 @@ var mensagem = '';
                 </div>
                  <div class="panel-footer">
                   <div class="input-group">
-                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." style="width:170px;" />
+                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." style="width:170px; border: 2px solid #ccc;" />
                    <span class="input-group-btn" id="flag">
                    <button onclick="enviar_msg_chat()" class="btn btn-warning btn-sm" id="btn-chat" value="<%- params.eu.nome %>,<%- adversario.usuario._id %>">Send</button>
                    </span>
