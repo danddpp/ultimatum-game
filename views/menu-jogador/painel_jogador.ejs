@@ -218,15 +218,56 @@ var mensagem = '';
                    
                     var x = element.children().children().children().children().children().next().children().next().children();
                     
+
                    var _msg = ""; 
                    if(mensagem.length > 30) {
                        var m = mensagem.split(" ");
-                       for(var i = 0; i < m.length; i++) {
-                           if(i > 0 && i % 3 == 0) {
-                             _msg += m[i]+"<br>";
-                           } else {
-                             _msg += m[i]+" ";
-                           }
+                       if(m.length > 1) {
+                         for(var i = 0; i < m.length; i++) {
+                             if(i > 0 && i % 3 == 0) {
+                               if(m[i].length < 30) {
+                                 _msg += m[i]+"<br>"; 
+                               } else {
+                                 var s = m[i];
+                                  for(var j = 0; j < s.length; j++) {
+                                   if(j > 0 && j % 15 == 0) {
+                                    _msg += s.substring(j,j+1);
+                                    _msg += '\n';          
+                                   } else {
+                                    _msg += s.substring(j,j+1);
+                                   }
+                                 }
+                                 _msg + "<br>";        
+                               }
+                             } else {
+                                if(m[i].length < 15) {
+                                  _msg += m[i]+" ";   
+                                } else {
+                                  var s = m[i];
+                                   for(var j = 0; j < s.length; j++) {
+                                    if(j > 0 && j % 15 == 0) {
+                                     _msg += s.substring(j,j+1);
+                                     _msg += '\n';          
+                                    } else {
+                                     _msg += s.substring(j,j+1);
+                                    }
+                                  }
+                                  _msg + "<br>";  
+                                }
+                               
+                             }
+                         }
+                       } else {
+                        alert('here');
+                        var s = m[0];
+                         for(var j = 0; j < s.length; j++) {
+                          if(j > 0 && j % 15 == 0) {
+                            _msg += s.substring(j,j+1);
+                            _msg += '\n';
+                          } else {
+                            _msg += s.substring(j,j+1);
+                          }
+                         }
                        }    
                    } else {
                     _msg = mensagem;
