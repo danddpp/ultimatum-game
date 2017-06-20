@@ -28,9 +28,9 @@ ul , li {
 }
 </style>
   <!--Socket.io client-->
-<script src="/socket.io/socket.io.js"></script>
-  <script>
-   var client = io(); 
+  <script src="/socket.io/socket.io.js"></script>
+    <script>
+     var client = io(); 
    
    $(document).ready(function() {
     $('#mudar_round').hide();
@@ -165,6 +165,7 @@ var abrir_chat = function() {
           //alert(element.children().children().children().children().next().attr('id'));
         
 
+
             if(tag == 0) {
              var new_message = element.children().children().children().children().children();
               new_message.children().each(function() {
@@ -218,16 +219,16 @@ var mensagem = '';
                    
                     var x = element.children().children().children().children().children().next().children().next().children();
                     
-
+                   //quebra de mensagem longa
                    var _msg = ""; 
                    if(mensagem.length > 30) {
                        var m = mensagem.split(" ");
                        if(m.length > 1) {
                          for(var i = 0; i < m.length; i++) {
-                             if(i > 0 && i % 3 == 0) {
-                               if(m[i].length < 30) {
+                          if(i > 0 && i % 3 == 0) {
+                            if(m[i].length < 30) {
                                  _msg += m[i]+"<br>"; 
-                               } else {
+                            } else {
                                  var s = m[i];
                                   for(var j = 0; j < s.length; j++) {
                                    if(j > 0 && j % 15 == 0) {
@@ -238,8 +239,8 @@ var mensagem = '';
                                    }
                                  }
                                  _msg + "<br>";        
-                               }
-                             } else {
+                            }
+                          } else {
                                 if(m[i].length < 15) {
                                   _msg += m[i]+" ";   
                                 } else {
@@ -283,7 +284,7 @@ var mensagem = '';
 
                    };
 
-                  var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+">"+
+                  var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
                       "<div class="+"'chat-body clearfix'"+">"+
                        "<div class="+"'header'"+">"+
                         "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+

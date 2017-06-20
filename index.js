@@ -78,6 +78,7 @@ app.post('/iniciar_novaRodada', routesMenuJogador);
 
 //config rotas pesquisar
 app.get('/pesquisar_filtros', routesPesquisar);
+app.post('/pesquisar', routesPesquisar);
 app.post('/visualizar_resultados_por_partida', routesPesquisar);
 
 

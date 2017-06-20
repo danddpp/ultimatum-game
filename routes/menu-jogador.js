@@ -59,13 +59,13 @@ router.post('/entrar_sala', function(req, res) {
                 if(flag == false) {
                    var id_partida = req.body.params.idPartida;
                    var cursoPartida = req.body.params.tipoCurso;
-                   //var adversarios = [];
-
+                   var moduloPartida= req.body.params.modulo;
+                   
                    Partida.findById(id_partida).exec(function(err, partida) {
                      if(partida) {
                        
                        var cursoJogador = req.user.curso; 
-
+                       var moduloJogador = req.user.modulo;
                        
                          if(cursoPartida == "Livre") {
                            partida.num_jogadores++;             
@@ -112,13 +112,13 @@ router.post('/entrar_sala', function(req, res) {
 
                          } else {
                             
-                           if(cursoJogador == cursoPartida) {
+                           if(cursoJogador == cursoPartida && moduloJogador == moduloPartida) {
                              partida.num_jogadores++;
                              
                            var novoJogador = new c_jogador(req.user);
                            //console.log(novoJogador); 
                            var jogador = new Jogador({
-                              flag_rodada1_round1: novoJogador.flag_rodada1_round1,
+                              flag_rodada_round1: novoJogador.flag_rodada_round1,
                               usuario: novoJogador.usuario, 
                               valores_sorteados: sortearValores(),
                               valores_ofertados: novoJogador.valores_ofertados,
@@ -127,9 +127,9 @@ router.post('/entrar_sala', function(req, res) {
                               num_ofertas_recusou: novoJogador.num_ofertas_recusou,
                               pontuacao_max: novoJogador.pontuacao_max,
                               percentual_ganho: novoJogador.percentual_ganho
-                          });        
+                          });
 
-                                         
+
                            Jogador.create(jogador, function(err, jogador) {
                               if(err) {
                                 return req.next(err);
@@ -151,7 +151,7 @@ router.post('/entrar_sala', function(req, res) {
                            });
 
                            } else {
-                             console.log("curso do jogador não é o mesmo que o da partida!");
+                             console.log("curso e/ou modulo do jogador não é o mesmo que o da partida!");
                              req.next();
                            }
                          }
@@ -203,7 +203,7 @@ router.post('/iniciar_partida', function(req, res) {
               meu_id_jogador = jogadores[i]._id; 
            }   
          }
-          
+          console.log(meu_id_jogador);
           var adversarios = [];
           var valor_total_R1_round1 = 0;
           if(flag == true) {
@@ -220,6 +220,7 @@ router.post('/iniciar_partida', function(req, res) {
             if(err) {
               req.next(err);
             } else {
+              
               if(jogador.flag_rodada_round1 == false) {
                  
                  jogador.flag_rodada_round1 = true;
@@ -640,15 +641,13 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                    }
 
                    
-                   //console.log('uuhuhu '+id_jogador);
-                   //pegar o painel pelo id do painel
+                   
                    Estado_Painel.findById(id_painel_).exec(function(err, painel) { 
                     
                     if(err) {
                       req.next(err);
                     } else {
-                          // console.log('uuhuhu 2222222222222 ' + p_id_rodada);
-                         
+                                                   
                         var aux_rodada = painel.rodadas.length-1;
 
                         var id_painel = painel._id;
@@ -689,9 +688,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                            status_partida: partida.status
                         };  
                         
-                        //console.log(params.painel);
-                        ///criar nova p_rodada aqui
-                        //console.log('uipa4');
+                        
                         res.render('menu-jogador/painel_jogador', {params: params});
                                              
                     } 
@@ -709,60 +706,6 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
     res.redirect('/');
   }
 });
-
-
-/*router.get('/iniciar_partida', function(req, res) {
-    if(req.isAuthenticated()) {
-    
-    Jogador.find(function(err, jogadores) {
-        if(err) {
-
-        } else {
-
-          if (jogadores[0].usuario.login == req.user.usuario.login) {
-             var adversarios = [];
-             var eu = {};
-             for(var i = 1; i < jogadores.length; i++) {
-               adversarios.push(jogadores[i]);
-             }
-             
-             jogadores[0].valor_total = sortearValorTotal();
-             eu = jogadores[0];             
-             var params = {
-                 adversarios: adversarios,
-                 eu: eu
-             };
-
-             res.render('menu-jogador/painel_jogador', {params: params});
-          } else { 
-
-            var adversarios = [];
-            var eu = {};
-            //adversarios.push(jogadores[0]);
-            for(var i = 0; i < jogadores.length; i++) {
-                if(!(jogadores[i].usuario.login == req.user.usuario.login)) {
-                   adversarios.push(jogadores[i]);
-                } else {
-                  jogadores[i].valor_total = sortearValorTotal();
-                  eu = jogadores[i];
-                }
-            }
-                
-                var params = {
-                    adversarios: adversarios,
-                    eu: eu
-                };
-
-                res.render('menu-jogador/painel_jogador', {params: params});
-            }
-        }
-    });
-
-    } else {
-    	res.redirect('/');
-    }
-});
-*/
 
 
 module.exports = router;

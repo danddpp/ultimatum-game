@@ -169,6 +169,7 @@
           <td><button type="submit" id="btEntrar" class="btn btn-default">Entrar</button></td>
           <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
           <td><input type="hidden" name="params[tipoCurso]" value="<%- partida.tipo_sala.curso %>"></td>
+          <td><input type="hidden" name="params[modulo]" value="<%- partida.tipo_sala.modulo %>"></td>
          </form>
          <form action="/iniciar_partida" method="POST">
          <td>
