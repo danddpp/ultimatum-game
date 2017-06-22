@@ -165,7 +165,7 @@ passport.use(new LocalStrategy({
 
 
   io.sockets.on('connection', function(socket) {
-     console.log('notify-onlines');
+     //console.log('notify-onlines');
      //armazena a sessao do usuario compartilhada com o socket
      var session = socket.handshake.session;
      //armazena os dados do jogador (vindos da sessao/socket )que acabou de se conectar ao socket
@@ -400,7 +400,7 @@ passport.use(new LocalStrategy({
                              var num_round = data_.num_round-1;
                              var num_rodada = data_.num_rodada-1;   
                              painel.rodadas[num_rodada].rounds[num_round].bt_prox_round_click = true;
-                             console.log(painel.rodadas[num_rodada].rounds[num_round]);
+                             //console.log(painel.rodadas[num_rodada].rounds[num_round]);
                              painel.save();
                              }
                          });
@@ -425,7 +425,21 @@ passport.use(new LocalStrategy({
 // *** Mudança de rodada *** //
         //a cada mudança de rodada
         //estado painel////////////////////////////////////////////////////////////
-        socket.on('salvar_bt_nova_rodada_show_ok', function(data) {
+        socket.on('salvar_flag_round1_ok', function(id_usuario) {
+           Jogador.find().where('usuario._id').equals(id_usuario).exec(function(err, jogador) {
+            if(err) {
+             console.log(err);
+            } else {
+             //console.log(jogador[0]);
+             jogador[0].flag_rodada_round1 = false;
+             jogador[0].save(function() {
+             socket.emit('finalizar_rodada');
+            });
+           }
+          });
+        });
+
+        /*socket.on('salvar_bt_nova_rodada_click_ok', function(data) {
           var id_painel = data.id_painel;
 
           Estado_Painel.findById(id_painel).exec(function(err, painel) {
@@ -434,7 +448,7 @@ passport.use(new LocalStrategy({
               } else {
               var num_round = data.num_round-1;
               var num_rodada = data.num_rodada-1;   
-              painel.rodadas[num_rodada].rounds[num_round].bt_prox_rodada_show = true;
+              painel.rodadas[num_rodada].rounds[num_round].bt_prox_rodada_click = true;
               painel.save(function() {
                 var id_usuario = data.id_usuario;
                 Jogador.find().where('usuario._id').equals(id_usuario).exec(function(err, jogador) {
@@ -449,7 +463,7 @@ passport.use(new LocalStrategy({
               });
               }
           }); 
-        });
+        });*/
         //estado painel////////////////////////////////////////////////////////////
 
         //estado painel////////////////////////////////////////////////////////////
@@ -478,7 +492,7 @@ passport.use(new LocalStrategy({
                           id_partida: data_.id_partida,
                           next_round: true
                         };
-                        //console.log('ei');
+                        console.log('ei');
                         socket.emit('iniciar_nova_rodada', data);
                         socket.broadcast.emit('iniciar_nova_rodada', data);
                       } else {
@@ -1246,7 +1260,8 @@ passport.use(new LocalStrategy({
 
                                             Partida.findById(query).exec(function(err, partida__) {
                                              if(partida__) {
-                                             id_rodada = partida__.rodadas[partida__.rodadas
+                                              var id_partida = partida__._id;
+                                              id_rodada = partida__.rodadas[partida__.rodadas
                                                                          .length-1]._id;
                                               var data = {
                                                nova_rodada: nova_rodada,
@@ -1260,8 +1275,8 @@ passport.use(new LocalStrategy({
                                                //jogo//////////////////////////////////////////////////////////////////////
 
                                                //estado painel////////////////////////////////////////////////////////////
-                                               socket.emit('salvar_bt_nova_rodada_show');
-                                               socket.broadcast.emit('salvar_bt_nova_rodada_show');                           
+                                               socket.emit('salvar_flag_round1', id_partida);
+                                               socket.broadcast.emit('salvar_flag_round1', id_partida);                           
                                                //estado painel////////////////////////////////////////////////////////////
                                             } else {
                                               console.log(err);

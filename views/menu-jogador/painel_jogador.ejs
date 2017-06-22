@@ -41,9 +41,7 @@ ul , li {
     $('#ver_ranking_partida').hide();
     $('#p_table_advs').hide();
     $('#vrTotal').prop('disabled', true);
-    //$('#chat').hide();
-    //$('#header_chat').hide();
-      
+          
 
       if('<%- params.num_rodada %>' < 2) {
         $('.vtotal').hide();
@@ -56,6 +54,14 @@ ul , li {
       } else {
         $('.pontuacao').show();
       }
+
+      /*if('<%- params.num_rodada %>' < 4) {
+        $('#chat_').hide();
+        $('#header_chat').hide();
+      } else {
+        $('#chat_').show();
+        $('#header_chat').show();
+      }*/
 
       if('<%- params.num_rodada %>' < 5) {
         $('.percentual_ganho').hide();
@@ -357,50 +363,44 @@ var mensagem = '';
      client.on('final_rodada', function(data) {
       if(data.id_partida == '<%- params.id_partida %>') {
         $(document).ready(function() {
-          $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+          if('<%- params.num_round %>' < 6) {
+            $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+          }
           $('#id_partida_').val(data.id_partida);
           $('#id_rodada_').val(data.id_rodada);//id da prox rodada para a rota /nova_rodada
           $('#numero_round').hide();
-          $('#bt_iniciar_novaRodada').children().text(data.nova_rodada.numero_rodada);//num da nova rodada
-          $('#mudar_rodada').show();
+          $('#bt_iniciar_novaRodada').children().text(data.nova_rodada.numero_rodada);//num da nova rodad
           $('#bt_iniciar_novaRodada').prop('disabled', false);
           var indice_valor = $('#indice_valor').val();
           $('#indice_valor_').val(indice_valor);
         });
+      }
+    });
 
 
+    client.on('finalizar_rodada', function() {
         var data_ = {
             id_partida: '<%- params.id_partida %>',
             id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
             id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
             id_painel: '<%- params.painel.id_painel %>'
-        };
-
-        carregar_jogadores_ = function() {
-          $(document).ready(function() {
-           $('#bt_iniciar_novaRodada').prop('disabled', true);
-          });
-           client.emit('carregar_jogadores_prox_rodada', data_);
-        };
-
-      }
-
+        }; 
+        
+       client.emit('carregar_jogadores_prox_rodada', data_);
     });
 
 
-    client.on('salvar_bt_nova_rodada_show', function() {
-       var data = {
-           id_painel: '<%- params.painel.id_painel %>',
-           num_round: '<%- params.num_round %>',
-           num_rodada: '<%- params.num_rodada %>',
-           id_usuario: '<%- params.eu._id %>'
-       }; 
 
-       client.emit('salvar_bt_nova_rodada_show_ok', data);
+
+    client.on('salvar_flag_round1', function(id_partida) {
+       if(id_partida == '<%- params.id_partida %>') {
+         var id_usuario = '<%- params.eu._id %>';
+         client.emit('salvar_flag_round1_ok', id_usuario);
+       }
     }); 
 
 
-
+    
 
    client.on('iniciar_nova_rodada', function(data) {
       if(data.id_partida == '<%- params.id_partida %>') {
@@ -664,8 +664,7 @@ var mensagem = '';
           var num_rodada = Number('<%- params.num_rodada %>');
           num_rodada++;
           $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
-          $('#mudar_rodada').show();
-          $('#bt_iniciar_novaRodada').prop('disabled', false);
+          $('#bt_iniciar_novaRodada').prop('disabled', true);
           var indice_valor = $('#indice_valor').val();
           $('#indice_valor_').val(indice_valor);           
        
@@ -680,7 +679,6 @@ var mensagem = '';
          var num_rodada = Number('<%- params.num_rodada %>');
          num_rodada++;
          $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
-         $('#mudar_rodada').show();
          $('#bt_iniciar_novaRodada').prop('disabled', false);
          var indice_valor = $('#indice_valor').val();
          $('#indice_valor_').val(indice_valor);

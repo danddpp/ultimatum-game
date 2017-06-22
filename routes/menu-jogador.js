@@ -203,7 +203,7 @@ router.post('/iniciar_partida', function(req, res) {
               meu_id_jogador = jogadores[i]._id; 
            }   
          }
-          console.log(meu_id_jogador);
+          //console.log(meu_id_jogador);
           var adversarios = [];
           var valor_total_R1_round1 = 0;
           if(flag == true) {
@@ -334,7 +334,7 @@ router.post('/iniciar_partida', function(req, res) {
                              painel: painel_round,
                              status_partida: partida.status
                          };
-                        console.log(params); 
+                        //console.log(params); 
                         res.render('menu-jogador/painel_jogador', {params: params});
                      }
                   });
@@ -409,17 +409,19 @@ router.post('/iniciar_novoRound', function(req, res) {
       var num_round = req.body.data.num_round;
       var indice_valor = ++req.body.data.indice_valor;
       var id_painel_ = req.body.data.id_painel;
+      //console.log(req.body.data);
 
-
-
+      
       if(num_round < 7) {
                       
         if(num_rodada < 7) {
-
+           
           Partida.findById(query).exec(function(err, partida) {
           if(partida) {
 
                   var aux = partida.rodadas.length-1;
+                  
+
                   var rodada = partida.rodadas[aux];
                   var novo_round = rodada.rounds[num_round];
                   var id_partida = partida._id;
@@ -488,12 +490,19 @@ router.post('/iniciar_novoRound', function(req, res) {
                       id_jogador = jogadores[i]._id;
                      }
                    }
-                   
+
+                   console.log(num_rodada);
+                  if(num_round == 5) {
+                    aux = num_rodada - 1;
+                  }
+                   console.log("ssss" + 'painel.rodadas[aux].id_rodada');
                    Estado_Painel.findById(id_painel_).exec(function(err, painel) {
                       if(err) {
                         req.next(err);
                       } else {
-                        
+                        console.log(num_round);
+                        console.log(aux);
+                        console.log("ssss" + painel.rodadas[aux]);
                        var id_painel = painel._id;
                        var id_rodada = painel.rodadas[aux].id_rodada;
                        var p_round = painel.rodadas[aux].rounds[num_round];
@@ -579,7 +588,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
       
        Jogador.find().where('id_partida').equals(id_partida)
                                                     .exec(function(err, jogadores) {
-                  console.log('7');
+                  //console.log('7');
                   var eu = req.user._id;
                   var valor_total = 0;
                   var aux_p_adversarios = [];
