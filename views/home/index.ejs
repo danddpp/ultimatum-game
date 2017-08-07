@@ -6,16 +6,31 @@
   <link href="stylesheets/home.css" rel="stylesheet">
   <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+  <script type="text/javascript" src="javascripts/bootstrap-progressbar.js"></script>
   <style type="text/css">
-    #rodape {
-      margin-top: 480px;
-      text-align: center;
-      font-size: 17px;
-    }
+  * {
+   box-sizing: border-box;
+   padding: 0;
+   margin: 0;
+  }
+  html body {
+    height: 100%;
+  }
+  main {
+    position: relative;
+  }
+  content {
+    height: 300px;
+  }
+  footer {
+    position: relative;
+    margin-top: 60%;
+  }
   </style>
 </head>
 <body>
-
+<main>
+<header>
 <div>
  <nav class="navbar navbar-default">
    <div class="container-fluid">
@@ -36,15 +51,16 @@
         <div class="form-group">
           <input type="password" class="form-control" name="usuario[senha]"placeholder="Senha">
         </div>&nbsp;
-        <button type="submit" class="btn btn-default">Entrar</button>
+        <button id="bt_entrar" type="submit" class="btn btn-default">Entrar</button>
       </form>
     </div><!-- /.navbar-collapse -->
     </li>
     </ul>
   </div><!-- /.container-fluid -->
   </nav>
-  </div>
-
+</div>
+</header>
+<content>
   <div id="cadastrar">
   	<label>
   		<h4>Não possui conta?</h4>
@@ -52,8 +68,21 @@
   	<a href="/criar_conta">Clique aqui</a>
   </div>
   <h3 style="text-align: center;"><%= mensagem %></h3>
-  <div id="rodape" class="container">
-    <footer><small class="label label-danger">Trabalho de Conclusão de Curso --- Aluno: Daniel Dias Pires --- Orientador: Nelson Alves Pinto --- Curso: Análise e Desenvolvimento de Sistemas</small></footer>
-  </div>
+</content>  
+<footer class="progress" id="bar">
+   <div class="progress-bar" data-transitiongoal="100" id="barl"><label>Instituto de Ciência e Tecnologia do Estado de São Paulo - Campus Caraguatatuba</label></div>
+</footer>
+</main>
+<script>
+  $(document).ready(function() {
+    $('#bar').css('height', 40);
+    $('#barl').children().css('font-size',15);
+    //$('.progress-bar').css('background','white');
+    $('#barl').children().css('padding-top',10);
+    $('#barl').progressbar(function() {
+      //transition_delay: 1500000;
+    });  // bootstrap 3
+  });
+</script>
 </body>
 </html>

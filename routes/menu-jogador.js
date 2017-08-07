@@ -27,6 +27,19 @@ router.get('/menu-jogador', function(req, res) {
 });
 
 
+router.get('/jogo_do_ultimato', function(req, res) {
+   if(req.isAuthenticated()) {
+      var nome_jogador = req.user.nome;
+      var nivel = req.user.nivel;
+      //console.log(req.user);
+      //console.log(req.session);
+      res.render('menu-jogador/descricao_jogo_do_ultimato', { nome_jogador: nome_jogador,
+                                         nivel_usuario: nivel });
+   } else {
+    res.redirect('/');
+   }
+});
+
 
 
 router.post('/entrar_sala', function(req, res) {
@@ -69,13 +82,15 @@ router.post('/entrar_sala', function(req, res) {
                        
                          if(cursoPartida == "Livre") {
                            partida.num_jogadores++;             
+                           
+                           var id_sala = partida.tipo_sala.id_sala;
 
-                           var novoJogador = new c_jogador(req.user);
+                           var novoJogador = new c_jogador(req.user, partida._id);
                            //console.log(novoJogador); 
                            var jogador = new Jogador({
                               flag_rodada_round1: novoJogador.flag_rodada_round1,
                               usuario: novoJogador.usuario,
-                              id_partida: novoJogador.id_partida, 
+                              id_partida: novoJogador.id_partida,
                               valores_sorteados: sortearValores(),
                               valores_ofertados: novoJogador.valores_ofertados,
                               ofertas_recebidas: novoJogador.ofertas_recebidas,
@@ -114,12 +129,15 @@ router.post('/entrar_sala', function(req, res) {
                             
                            if(cursoJogador == cursoPartida && moduloJogador == moduloPartida) {
                              partida.num_jogadores++;
-                             
-                           var novoJogador = new c_jogador(req.user);
+                           
+                           var id_sala = partida.tipo_sala.id_sala; 
+
+                           var novoJogador = new c_jogador(req.user, partida._id);
                            //console.log(novoJogador); 
                            var jogador = new Jogador({
                               flag_rodada_round1: novoJogador.flag_rodada_round1,
-                              usuario: novoJogador.usuario, 
+                              usuario: novoJogador.usuario,
+                              id_partida: novoJogador.id_partida,
                               valores_sorteados: sortearValores(),
                               valores_ofertados: novoJogador.valores_ofertados,
                               ofertas_recebidas: novoJogador.ofertas_recebidas,
@@ -151,8 +169,25 @@ router.post('/entrar_sala', function(req, res) {
                            });
 
                            } else {
-                             console.log("curso e/ou modulo do jogador não é o mesmo que o da partida!");
-                             req.next();
+                              var nome_jogador = req.user.nome;
+                              var curso = req.user.curso;
+                              var modulo = req.user.modulo;
+                              var nivel = req.user.nivel;
+                              var id_usuario = req.user._id;
+                              
+                             Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
+                              if(partidas) {
+                               //console.log(partidas);
+                               res.render('menu-partida/index', { nome_jogador: nome_jogador,
+                                                                  curso: curso,
+                                                                  modulo: modulo,
+                                                                  mensagem: 'curso e/ou modulo do jogador não é'+ 
+                                                                  'o mesmo que o da partida!',
+                                                                  partidas: partidas,
+                                                                  nivel_usuario: nivel,
+                                                                  id_usuario: id_usuario });
+                               }
+                             });
                            }
                          }
                              
@@ -161,10 +196,25 @@ router.post('/entrar_sala', function(req, res) {
                      }
                    });    
                 } else {
-                  console.log('ja estou participando de um jogo');
-                  req.next();
-                }
-
+                   var nome_jogador = req.user.nome;
+                   var curso = req.user.curso;
+                   var modulo = req.user.modulo;
+                   var nivel = req.user.nivel;
+                   var id_usuario = req.user._id;
+                   
+                  Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
+                   if(partidas) {
+                    //console.log(partidas);
+                    res.render('menu-partida/index', { nome_jogador: nome_jogador,
+                                                       curso: curso,
+                                                       modulo: modulo,
+                                                       mensagem: 'Já estou participando de outra partida!',
+                                                       partidas: partidas,
+                                                       nivel_usuario: nivel,
+                                                       id_usuario: id_usuario });
+                    }
+                  });
+                 }
                
             } else {
                 return req.next(err);
@@ -184,211 +234,431 @@ router.post('/entrar_sala', function(req, res) {
 router.post('/iniciar_partida', function(req, res) {
     if(req.isAuthenticated()) {
     
-      var query = req.body.idPartida;
+      var query = req.body.idPartida_ok;
       //res.req.params.id = null;
-      //console.log(res.req);
+      console.log(query);
       
       Partida.findById(query).exec(function(err, partida) {
          if(partida) {
          
-          var eu = req.user._id;
-          var flag = false; 
-          var jogadores = [];
-          var meu_id_jogador = 0;
-          jogadores = partida.jogadores;
-         
-         for(var i = 0; i < jogadores.length; i++) {
-           if(eu == jogadores[i].usuario._id) {
-              flag = true;
-              meu_id_jogador = jogadores[i]._id; 
-           }   
-         }
-          //console.log(meu_id_jogador);
-          var adversarios = [];
-          var valor_total_R1_round1 = 0;
-          if(flag == true) {
-           for(var i = 0; i < jogadores.length; i++) {
-             if(eu != jogadores[i].usuario._id) {   
-                adversarios.push(jogadores[i]);
-             } else {
-                valor_total_R1_round1 = jogadores[i].valores_sorteados[0];
-             }
-           }
+          if(partida.num_rodada_atual == 1 && partida.num_round_atual == 1) {
+             var eu = req.user._id;
+             var flag = false; 
 
-          
-          Jogador.findById(meu_id_jogador).exec(function(err, jogador) {
-            if(err) {
-              req.next(err);
-            } else {
-              
-              if(jogador.flag_rodada_round1 == false) {
+             var jogadores = [];
+             var meu_id_jogador = 0;
+             jogadores = partida.jogadores;
+            
+            for(var i = 0; i < jogadores.length; i++) {
+              if(eu == jogadores[i].usuario._id) {
+                 flag = true;
+                 meu_id_jogador = jogadores[i]._id; 
+              }   
+            }
+             //console.log(meu_id_jogador);
+             var adversarios = [];
+             var valor_total_R1_round1 = 0;
+             if(flag == true) {
+              for(var i = 0; i < jogadores.length; i++) {
+                if(eu != jogadores[i].usuario._id) {   
+                   adversarios.push(jogadores[i]);
+                } else {
+                   valor_total_R1_round1 = jogadores[i].valores_sorteados[0];
+                }
+              }
+
+             
+             Jogador.findById(meu_id_jogador).exec(function(err, jogador) {
+               if(err) {
+                 req.next(err);
+               } else {
                  
-                 jogador.flag_rodada_round1 = true;
-                 jogador.save();
-
-                 //dados para armazenamento do estado do painel de jogo
-                  var p_id_usuario = req.user._id; 
-                  //var jogador_painel = new p_jogador(p_id_usuario);
-                  var jogador_painel = {
-                    id_usuario: p_id_usuario,
-                    valor_ofertado: 0,
-                    nome_adversario: null,
-                    bt_enviar_oferta: false,
-                    subtotal: 0
-                  };                         
-                 
-
-
-
-                 var p_adversarios = [];
-                 for(var i = 0; i < adversarios.length; i++) {
-                   var id = adversarios[i].usuario._id;
-                   var p_adv = new p_adversario(id);
-                   p_adversarios.push(p_adv);
-                 }               
-
-                 
-                  var round1 = new p_round(1, jogador_painel);
-                  round1.adversarios = p_adversarios;
-                  
-                  var round2 = new p_round(2, jogador_painel);
-                  round2.adversarios = p_adversarios;
-
-                  var round3 = new p_round(3, jogador_painel);
-                  round3.adversarios = p_adversarios;
-
-                  var round4 = new p_round(4, jogador_painel);
-                  round4.adversarios = p_adversarios;
-
-                  var round5 = new p_round(5, jogador_painel);
-                  round5.adversarios = p_adversarios;
-
-                  var round6 = new p_round(6, jogador_painel);
-                  round6.adversarios = p_adversarios;
-
-
-                  var p_rounds = [];
-                  p_rounds.push(round1);
-                  p_rounds.push(round2);
-                  p_rounds.push(round3);
-                  p_rounds.push(round4);
-                  p_rounds.push(round5);
-                  p_rounds.push(round6);
+                 if(jogador.flag_rodada_round1 == false) {
                     
-                  var p_id_rodada = partida.rodadas[0]._id;   
-                  var rodada_painel = new p_rodada(p_id_rodada, 1);  
+                    jogador.flag_rodada_round1 = true;
+                    jogador.save();
+
+                    //dados para armazenamento do estado do painel de jogo
+                     var p_id_usuario = req.user._id; 
+                     //var jogador_painel = new p_jogador(p_id_usuario);
+                     var jogador_painel = {
+                       id_usuario: p_id_usuario,
+                       valor_ofertado: 0,
+                       nome_adversario: null,
+                       bt_enviar_oferta: false,
+                       subtotal: 0
+                     };                         
+                    
+
+
+
+                    var p_adversarios = [];
+                    for(var i = 0; i < adversarios.length; i++) {
+                      var id = adversarios[i].usuario._id;
+                      var p_adv = new p_adversario(id);
+                      p_adversarios.push(p_adv);
+                    }               
+
+                    
+                     var round1 = new p_round(1, jogador_painel);
+                     round1.adversarios = p_adversarios;
+                     
+                     var round2 = new p_round(2, jogador_painel);
+                     round2.adversarios = p_adversarios;
+
+                     var round3 = new p_round(3, jogador_painel);
+                     round3.adversarios = p_adversarios;
+
+                     var round4 = new p_round(4, jogador_painel);
+                     round4.adversarios = p_adversarios;
+
+                     var round5 = new p_round(5, jogador_painel);
+                     round5.adversarios = p_adversarios;
+
+                     var round6 = new p_round(6, jogador_painel);
+                     round6.adversarios = p_adversarios;
+
+
+                     var p_rounds = [];
+                     p_rounds.push(round1);
+                     p_rounds.push(round2);
+                     p_rounds.push(round3);
+                     p_rounds.push(round4);
+                     p_rounds.push(round5);
+                     p_rounds.push(round6);
+                       
+                     var p_id_rodada = partida.rodadas[0]._id;   
+                     var rodada_painel = new p_rodada(p_id_rodada, 1);  
+                         
+                     rodada_painel.rounds = p_rounds;
+
+                     var p_rodadas = [];
+                     
+                     p_rodadas.push(rodada_painel);
+                     
+                     var c_painel = new c_estado_painel(partida._id, meu_id_jogador);
+                     c_painel.rodadas = p_rodadas;
+
+                     //console.log(p_rodadas); 
                       
-                  rodada_painel.rounds = p_rounds;
+                     var painel = new Estado_Painel({
+                         id_partida: c_painel.id_partida,
+                         id_jogador: c_painel.id_jogador,
+                         rodadas:c_painel.rodadas
+                     });
 
-                  var p_rodadas = [];
-                  
-                  p_rodadas.push(rodada_painel);
-                  
-                  var c_painel = new c_estado_painel(partida._id, meu_id_jogador);
-                  c_painel.rodadas = p_rodadas;
+                     
+                     Estado_Painel.create(painel, function(err, painel) {
+                        if(err) {
+                          req.next(err)
+                        } else {
+                    
+                           var id_painel = painel._id;
+                           var id_rodada = painel.rodadas[0].id_rodada;
+                           var p_round = painel.rodadas[0].rounds[0];
+                           var aux_id_partida = partida._id;
+                           var aux_num_round = 0;
+                           var aux_num_rodada = 0;
+                           var aux_indice_valor = 0;
+                           
+                           var painel_round = {
+                               id_painel: id_painel,
+                               id_rodada: id_rodada,
+                               p_round: p_round,
+                               aux_id_partida: aux_id_partida,
+                               aux_num_round: aux_num_round,
+                               aux_num_rodada: aux_num_rodada,
+                               aux_indice_valor: aux_indice_valor
+                           };                  
+                           
+                           var persuasao_padrao = null;
+                           
+                           if(partida.persuasoes_padrao != null) {
+                             if(partida.persuasoes_padrao[0].rodada == 1 && 
+                                partida.persuasoes_padrao[0].round == 1 &&
+                                partida.persuasoes_padrao[0].opcao == true) {
+                                
+                                if(partida.persuasoes_padrao[0].tipo == 'Reciprocidade') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].tipo;
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].msg;
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].msg2;
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].jogador;
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;   
+                                }
 
-                  //console.log(p_rodadas); 
+                                if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                }
+
+                                if(partida.persuasoes_padrao[0].tipo == 'Aprovação social') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                }
+
+                                if(partida.persuasoes_padrao[0].tipo == 'Afinidade') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                }
+
+                                if(partida.persuasoes_padrao[0].tipo == 'Autoridade') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                }
+
+                                if(partida.persuasoes_padrao[0].tipo == 'Escassez') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                } 
+                                 
+                                
+                             }
+                           }
+                           
+                           //var persuasao_padrao = partida.persuasoes_padrao[0].;                        
+
+                           var params = {
+                                eu: req.user,
+                                valor_total: valor_total_R1_round1,
+                                adversarios: adversarios,
+                                rodada: partida.rodadas[0],
+                                id_rodada: partida.rodadas[0]._id,
+                                id_partida: partida._id,
+                                id_round: partida.rodadas[0].rounds[0]._id,
+                                id_jogador: null,
+                                num_rodada: partida.rodadas[0].numero_rodada,
+                                num_round: partida.rodadas[0].rounds[0].numero,
+                                indice_valor: 0,
+                                painel: painel_round,
+                                status_partida: partida.status,
+                                persuasao_padrao: persuasao_padrao
+                            };
+                           
+
+                           res.render('menu-jogador/painel_jogador', {params: params});
+                        }
+                     });
+                 } else {
                    
-                  var painel = new Estado_Painel({
-                      id_partida: c_painel.id_partida,
-                      id_jogador: c_painel.id_jogador,
-                      rodadas:c_painel.rodadas
-                  });
+                   Estado_Painel.find().where('id_jogador').equals(meu_id_jogador).exec(function(err, painel) {
+                      
+                      var id_painel = painel[0]._id;
+                      var id_rodada = painel[0].rodadas[0].id_rodada;
+                      var p_round = painel[0].rodadas[0].rounds[0];
+                      var aux_id_partida = painel[0].aux_id_partida;
+                      var aux_num_round = painel[0].aux_num_round;
+                      var aux_num_rodada = painel[0].aux_num_rodada;
+                      var aux_indice_valor = painel[0].aux_indice_valor;                   
+                      
+                      
+                      var painel_round = {
+                          id_painel: id_painel,
+                          id_rodada: id_rodada,
+                          p_round: p_round,
+                          aux_id_partida: aux_id_partida,
+                          aux_num_round: aux_num_round,
+                          aux_num_rodada: aux_num_rodada,
+                          aux_indice_valor: aux_indice_valor
+                      };
 
-                  
-                  Estado_Painel.create(painel, function(err, painel) {
-                     if(err) {
-                       req.next(err)
-                     } else {
-                 
-                        var id_painel = painel._id;
-                        var id_rodada = painel.rodadas[0].id_rodada;
-                        var p_round = painel.rodadas[0].rounds[0];
-                        var aux_id_partida = partida._id;
-                        var aux_num_round = 0;
-                        var aux_num_rodada = 0;
-                        var aux_indice_valor = 0;
-                        
-                        var painel_round = {
-                            id_painel: id_painel,
-                            id_rodada: id_rodada,
-                            p_round: p_round,
-                            aux_id_partida: aux_id_partida,
-                            aux_num_round: aux_num_round,
-                            aux_num_rodada: aux_num_rodada,
-                            aux_indice_valor: aux_indice_valor
-                        };                  
+                      var persuasao_padrao = null;
+                          
+                          if(partida.persuasoes_padrao != null) {
+                            if(partida.persuasoes_padrao[0].rodada == 1 && 
+                               partida.persuasoes_padrao[0].round == 1 &&
+                               partida.persuasoes_padrao[0].opcao == true) {
+                               if(partida.persuasoes_padrao[0].tipo == 'Reciprocidade') {
+                                 persuasao_padrao = partida.persuasoes_padrao[0].tipo;
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].msg;
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].msg2;
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].jogador;
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;   
+                                } 
 
-                        var params = {
-                             eu: req.user,
-                             valor_total: valor_total_R1_round1,
-                             adversarios: adversarios,
-                             rodada: partida.rodadas[0],
-                             id_rodada: partida.rodadas[0]._id,
-                             id_partida: partida._id,
-                             id_round: partida.rodadas[0].rounds[0]._id,
-                             id_jogador: null,
-                             num_rodada: partida.rodadas[0].numero_rodada,
-                             num_round: partida.rodadas[0].rounds[0].numero,
-                             indice_valor: 0,
-                             painel: painel_round,
-                             status_partida: partida.status
-                         };
-                        //console.log(params); 
-                        res.render('menu-jogador/painel_jogador', {params: params});
-                     }
-                  });
-              } else {
+                               if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                               }
+
+                               if(partida.persuasoes_padrao[0].tipo == 'Aprovação social') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                               }
+
+                               if(partida.persuasoes_padrao[0].tipo == 'Afinidade') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                               }
+
+                               if(partida.persuasoes_padrao[0].tipo == 'Autoridade') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                               }
+
+                               if(partida.persuasoes_padrao[0].tipo == 'Escassez') {
+                                   persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                               } 
+                            }
+                          }
+                           
+                      var params = {
+                           eu: req.user,
+                           valor_total: valor_total_R1_round1,
+                           adversarios: adversarios,
+                           rodada: partida.rodadas[0],
+                           id_rodada: partida.rodadas[0]._id,
+                           id_partida: partida._id,
+                           id_round: partida.rodadas[0].rounds[0]._id,
+                           id_jogador: null,
+                           num_rodada: partida.rodadas[0].numero_rodada,
+                           num_round: partida.rodadas[0].rounds[0].numero,
+                           indice_valor: 0,
+                           painel: painel_round,
+                           status_partida: partida.status,
+                           persuasao_padrao: persuasao_padrao
+                       };
+
+                      res.render('menu-jogador/painel_jogador', {params: params}); 
+                   });
+
+                 }
+               }
+             });
+             
+
+             } else {
+                console.log('não posso jogar essa partida. não estou nessa sala!!!');
+             }
+          
+          } else {//se rodada e round naõ forem mais 1
+            //console.log('dddddddddddddddddddddddddddddddddd');
+             Partida.findById(query).exec(function(err, partida) {
+              if (partida) {
+
+                var indice_round = partida.num_round_atual-1;
+                var indice_rodada = partida.num_rodada_atual-1;
+                var num_round = partida.num_round_atual;
+
+                var rodada = partida.rodadas[indice_rodada];
+                var round = rodada.rounds[indice_round];
+                var id_partida = partida._id;
+                var adversarios = [];
+                var id_jogador = 0;
+                var indice_valor = partida.indice_valor;
+
+                Jogador.find().where('id_partida').equals(id_partida)
+                                                  .exec(function(err, jogadores) {
+                var eu = req.user._id;
                 
-                Estado_Painel.find().where('id_jogador').equals(meu_id_jogador).exec(function(err, painel) {
+                 for(var i = 0; i < jogadores.length; i++) {
                    
-                   var id_painel = painel[0]._id;
-                   var id_rodada = painel[0].rodadas[0].id_rodada;
-                   var p_round = painel[0].rodadas[0].rounds[0];
-                   var aux_id_partida = painel[0].aux_id_partida;
-                   var aux_num_round = painel[0].aux_num_round;
-                   var aux_num_rodada = painel[0].aux_num_rodada;
-                   var aux_indice_valor = painel[0].aux_indice_valor;                   
-                   
-                   
-                   var painel_round = {
-                       id_painel: id_painel,
-                       id_rodada: id_rodada,
-                       p_round: p_round,
-                       aux_id_partida: aux_id_partida,
-                       aux_num_round: aux_num_round,
-                       aux_num_rodada: aux_num_rodada,
-                       aux_indice_valor: aux_indice_valor
-                   };
+                   if(jogadores[i].usuario._id != eu) {
+                     adversarios.push(jogadores[i]);
+                   } else {
+                    valor_total = jogadores[i].valores_sorteados[indice_valor];
+                    id_jogador = jogadores[i]._id;
+                   }
+                 }
+
+                 
+                //if(num_round == 5) {
+                  //rodada = num_rodada - 1;
+                //}
+                 
+                 Estado_Painel.find().where('id_jogador').equals(id_jogador)
+                                                      .exec(function(err, painel) {
+                    if(err) {
+                      req.next(err);
+                    } else {
+ 
+                     var id_painel = painel[0]._id;
+                     var id_rodada = painel[0].rodadas[indice_rodada].id_rodada;
+                     var p_round = painel[0].rodadas[indice_rodada].rounds[indice_round];
+                     var aux_id_partida = painel[0].aux_id_partida;
+                     var aux_num_round = painel[0].aux_num_round;
+                     var aux_num_rodada = painel[0].aux_num_rodada;
+                     var aux_indice_valor = painel[0].aux_indice_valor;
 
 
-                   var params = {
-                        eu: req.user,
-                        valor_total: valor_total_R1_round1,
-                        adversarios: adversarios,
-                        rodada: partida.rodadas[0],
-                        id_rodada: partida.rodadas[0]._id,
-                        id_partida: partida._id,
-                        id_round: partida.rodadas[0].rounds[0]._id,
-                        id_jogador: null,
-                        num_rodada: partida.rodadas[0].numero_rodada,
-                        num_round: partida.rodadas[0].rounds[0].numero,
-                        indice_valor: 0,
-                        painel: painel_round,
-                        status_partida: partida.status
-                    };
-                   res.render('menu-jogador/painel_jogador', {params: params}); 
-                });
+
+                     var painel_round = {
+                         id_painel: id_painel,
+                         id_rodada: id_rodada,
+                         p_round: p_round,
+                         aux_id_partida: aux_id_partida,
+                         aux_num_round: aux_num_round,
+                         aux_num_rodada: aux_num_rodada,
+                         aux_indice_valor: aux_indice_valor
+                     };
+                      
+                     var persuasao_padrao = null;
+                     var n_rodada = partida.rodadas[indice_rodada].numero_rodada;
+                     var n_round =  partida.rodadas[indice_rodada].rounds[indice_round].numero;
+                     
+                     if(partida.persuasoes_padrao != null) {
+                       var persuasoes_padrao = [];
+                       persuasoes_padrao = partida.persuasoes_padrao;
+                       
+                       for(var k = 0; k < persuasoes_padrao.length; k++ ) {
+                           if(persuasoes_padrao[k].opcao != false) {
+                             if(persuasoes_padrao[k].rodada == n_rodada &&
+                                persuasoes_padrao[k].round == n_round) {
+                                if(persuasoes_padrao[k].tipo == 'Reciprocidade') {
+                                  persuasao_padrao = persuasoes_padrao[k].tipo;
+                                  persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                  persuasao_padrao += ','+persuasoes_padrao[k].msg2;
+                                  persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                  persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                 } 
+
+                                 if(persuasoes_padrao[k].tipo == 'Coerência') {
+                                    if(persuasoes_padrao[k].resposta == null) {
+                                      persuasao_padrao = persuasoes_padrao[k].tipo;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].resposta;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                    }  
+                                 }
+
+                                 if(persuasoes_padrao[k].tipo == 'Aprovação social') {
+                                     persuasao_padrao = persuasoes_padrao[k].msg; 
+                                 }
+
+                                 if(persuasoes_padrao[k].tipo == 'Afinidade') {
+                                     persuasao_padrao = persuasoes_padrao[k].msg; 
+                                 }
+
+                                 if(persuasoes_padrao[k].tipo == 'Autoridade') {
+                                     persuasao_padrao = persuasoes_padrao[k].msg; 
+                                 }
+
+                                 if(persuasoes_padrao[k].tipo == 'Escassez') {
+                                     persuasao_padrao = persuasoes_padrao[k].msg; 
+                                 }   
+                             }
+                           }
+                       }
+                     }   
+                      
+                      var params = {
+                          eu: req.user,
+                          valor_total: valor_total,
+                          adversarios: adversarios,
+                          rodada: partida.rodadas[indice_rodada],
+                          id_rodada: partida.rodadas[indice_rodada]._id,
+                          id_partida: partida._id,
+                          id_round: partida.rodadas[indice_rodada].rounds[indice_round]._id,
+                          id_jogador: id_jogador,
+                          num_rodada: n_rodada,
+                          num_round: n_round,
+                          indice_valor: indice_valor,
+                          painel: painel_round,
+                          status_partida: partida.status,
+                          persuasao_padrao: persuasao_padrao
+                      }; 
+                      
+                      res.render('menu-jogador/painel_jogador', {params: params});
+                    }
+                 });
+                  
+                });                 
+              } else {
 
               }
-            }
-          });
-          
-
-          } else {
-             console.log('não posso jogar essa partida. não estou nessa sala!!!');
+            });
           }
-
 
          } else {
            return req.next(err);
@@ -427,6 +697,8 @@ router.post('/iniciar_novoRound', function(req, res) {
                   var id_partida = partida._id;
                   var adversarios = [];
                   var id_jogador = 0;
+                  var indice_round = partida.num_round_atual-1;
+                  var indice_rodada = partida.num_rodada_atual-1;
 
                   Jogador.find().where('id_partida').equals(id_partida)
                                                     .exec(function(err, jogadores) {
@@ -491,21 +763,20 @@ router.post('/iniciar_novoRound', function(req, res) {
                      }
                    }
 
-                   console.log(num_rodada);
-                  if(num_round == 5) {
+                   
+                  /*if(num_round == 5) {
                     aux = num_rodada - 1;
-                  }
-                   console.log("ssss" + 'painel.rodadas[aux].id_rodada');
+                  }*/
+                   console.log(indice_rodada);
+                   console.log(indice_round);
                    Estado_Painel.findById(id_painel_).exec(function(err, painel) {
                       if(err) {
                         req.next(err);
                       } else {
-                        console.log(num_round);
-                        console.log(aux);
-                        console.log("ssss" + painel.rodadas[aux]);
+                        
                        var id_painel = painel._id;
-                       var id_rodada = painel.rodadas[aux].id_rodada;
-                       var p_round = painel.rodadas[aux].rounds[num_round];
+                       var id_rodada = painel.rodadas[indice_rodada].id_rodada;
+                       var p_round = painel.rodadas[indice_rodada].rounds[indice_round];
                        var aux_id_partida = painel.aux_id_partida;
                        var aux_num_round = painel.aux_num_round;
                        var aux_num_rodada = painel.aux_num_rodada;
@@ -522,23 +793,74 @@ router.post('/iniciar_novoRound', function(req, res) {
                            aux_num_rodada: aux_num_rodada,
                            aux_indice_valor: aux_indice_valor
                        };
+                        
+                       var persuasao_padrao = null;
+                       var n_rodada = partida.rodadas[indice_rodada].numero_rodada;
+                       var n_round =  partida.rodadas[indice_rodada].rounds[indice_round].numero;
+                       
+                       if(partida.persuasoes_padrao != null) {
+                         var persuasoes_padrao = [];
+                         persuasoes_padrao = partida.persuasoes_padrao;
+                         
+                         for(var k = 0; k < persuasoes_padrao.length; k++ ) {
+                             if(persuasoes_padrao[k].opcao != false) {
+                               if(persuasoes_padrao[k].rodada == n_rodada &&
+                                  persuasoes_padrao[k].round == n_round) {
+                                  if(persuasoes_padrao[k].tipo == 'Reciprocidade') {
+                                    persuasao_padrao = persuasoes_padrao[k].tipo;
+                                    persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                    persuasao_padrao += ','+persuasoes_padrao[k].msg2;
+                                    persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                    persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                   } 
 
+                                   if(persuasoes_padrao[k].tipo == 'Coerência') {
+                                     console.log('here persuasao '+persuasoes_padrao[k].resposta);
+                                     if(persuasoes_padrao[k].resposta == null) {
+                                      console.log('here persuasao hbhbbhbhbhbhh'); 
+                                      persuasao_padrao = persuasoes_padrao[k].tipo;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].resposta;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                    } 
+                                   }
 
+                                   if(persuasoes_padrao[k].tipo == 'Aprovação social') {
+                                       persuasao_padrao = persuasoes_padrao[k].msg; 
+                                   }
+
+                                   if(persuasoes_padrao[k].tipo == 'Afinidade') {
+                                       persuasao_padrao = persuasoes_padrao[k].msg; 
+                                   }
+
+                                   if(persuasoes_padrao[k].tipo == 'Autoridade') {
+                                       persuasao_padrao = persuasoes_padrao[k].msg; 
+                                   }
+
+                                   if(persuasoes_padrao[k].tipo == 'Escassez') {
+                                       persuasao_padrao = persuasoes_padrao[k].msg; 
+                                   }
+                               }
+                             }
+                         }
+                       }   
                         
                         var params = {
                             eu: req.user,
                             valor_total: valor_total,
                             adversarios: adversarios,
-                            rodada: partida.rodadas[aux],
-                            id_rodada: partida.rodadas[aux]._id,
+                            rodada: partida.rodadas[indice_rodada],
+                            id_rodada: partida.rodadas[indice_rodada]._id,
                             id_partida: partida._id,
-                            id_round: partida.rodadas[aux].rounds[num_round]._id,
+                            id_round: partida.rodadas[indice_rodada].rounds[indice_round]._id,
                             id_jogador: id_jogador,
-                            num_rodada: partida.rodadas[aux].numero_rodada,
-                            num_round: partida.rodadas[aux].rounds[num_round].numero,
+                            num_rodada: n_rodada,
+                            num_round: n_round,
                             indice_valor: indice_valor,
                             painel: painel_round,
-                            status_partida: partida.status
+                            status_partida: partida.status,
+                            persuasao_padrao: persuasao_padrao
                         }; 
                         
                         res.render('menu-jogador/painel_jogador', {params: params});
@@ -576,7 +898,9 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
         var adversarios = [];
         var id_partida = partida._id;
         var id_jogador = 0;
-        
+        var indice_round = partida.num_round_atual-1;
+        var indice_rodada = partida.num_rodada_atual-1;
+
         for(var i = 0; i < partida.rodadas.length; i++) {
           if(partida.rodadas[i]._id == id_rodada) {
             var nova_rodada = partida.rodadas[i];
@@ -651,6 +975,8 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
 
                    
                    
+                   console.log(indice_rodada);
+                   console.log(indice_round);
                    Estado_Painel.findById(id_painel_).exec(function(err, painel) { 
                     
                     if(err) {
@@ -663,7 +989,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                         var id_rodada_ = p_id_rodada;
                         var p_round = painel.rodadas[aux_rodada].rounds[0];
                         
-                        console.log(p_round);
+                        //console.log(p_round);
                         var aux_id_partida = painel.aux_id_partida;
                         var aux_num_round = painel.aux_num_round;
                         var aux_num_rodada = painel.aux_num_rodada;
@@ -679,8 +1005,57 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                             aux_num_rodada: aux_num_rodada,
                             aux_indice_valor: aux_indice_valor
                         };
-
                         
+                        var persuasao_padrao = null;
+                        var n_rodada = nova_rodada.numero_rodada;
+                        var n_round =  nova_rodada.rounds[0].numero;
+
+                        if(partida.persuasoes_padrao != null) {
+                           var persuasoes_padrao = [];
+                           persuasoes_padrao = partida.persuasoes_padrao;
+                           
+                           for(var k = 0; k < persuasoes_padrao.length; k++ ) {
+                               if(persuasoes_padrao[k].opcao != false) {
+                                 if(persuasoes_padrao[k].rodada == n_rodada &&
+                                    persuasoes_padrao[k].round == n_round) {
+                                    if(persuasoes_padrao[k].tipo == 'Reciprocidade') {
+                                      persuasao_padrao = persuasoes_padrao[k].tipo;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].msg2;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                     } 
+
+                                     if(persuasoes_padrao[k].tipo == 'Coerência') {
+                                      if(persuasoes_padrao[k].resposta == null) {
+                                        persuasao_padrao = persuasoes_padrao[k].tipo;
+                                        persuasao_padrao += ','+persuasoes_padrao[k].msg;
+                                        persuasao_padrao += ','+persuasoes_padrao[k].jogador;
+                                        persuasao_padrao += ','+persuasoes_padrao[k].resposta;
+                                        persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                      } 
+                                     }
+
+                                     if(persuasoes_padrao[k].tipo == 'Aprovação social') {
+                                         persuasao_padrao = persuasoes_padrao[k].msg; 
+                                     }
+
+                                     if(persuasoes_padrao[k].tipo == 'Afinidade') {
+                                         persuasao_padrao = persuasoes_padrao[k].msg; 
+                                     }
+
+                                     if(persuasoes_padrao[k].tipo == 'Autoridade') {
+                                         persuasao_padrao = persuasoes_padrao[k].msg; 
+                                     }
+
+                                     if(persuasoes_padrao[k].tipo == 'Escassez') {
+                                         persuasao_padrao = persuasoes_padrao[k].msg; 
+                                     } 
+                                 }
+                               }
+                           }
+                        }
+
                         var params = {
                            eu: req.user,           
                            valor_total: valor_total,
@@ -690,13 +1065,13 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                            id_partida: partida._id,
                            id_round: nova_rodada.rounds[0]._id,
                            id_jogador: id_jogador,
-                           num_rodada: nova_rodada.numero_rodada,
-                           num_round: nova_rodada.rounds[0].numero,
+                           num_rodada: n_rodada,
+                           num_round: n_round,
                            indice_valor: indice_valor,
                            painel: painel_round,
-                           status_partida: partida.status
+                           status_partida: partida.status,
+                           persuasao_padrao: persuasao_padrao
                         };  
-                        
                         
                         res.render('menu-jogador/painel_jogador', {params: params});
                                              

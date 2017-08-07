@@ -11,6 +11,13 @@
  <script>
    $(document).ready(function() {
     var client = io();
+       
+       $('.flag').hide();
+
+       if('<%= mensagem %>' != '') {
+        var msg = '<%= mensagem %>';  
+        alert(msg);
+       }
 
        $('#cursos').find('option').each(function() {
           if($('#curso').val() == $(this).text()){
@@ -87,9 +94,62 @@
                 $(this).children().children('#linkJogar').prop('disabled', false);
             }
         });
+     });
+
+     $('#tabela').on('click','#linkJogar', function() {
+        //$(this).prop('disabled', true);
+        var id_usuario = '<%- id_usuario %>';
+        var id_partida = $(this).next().val();
+        var data = {
+            id_usuario: id_usuario,
+            id_partida: id_partida
+        };
+        /*var form = $(this).parent().parent().parent();
+         
+        form.submit(function(e){
+        e = e || window.event;
+        e.preventDefault();
+        });*/
+        client.emit('verificar_jogador_iniciar_partida', data);
      }); 
 
-   });		
+
+     client.on('jogador_esta_nessa_partida', function(data_) {        
+        if(data_.habilitado == true) {  
+          $('#tabela').find('tr').each(function() {
+            $(this).find('td').each(function() {
+              if(data_.id_partida == $(this).attr('id')) {
+                $(this).children().prop('disabled', true);
+              }
+            });
+          });  
+        } else {
+          alert(data_.msg);
+        }
+     });
+
+     client.on('iniciar_partida_ok', function(id_partida) {
+       $('#tabela').find('tr').each(function() {
+         $(this).find('td').each(function() {
+           if(id_partida == $(this).attr('id')) {
+             alert('here');
+             $(this).next().next().children().click();//.click();
+           }
+         });
+       });
+     });
+
+     client.on('voltou_ao_jogo', function(data_) {
+        $('#tabela').find('tr').each(function() {
+          $(this).find('td').each(function() {
+            if(data_.id_partida == $(this).attr('id')) {
+              $(this).next().next().children().click();//.click();
+            }
+          });
+        }); 
+     });
+
+   });	
  </script>
 
 </head>
@@ -102,7 +162,6 @@
    <legend>Iniciar nova partida</legend>
 	<fieldset>
 	 <form action="/criar_partida" method="POST" class="navbar-form navbar-left" role="search">
-	 <h5 style="font-weight:bold;"><%= mensagem %></h5>
 	   <div class="form-group"> 
 	      <label>Capacidade da sala</label>
 	      <input type="text" class="form-control" name="partida[capacidade]" 
@@ -171,10 +230,14 @@
           <td><input type="hidden" name="params[tipoCurso]" value="<%- partida.tipo_sala.curso %>"></td>
           <td><input type="hidden" name="params[modulo]" value="<%- partida.tipo_sala.modulo %>"></td>
          </form>
-         <form action="/iniciar_partida" method="POST">
-         <td>
+         <td id="<%- partida._id %>">
              <button type="submit" class="btn btn-success"  disabled="true" id="linkJogar">Jogar</button>
                <input type="hidden" name="idPartida" value="<%- partida._id %>">
+         </td>
+         <form action="/iniciar_partida" method="POST">
+         <td class='flag'>
+             <button type="submit" id="ok"></button>
+             <input type="hidden" name="idPartida_ok" value="<%- partida._id %>">
          </td>
          </form>
         </tr>

@@ -64,5 +64,4 @@ router.post('/cadastrar_usuario', verificarCampos, function(req, res) {
     });
 });
 
-
 module.exports = router;

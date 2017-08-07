@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Painel do Administrador</title>
+</head>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+<style type="text/css">
+  #tab_left {float: left; margin-left: 30px;}
+  #tab_right {float: right;}
+  #botoes {text-align: right;}
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  var client = io();
+
+   $(document).ready(function () {
+     
+     $('#myTabContent').hide();
+     $('#botoes').hide();
+     $('#botoes').children().children().prop('disabled', true);
+     $('#painel').on('click', function() {
+       $('#myTabContent').show();
+       $('#botoes').show();
+     });
+   });
+
+
+   function muda(check, id) {
+     $('#botoes').children().children().prop('disabled', false);
+      //document.getElementById(id).checked = false;
+   };
+       //
+
+
+
+   var salvar_configuracoes = function() {  
+
+        var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+        var round_reciprocidade = $('#select_round_reciprocidade').val();
+        var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+ 
+        var rodada_coerencia = $('#select_rodada_coerencia').val();
+        var round_coerencia = $('#select_round_coerencia').val();
+        var opcao_coerencia = $('#check_coerencia').prop('checked');      
+
+        var rodada_ap_social = $('#select_rodada_ap_social').val();
+        var round_ap_social = $('#select_round_ap_social').val();
+        var opcao_ap_social = $('#check_ap_social').prop('checked');
+
+        var rodada_afinidade = $('#select_rodada_afinidade').val();
+        var round_afinidade = $('#select_round_afinidade').val();
+        var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+        var rodada_autoridade = $('#select_rodada_autoridade').val();
+        var round_autoridade = $('#select_round_autoridade').val();
+        var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+        var rodada_escassez = $('#select_rodada_escassez').val();
+        var round_escassez = $('#select_round_escassez').val();
+        var opcao_escassez = $('#check_escassez').prop('checked');
+        
+        //var id_partida 
+        //var check_partidac
+        
+            var reciprocidade = {
+                jogador: '<%- nome_jogador %>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Reciprocidade',
+                rodada: rodada_reciprocidade, 
+                round: round_reciprocidade,
+                opcao: opcao_reciprocidade,
+                msg: 'Olá!! Poderia me ofertar 90?',
+                msg2: 'Ok. Pedi muito mesmo. POderia então me ofertar 55?'              
+            };
+            var coerencia = {
+                jogador: '<%-nome_jogador%>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Coerência',
+                rodada: rodada_coerencia, 
+                round: round_coerencia,
+                rodada_aux: rodada_coerencia + 2, 
+                round_aux: round_coerencia,
+                opcao: opcao_coerencia,
+                msg: 'Olá!! Se eu estivesse numa posição ruim na partida, e você numa boa posição, me daria uma força?' + ' Me faria uma unica vez, uma oferta de valor alto para ajudar'
+                +' a melhorar minha posição no ranking?.',
+                resposta: null,
+                acao: null,
+                msg2: 'Oçá, estou mal mesmo nessa partida. Poderia me dar aquela ajuda agora?' +
+                ' Com certeza não me esquecerei =).'              
+            };
+            var aprovacao_social = {
+                jogador: '<%-nome_jogador%>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Aprovação social',
+                rodada: rodada_ap_social, 
+                round: round_ap_social,
+                opcao: opcao_ap_social,
+                msg: 'Texto persuasivo utilizando o método da aprovacao social.'              
+            };
+            var afinidade = {
+                jogador: '<%-nome_jogador%>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Afinidade',
+                rodada: rodada_afinidade, 
+                round: round_afinidade,
+                opcao: opcao_afinidade,
+                msg: 'Texto persuasivo utilizando o método da afinidade.'              
+            }
+            var autoridade = {
+                jogador: '<%-nome_jogador%>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Autoridade',
+                rodada: rodada_autoridade, 
+                round: round_autoridade,
+                opcao: opcao_autoridade,
+                msg: 'Texto persuasivo utilizando o método da autoridade.'              
+            };
+            var escassez = {
+                jogador: '<%-nome_jogador%>',
+                id_usuario: '<%- id_usuario %>',
+                tipo: 'Escassez',
+                rodada: rodada_escassez, 
+                round: round_escassez,
+                opcao: opcao_escassez,
+                msg: 'Texto persuasivo utilizando o método da escassez.'              
+            };
+
+        var configuracoes = [reciprocidade,coerencia,aprovacao_social,afinidade,autoridade,escassez];
+
+        $('#tabela').find('tr').each(function(index) {
+            if(index > 0) {
+              $(this).find('td').each(function(index) {
+                  if($(this).attr('id') == 'check_partida') {
+                    if($(this).children().children().children().prop('checked') == true) {
+                       var id_partida = $(this).next().attr('id');
+
+                       var data = {
+                          id_partida: id_partida,
+                          configuracoes: configuracoes
+                       };
+                       
+                       client.emit('salvar_persuasoes_padrao', data);
+                    }                    
+                  }
+              });
+            }
+        });
+
+   };
+
+</script>
+<body>
+<% include ../barraMenu %>
+
+<div class="container-fluid">
+  <div id="tab_left" style="padding-left:10px;" class="container-fluid">  
+   <fieldset>
+         <legend>Lista de métodos persuasivos</legend>
+           <h5 style="font-weight:bold;"><%= mensagem %></h5>
+           <div class="form-group">
+            <div> 
+                <ul class="nav nav-tabs" id="painel">
+                  <li class="activate"><a href="#r1" data-toggle="tab">Reciprocidade</a></li>
+                  <li class="activate"><a href="#r2" data-toggle="tab">Coerência</a></li>
+                  <li class="activate"><a href="#r3" data-toggle="tab">Aprovação Social</a></li>
+                  <li class="activate"><a href="#r4" data-toggle="tab">Afinidade</a></li>
+                  <li class="activate"><a href="#r5" data-toggle="tab">Autoridade</a></li>
+                  <li class="activate"><a href="#r6" data-toggle="tab">Escassez</a></li>
+                </ul>
+            <div id="myTabContent" class="tab-content">
+              <div class="tab-pane fade active off" id="r1">
+               <fieldset class="panel panel-primary">
+                <br>
+                <div class="form-group">
+                 <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                 <div class="col-lg-10">
+                  <span class="help-block">Nos sentimos compelidos a retribuir, nem sempre de forma vantajosa</br> para nós, o que outra pessoa nos proporcionou.</span>
+                  </div>
+                 </div>
+                 <div class="form-group">
+                  <label for="select" class="col-lg-2 control-label">Rodada</label>
+                   <div class="col-lg-10">
+                    <select class="form-control" id="select_rodada_reciprocidade" style="width:60px;">
+                     <option>1</option>
+                     <option disabled="true">2</option>
+                     <option disabled="true">3</option>
+                     <option disabled="true">4</option>
+                     <option disabled="true">5</option>
+                     <option disabled="true">6</option>
+                    </select>
+                   </div>
+                  </div>
+                  <br><br><br><br><br>
+                  <div class="form-group">
+                   <label for="select" class="col-lg-2 control-label">Round</label>
+                    <div class="col-lg-10">
+                     <select class="form-control" id="select_round_reciprocidade" style="width:60px;">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                      <option>6</option>
+                     </select>
+                    </div>
+                   </div><br><br>
+                   <div class="form-group">
+                       <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                      <div class="col-lg-10">
+                     <div class="checkbox">
+                      <label>
+                       <input type="checkbox" id="check_reciprocidade"> Aplicar 
+                      </label>
+                     </div>
+                    </div>
+                   </div>
+                  </fieldset>
+                  </div>
+                  <div class="tab-pane fade active off" id="r2">
+                    <fieldset class="panel panel-primary">
+                    <br>
+                     <div class="form-group">
+                      <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                      <div class="col-lg-10">
+                       <span class="help-block">Depois que fazemos uma escolha, enfrentamos pressões para nos</br> comportarmos de maneira condizente com o compromisso assumido.</span>
+                       </div>
+                      </div>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_coerencia" style="width:60px;">
+                          <option disabled="true">1</option>
+                          <option>2</option>
+                          <option disabled="true">3</option>
+                          <option disabled="true">4</option>
+                          <option disabled="true">5</option>
+                          <option disabled="true">6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br><br><br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_coerencia" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div><br><br>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                           <div class="col-lg-10">
+                          <div class="checkbox">
+                           <label>
+                            <input type="checkbox" id="check_coerencia"> Aplicar 
+                           </label>
+                          </div>
+                         </div>
+                        </div>
+                       </fieldset>
+                  </div>
+                  <div class="tab-pane fade active off" id="r3">
+                    <fieldset class="panel panel-primary">
+                    <br>
+                     <div class="form-group">
+                      <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                      <div class="col-lg-10">
+                       <span class="help-block">Buscamos nos outros indícios do comportamento mais apropriado a seguir.</span>
+                       </div>
+                      </div>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_ap_social" style="width:60px;">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br><br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_ap_social" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div><br><br>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                           <div class="col-lg-10">
+                          <div class="checkbox">
+                           <label>
+                            <input type="checkbox" id="check_ap_social"> Aplicar 
+                           </label>
+                          </div>
+                         </div>
+                        </div>
+                       </fieldset>
+                  </div>
+                  <div class="tab-pane fade active off" id="r4">
+                    <fieldset class="panel panel-primary">
+                    <br>
+                     <div class="form-group">
+                      <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                      <div class="col-lg-10">
+                       <span class="help-block">Preferimos acatar pedidos de pessoas que conhecemos e de que gostamos.</span>
+                       </div>
+                      </div>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_afinidade" style="width:60px;">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br><br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_afinidade" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div><br><br>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                           <div class="col-lg-10">
+                          <div class="checkbox">
+                           <label>
+                            <input type="checkbox" id="check_afinidade"> Aplicar 
+                           </label>
+                          </div>
+                         </div>
+                        </div>
+                       </fieldset>
+                  </div>
+                  <div class="tab-pane fade active off" id="r5">
+                    <fieldset class="panel panel-primary">
+                    <br>
+                     <div class="form-group">
+                      <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                      <div class="col-lg-10">
+                       <span class="help-block">Temos um arraigado senso de obediência à autoridade.</span>
+                       </div>
+                      </div>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_autoridade" style="width:60px;">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br><br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_autoridade" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div><br><br>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                           <div class="col-lg-10">
+                          <div class="checkbox">
+                           <label>
+                            <input type="checkbox" id="check_autoridade"> Aplicar 
+                           </label>
+                          </div>
+                         </div>
+                        </div>
+                       </fieldset>
+                  </div>
+                  <div class="tab-pane fade active off" id="r6">
+                    <fieldset class="panel panel-primary">
+                    <br>
+                     <div class="form-group">
+                      <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
+                      <div class="col-lg-10">
+                       <span class="help-block">Tudo se torna mais valioso quando fica menos disponível.</span>
+                       </div>
+                      </div>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_escassez" style="width:60px;">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br><br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_escassez" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div><br><br>
+                        <div class="form-group">
+                            <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
+                           <div class="col-lg-10">
+                          <div class="checkbox">
+                           <label>
+                            <input type="checkbox" id="check_escassez"> Aplicar 
+                           </label>
+                          </div>
+                         </div>
+                        </div>
+                       </fieldset>
+                  </div>
+                </div>    
+              </div>              
+           </div>
+           <div class="form-group" id="botoes">
+            <div class="col-lg-10 col-lg-offset-2">
+               <!--<button type="reset" class="btn btn-default">Cancel</button>-->
+               <button onclick="salvar_configuracoes()" class="btn btn-primary">Salvar configurações</button>
+            </div>
+           </div>    
+        </fieldset>      
+  </div>
+   <div id="tab_right" class="container-fluid">
+     <fieldset>
+       <legend>Lista de partidas em andamento</legend>
+        <table id="tabela" class="table table-striped table-hover">
+        <thead>
+         <tr>
+          <th>Nº</th>
+          <th>Curso</th>
+          <th>Modulo</th>
+          <th>Status</th>
+          <th>Jogadores</th>
+          <th>Opção</th>
+         </tr>  
+        </thead>
+        <tbody>
+          <% if(partidas !== null) {  
+            partidas.forEach(function(partida, index) { %> 
+            <tr>
+             <form action="/" method="POST">
+             <td><%- (index + 1) %></td>
+             <td><%- partida.tipo_sala.curso %></td>
+             <td><%- partida.tipo_sala.modulo %></td>
+             <td><%- partida.status %></td>
+             <td ><%- partida.tipo_sala.capacidadeSala %></td>
+             <td id="check_partida"><div class="checkbox"><label><input type="checkbox" id="check" onchange="muda(this, id);">Aplicar</label></div></td>
+             <td id="<%- partida._id %>"><input type="hidden"></td>
+             </form> 
+            </tr>
+           <% }) 
+           } %>
+        </tbody>
+        </table>
+     </fieldset>
+   </div>      
+</div>
+</body>
+</html>
+
+
+<!--
+<p>cada princípio é analisado em sua capacidade de produzir nas
+   pessoas um tipo singular de consentimento automático e impensado, ou
+   seja, uma disposição em dizer “sim” sem pensar primeiro. Indícios sugerem
+   que o ritmo acelerado e o bombardeio de informações da vida moderna tornarão
+   essa forma específica de persuasão cada vez mais predominante. Será
+   ainda mais importante para a sociedade, portanto, entender como e por que
+   a influência automática ocorre</p>
+-->
+
+
+<!--
+<div class="form-group">      
+           <button type="submit" id="bt_pesquisar" class="btn btn-default" style="margin-left: 470px;
+           position: absolute; margin-top: 2px;">Aplicar</button><br><br>
+           </div>
+-->

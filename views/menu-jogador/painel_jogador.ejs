@@ -9,6 +9,7 @@
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 <style type="text/css">
+
 ul , li {
       list-style-type: none;
 }  
@@ -26,6 +27,30 @@ ul , li {
   font-family: "Comic Sans MS", cursive, sans-serif;
   font-size: 15px;
 }
+#mudar_round {
+  display: none;
+}
+#mudar_round_OK {
+  display: none;
+}
+#mudar_rodada {
+  display: none;
+}
+#mudar_rodada_OK {
+  display: none;
+} 
+#game_over__ {
+  display: none;
+}
+#ver_ranking_partida {
+  display: none;
+}
+#p_table_advs {
+  display: none;
+}
+#bt_informacao {
+  display: none;
+}
 </style>
   <!--Socket.io client-->
   <script src="/socket.io/socket.io.js"></script>
@@ -33,14 +58,9 @@ ul , li {
      var client = io(); 
    
    $(document).ready(function() {
-    $('#mudar_round').hide();
-    $('#mudar_round_OK').hide();
-    $('#mudar_rodada').hide();
-    $('#mudar_rodada_OK').hide();
-    $('#game_over__').hide();
-    $('#ver_ranking_partida').hide();
-    $('#p_table_advs').hide();
     $('#vrTotal').prop('disabled', true);
+    
+    
           
 
       if('<%- params.num_rodada %>' < 2) {
@@ -69,6 +89,8 @@ ul , li {
         $('.percentual_ganho').show();
       }
 
+      
+
        //caso o jogador atualize a pagina apos partida terminar
       if('<%- params.status_partida %>' == 'Finalizada') {
         $(document).ready(function() {
@@ -80,7 +102,110 @@ ul , li {
         });
       }
 
+
+      if('<%- params.persuasao_padrao %>') {
+       
+        var persuasao_padrao = '<%- params.persuasao_padrao %>';
+        var temp = persuasao_padrao.split(',');
+        var tipo = temp[0];
+           
+           if(tipo == 'Reciprocidade') {
+            var msg = temp[3]+' diz: '+'\n'+temp[1];
+             var campo = $('#myModal').children().children().children().next().children();
+             if(campo.attr('id') == 'msg') {
+               campo.text(msg);
+               $('.modal-footer').children().text('Sim');
+               $('.modal-footer').children().next().text('Não');
+               //alert(campo.attr('id'));
+             }
+             if(temp[4] != '<%- params.eu._id %>') {
+               $('#myModal').modal(); 
+             }
+           }
+
+           if(tipo == 'Coerência') {
+               if(temp[3] == '') {
+                  var msg = temp[2]+' diz: '+'\n'+temp[1];
+                   var campo = $('#myModal').children().children().children().next().children();
+                   if(campo.attr('id') == 'msg') {
+                     campo.text(msg);
+                     $('.modal-footer').children().text('Sim');
+                     $('.modal-footer').children().next().text('Não');
+                     //alert(campo.attr('id'));
+                   }
+                   if(temp[4] != '<%- params.eu._id %>') {
+                     $('#myModal').modal(); 
+                   }
+               }
+           }
+
+           if(tipo == 'Aprovação social') {
+            
+           }
+
+           if(tipo == 'Afinidade') {
+            
+           }
+
+           if(tipo == 'Autoridade') {
+            
+           }
+
+           if(tipo == 'Escassez') {
+            
+           }
+
+      }
    });
+
+   
+var cont = 0;
+
+   function yes() {
+    var persuasao_padrao = '<%- params.persuasao_padrao %>';
+    var temp = persuasao_padrao.split(',');
+    var nome = temp[3];
+    $('#meus-adversarios').val( $('option:contains('+nome+')').val() );
+     if(cont > 0) {
+       $('#minha_oferta').val(50);
+       $('#bt_envOferta').click();
+
+     } else {
+      $('#minha_oferta').val(99);
+      $('#bt_envOferta').click();
+     }
+    
+   };
+   
+   function no() {
+       $('#myModal').modal('hide');
+     if(cont == 0) {
+        setTimeout(function(){
+          if('<%- params.persuasao_padrao %>' != '') {
+             cont++;
+             var persuasao_padrao = '<%- params.persuasao_padrao %>';
+             var temp = persuasao_padrao.split(',');
+             var tipo = temp[0];
+                
+                if(tipo == 'Reciprocidade') {
+                 var msg = temp[3]+' diz: '+'\n'+temp[2];
+                  var campo = $('#myModal').children().children().children().next().children();
+                  if(campo.attr('id') == 'msg') {
+                    campo.text(msg);
+                    $('.modal-footer').children().text('Sim');
+                    $('.modal-footer').children().next().text('Não');
+                    //alert(campo.attr('id'));
+                  }
+                  if(temp[4] != '<%- params.eu._id %>') {
+                     $('#myModal').modal(); 
+                  }
+                }
+          }
+        },10000); 
+      } else {
+          $('#myModal').modal('hide');
+       }
+   };
 
 
   var notify = function(data) {
@@ -360,42 +485,52 @@ var mensagem = '';
     var carregar_jogadores = null;
 
 
-     client.on('final_rodada', function(data) {
-      if(data.id_partida == '<%- params.id_partida %>') {
-        $(document).ready(function() {
-          if('<%- params.num_round %>' < 6) {
-            $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-          }
-          $('#id_partida_').val(data.id_partida);
-          $('#id_rodada_').val(data.id_rodada);//id da prox rodada para a rota /nova_rodada
-          $('#numero_round').hide();
-          $('#bt_iniciar_novaRodada').children().text(data.nova_rodada.numero_rodada);//num da nova rodad
-          $('#bt_iniciar_novaRodada').prop('disabled', false);
-          var indice_valor = $('#indice_valor').val();
-          $('#indice_valor_').val(indice_valor);
-        });
-      }
-    });
+     /*client.on('final_rodada', function(data) {
+      
+     });*/
 
 
-    client.on('finalizar_rodada', function() {
-        var data_ = {
+    client.on('finalizar_rodada', function(data_) {
+        
+     if(data_.id_partida == '<%- params.id_partida %>') {
+       $(document).ready(function() {
+         //if('<%- params.num_round %>' < 6) {
+           //$('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+         //}
+         $('#id_partida_').val(data_.id_partida);
+         $('#id_rodada_').val(data_.id_rodada);//id da prox rodada para a rota /nova_rodada
+         $('#numero_round').hide();
+         $('#bt_iniciar_novaRodada').children().text(data_.nova_rodada.numero_rodada);//num da nova rodad
+         //$('#bt_iniciar_novaRodada').prop('disabled', false);
+         var indice_valor = $('#indice_valor').val();
+         $('#indice_valor_').val(indice_valor);
+       });
+     
+        var data__ = {
             id_partida: '<%- params.id_partida %>',
             id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
             id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
             id_painel: '<%- params.painel.id_painel %>'
         }; 
         
-       client.emit('carregar_jogadores_prox_rodada', data_);
+       client.emit('carregar_jogadores_prox_rodada', data__);
+
+     }
     });
 
+      
 
-
-
-    client.on('salvar_flag_round1', function(id_partida) {
-       if(id_partida == '<%- params.id_partida %>') {
+    client.on('salvar_flag_round1', function(data) {
+       if(data.id_partida == '<%- params.id_partida %>') {
          var id_usuario = '<%- params.eu._id %>';
-         client.emit('salvar_flag_round1_ok', id_usuario);
+         var data_ = {
+             nova_rodada: data.nova_rodada,
+             id_partida: data.id_partida,
+             id_rodada: data.id_rodada,
+             num_round: data.num_round,
+             id_usuario: id_usuario      
+         };
+         client.emit('salvar_flag_round1_ok', data_);
        }
     }); 
 
@@ -1020,6 +1155,31 @@ var mensagem = '';
     </table>
   </div>
 
+
+  <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="bt_informacao">Informação!</button>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content" id="test">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Informação</h4>
+        </div>
+        <div class="modal-body">
+          <label id="msg">Some text in the modal.</label>
+        </div>
+        <div class="modal-footer">
+           <button type="button" onclick="yes()" id="bt_sim" class="btn btn-default" data-dismiss="modal">Close</button>
+           <button type="button" onclick="no()" id="bt_nao" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <h1 id="game_over" style="text-align: center;"></h1><br>
 <h3 id="game_over_" style="text-align: center;"></h3><br>
@@ -1033,7 +1193,7 @@ var mensagem = '';
    </form>
 </div>
 
-<a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
+   <a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
 
 </body>
 </html>

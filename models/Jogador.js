@@ -41,7 +41,8 @@ var ofertado = {
 var Jogador = new Schema({
     flag_rodada_round1: Boolean,
     usuario: usuario,
-    id_partida: String, 
+    id_partida: String,
+    id_sala: String, 
     valores_sorteados: Array,
     ofertas_realizadas: [oferta],
     ofertas_recebidas: [ofertado],

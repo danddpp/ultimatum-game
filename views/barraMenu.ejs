@@ -50,6 +50,14 @@
              </li>
          </ul>
         </li>
+        <li class="menu-item dropdown">
+         <a href="#" class="dropdown-toggle" id="painel-persuasao" data-toggle="dropdown">Manipulação<b class="caret"></b></a>
+         <ul class="dropdown-menu">
+             <li class="menu-item dropdown dropdown-submenu">
+                <a href="/painel_persuasao">Métodos persuasivos</a>
+             </li>
+         </ul>
+        </li>
        </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -70,8 +78,10 @@
   $(document).ready(function() {
       if('<%=nivel_usuario%>' == 'admin') {
         $('#resultados').prop('disabled', false);
+        $('#painel-persuasao').show();
       } else {
         $('#resultados').prop('disabled', true);
+        $('#painel-persuasao').hide();
       }
   });
 </script>

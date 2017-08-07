@@ -1,7 +1,7 @@
-var Jogador = function(usuario) {
+var Jogador = function(usuario, id_partida) {
   this.flag_rodada_round1 = false;
   this.usuario = usuario;
-  this.id_partida = null; 
+  this.id_partida = id_partida; 
   this.valores_sorteados = [];
   this.ofertas_realizadas = [];
   this.ofertas_recebidas = [];

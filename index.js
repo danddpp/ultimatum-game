@@ -5,6 +5,7 @@ var routesLogin = require('./routes/autenticacao');
 var routesMenuJogador = require('./routes/menu-jogador');
 var routesMenuPartida = require('./routes/menu-partida');
 var routesPesquisar = require('./routes/pesquisar');
+var routesPersuasao = require('./routes/painel-persuasao');
 var mongoose = require('mongoose');
 var path = require('path');
 var express = require('express');
@@ -70,6 +71,7 @@ app.post('/criar_partida', routesMenuPartida);
 
 //config rotas menu-jogador
 app.get('/menu-jogador', routesMenuJogador);
+app.get('/jogo_do_ultimato', routesMenuJogador);
 app.post('/iniciar_partida', routesMenuJogador);
 app.post('/entrar_sala', routesMenuJogador);
 app.post('/iniciar_novoRound', routesMenuJogador);
@@ -81,6 +83,9 @@ app.get('/pesquisar_filtros', routesPesquisar);
 app.post('/pesquisar', routesPesquisar);
 app.post('/visualizar_resultados_por_partida', routesPesquisar);
 
+
+//config rotas persuasao
+app.get('/painel_persuasao', routesPersuasao);
 
 //configuração do passport
 var Usuario = require('./models/Usuario');
@@ -128,13 +133,13 @@ passport.use(new LocalStrategy({
      var data = socket.request;
      cookie(data, {}, function(err) {
         var sessionID = data.signedCookies[KEY];
-        //console.log(data);
         store.get(sessionID, function(err, session) {
            if(err || !session) {
               return next(new Error('Acesso negado!'));
            } else {
             //console.log(session);
             socket.handshake.session = session;
+            //console.log(socket.handshake.session)
             return next();
            }
         });
@@ -170,20 +175,26 @@ passport.use(new LocalStrategy({
      var session = socket.handshake.session;
      //armazena os dados do jogador (vindos da sessao/socket )que acabou de se conectar ao socket
      var usuario = session.passport.user;
+
+     //console.log(usuario.sala);
      
      //vetor que armazena os jogadores conectados ao socket
      onlines[usuario._id] = usuario._id;
-        
+       
+
+
+
+
        //laço executado sempre que um novo jogador se conecta ao socket  
        for(var id in onlines) {
          //eventos que emitem o id do jogador para que no cliente apareça como Online
-         //console.log('notify-onlines');
          socket.emit('notify-onlines', id);
          socket.broadcast.emit('notify-onlines', id);
        }
 
-       
+
        socket.on('disconnect', function() {
+        //console.log('saindo');
          //evento que emite o id de um jogador para que no cliente apareça como Offline
         socket.broadcast.emit('notify-offlines', usuario._id);
         //deletando o jogador do vetor pois saiu da aplicação
@@ -191,6 +202,54 @@ passport.use(new LocalStrategy({
        });
 
 
+
+       socket.on('reincluir_jogador_partida', function(data_) {
+          Partida.findById(data_.id_partida).exec(function(err, partida) {
+             if (partida) {
+               var temp = partida.num_jogadores + 1;
+               if (temp <= partida.num_jogadores) {
+                 partida.num_jogadores++;
+                 Jogador.find().where('usuario._id').equals(data_.id_usuario).exec(function(err, jogador) {
+                    if (jogador) {
+                       jogador[0].on_off = true;
+                       var aux = jogador[0];
+                       jogador[0].save();
+                       
+                       var jogadores = [];
+                       jogadores = partida.jogadores;
+
+                       for(var i = 0; i < jogadores.length; i++) {
+                           if(jogadores[i].usuario._id == data_.id_jogador) {
+                              jogadores[i] = aux;
+                           }
+                       }
+                       partida.jogadores = jogadores;
+                       partida.save();
+                    }
+                 });
+               }
+             }
+          });
+     });
+     
+     socket.on('excluir_jogador_partida', function(data_) {
+         Partida.findById(data_.id_partida).exec(function(err, partida) {
+             if (partida) {
+               var temp = partida.num_jogadores - 1;
+               if (temp >= 0) {
+                 partida.num_jogadores--;
+                 partida.save();
+                 Jogador.findById(data_.id_usuario).exec(function(err, jogador) {
+                    if (jogador) {
+                       jogador.on_off = false;
+                    }
+                 });
+               }
+             }
+          });
+     });
+
+     
       socket.on('qtde_atual_jogadores', function(data) {
          socket.emit('qtde_atual_jogadores_send', data);
          socket.broadcast.emit('qtde_atual_jogadores_send', data);
@@ -202,6 +261,66 @@ passport.use(new LocalStrategy({
         socket.broadcast.emit('habilitar_bt_jogar_ok', data);
       });
 
+
+      socket.on('verificar_jogador_iniciar_partida', function(data) {
+          var time = Math.floor((Math.random() * 5000) + 1);
+          var time2 = Math.floor((Math.random() * 100) + 1);
+          var time3 = Math.floor((Math.random() * 10) + 1);
+          
+          time = ((time - time2) + time3);
+
+          setTimeout(function(){
+             var query = data.id_partida;
+             var flag = false;
+             Partida.findById(query).exec(function(err, partida) {
+                 if(err) {
+                   console.log(err);
+                 } else {
+                  var jogadores = partida.jogadores;
+                  var flag = false;           
+                  for(var i = 0; i < jogadores.length; i++) {
+                    if(jogadores[i].usuario._id == data.id_usuario) {
+                      flag = true;
+                      var jogador = jogadores[i]; 
+                    }        
+                  }
+
+                  if(flag == true) {
+                    var data_ = {
+                        id_partida: partida._id,
+                        id_usuario: jogador.usuario._id,
+                        habilitado: true
+                    };
+
+                    partida.contador_iniciar_partida++;
+                    partida.save();
+                    if(partida.contador_iniciar_partida == partida.num_jogadores) {
+                      var id_partida = partida._id;
+                          socket.emit('iniciar_partida_ok', id_partida);
+                          socket.broadcast.emit('iniciar_partida_ok', id_partida);
+                    } 
+                    else if(partida.contador_iniciar_partida < partida.num_jogadores) {
+                          socket.emit('jogador_esta_nessa_partida', data_);
+                    } else {
+                          socket.emit('voltou_ao_jogo', data_);                      
+                    }
+
+                  } else {
+                    var data_ = {
+                         habilitado: false,
+                         msg: 'Ops!! Partida errada.'+'\n'+
+                        'É necessário estar na partida para poder jogar!'
+                     };
+                        //jogador nao esta na partida
+                        socket.emit('jogador_esta_nessa_partida', data_);          
+                  }
+                 
+                 }
+             });
+          }, time);
+      });
+
+      
 
   //inicio rotinas socket chat//////////////////
   socket.on('send-server', function(data) {
@@ -235,6 +354,7 @@ passport.use(new LocalStrategy({
         //recebe do cliente a oferta
         socket.on('send-server-oferta', function(ofertaAdv) {
            var query = ofertaAdv.id_painel;
+
            Estado_Painel.findById(query).exec(function(err, painel) {
               if(err) {
                 console.log(err);
@@ -365,55 +485,71 @@ passport.use(new LocalStrategy({
 
         socket.on('carregar_jogadores', function(data_) {
          //jogo//////////////////////////////////////////////////////////////////////
-         var query = data_.id_partida;
-         Partida.findById(query).exec(function(err, partida) {
-           if(partida) {
-           var qtde_jogadores = Number(partida.num_jogadores);
-            for(var i = 0; i < partida.rodadas.length; i++) {
-                if(data_.id_rodada == partida.rodadas[i]._id) {
-                  var rodada = partida.rodadas[i];
-                  for(var j = 0; j < rodada.rounds.length; j++) {
-                    if(data_.id_round == rodada.rounds[j]._id) {
-                      var round = rodada.rounds[j];
-                      round.count_change_round++;
-                      partida.rodadas[i].rounds[j].count_change_round = 
-                                                    Number(round.count_change_round);
-                      partida.save();
+         var time = Math.floor((Math.random() * 5000) + 1);
+         var time2 = Math.floor((Math.random() * 100) + 1);
+         var time3 = Math.floor((Math.random() * 10) + 1);
+          
+         time = ((time - time2) + time3);
+
+         setTimeout(function() {
+            var query = data_.id_partida;
+            Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+              var qtde_jogadores = Number(partida.num_jogadores);
+               for(var i = 0; i < partida.rodadas.length; i++) {
+                   if(data_.id_rodada == partida.rodadas[i]._id) {
+                     var rodada = partida.rodadas[i];
+                     for(var j = 0; j < rodada.rounds.length; j++) {
+                       if(data_.id_round == rodada.rounds[j]._id) {
+                         var round = rodada.rounds[j];
+                         round.count_change_round++;
+                         partida.rodadas[i].rounds[j].count_change_round = 
+                                                       Number(round.count_change_round);
+                         partida.save();
 
 
-                      if(round.count_change_round == qtde_jogadores) {
-                        var data = {
-                          id_partida: data_.id_partida,
-                          next_round: true
-                        };
-                        socket.emit('iniciar_novo_round', data);
-                        socket.broadcast.emit('iniciar_novo_round', data);
-                      //jogo//////////////////////////////////////////////////////////////////////  
-                      } else {
-                      //estado painel////////////////////////////////////////////////////////////  
-                         var id_painel = data_.id_painel;
-                         Estado_Painel.findById(id_painel).exec(function(err, painel) {
-                             if(err) {
-                              console.log(err);
-                             } else {
-                              //console.log('err');
-                             var num_round = data_.num_round-1;
-                             var num_rodada = data_.num_rodada-1;   
-                             painel.rodadas[num_rodada].rounds[num_round].bt_prox_round_click = true;
-                             //console.log(painel.rodadas[num_rodada].rounds[num_round]);
-                             painel.save();
-                             }
-                         });
-                       //estado painel////////////////////////////////////////////////////////////   
-                      }
-                    }
-                  }
-                }
-            }
-           } else {
-            console.log(err);
-           }
-         });           
+                         if(round.count_change_round == qtde_jogadores) {
+                           var data = {
+                             id_partida: data_.id_partida,
+                             next_round: true
+                           };
+                           
+                           if(partida.num_round_atual < 6) {
+                             partida.num_round_atual++;
+                             partida.indice_valor++;
+                             partida.save();
+                           }
+                           
+                           socket.emit('iniciar_novo_round', data);
+                           socket.broadcast.emit('iniciar_novo_round', data);
+                         //jogo//////////////////////////////////////////////////////////////////////  
+                         } else {
+                         //estado painel////////////////////////////////////////////////////////////  
+                            var id_painel = data_.id_painel;
+                            Estado_Painel.findById(id_painel).exec(function(err, painel) {
+                                if(err) {
+                                 console.log(err);
+                                } else {
+                                 //console.log('err');
+                                var num_round = data_.num_round-1;
+                                var num_rodada = data_.num_rodada-1;   
+                                painel.rodadas[num_rodada].rounds[num_round].bt_prox_round_click = true;
+                                //console.log(painel.rodadas[num_rodada].rounds[num_round]);
+                                painel.save();
+                                }
+                            });
+                          //estado painel////////////////////////////////////////////////////////////   
+                         }
+                       }
+                     }
+                   }
+               }
+              } else {
+               console.log(err);
+              }
+            });
+         }, time);
+           
         });
 // *** Mudança de round *** //
 
@@ -425,15 +561,16 @@ passport.use(new LocalStrategy({
 // *** Mudança de rodada *** //
         //a cada mudança de rodada
         //estado painel////////////////////////////////////////////////////////////
-        socket.on('salvar_flag_round1_ok', function(id_usuario) {
-           Jogador.find().where('usuario._id').equals(id_usuario).exec(function(err, jogador) {
+        socket.on('salvar_flag_round1_ok', function(data_) {
+           var query = data_.id_usuario;
+           Jogador.find().where('usuario._id').equals(query).exec(function(err, jogador) {
             if(err) {
              console.log(err);
             } else {
              //console.log(jogador[0]);
              jogador[0].flag_rodada_round1 = false;
              jogador[0].save(function() {
-             socket.emit('finalizar_rodada');
+             socket.emit('finalizar_rodada', data_);
             });
            }
           });
@@ -467,866 +604,903 @@ passport.use(new LocalStrategy({
         //estado painel////////////////////////////////////////////////////////////
 
         //estado painel////////////////////////////////////////////////////////////
-        socket.on('carregar_jogadores_prox_rodada', function(data_) {
+        socket.on('carregar_jogadores_prox_rodada', function(data__) {
          //jogo//////////////////////////////////////////////////////////////////////
-         var query = data_.id_partida;
-         Partida.findById(query).exec(function(err, partida) {
-           if(partida) {
-           var qtde_jogadores = Number(partida.num_jogadores);
-            
-            for(var i = 0; i < partida.rodadas.length; i++) {
+         var time = Math.floor((Math.random() * 5000) + 1);
+         var time2 = Math.floor((Math.random() * 100) + 1);
+         var time3 = Math.floor((Math.random() * 10) + 1);
+         
+         time = ((time - time2) + time3);
+
+         setTimeout(function() {
+             var query = data__.id_partida;
+             Partida.findById(query).exec(function(err, partida) {
+               if(partida) {
+               var qtde_jogadores = Number(partida.num_jogadores);
                 
-                if(data_.id_rodada == partida.rodadas[i]._id) {
-                  var rodada = partida.rodadas[i];
-                  
-                  for(var j = 0; j < rodada.rounds.length; j++) {
+                for(var i = 0; i < partida.rodadas.length; i++) {
                     
-                    if(data_.id_round == rodada.rounds[j]._id) {
-                      var round = rodada.rounds[j];
-                      round.count_change_round++;
-                      partida.rodadas[i].rounds[j].count_change_round = Number(round.count_change_round);
-                      partida.save();
-
-                      if(round.count_change_round == qtde_jogadores) {
-                        var data = {
-                          id_partida: data_.id_partida,
-                          next_round: true
-                        };
-                        console.log('ei');
-                        socket.emit('iniciar_nova_rodada', data);
-                        socket.broadcast.emit('iniciar_nova_rodada', data);
-                      } else {
-                        var id_painel = data_.id_painel;
+                    if(data__.id_rodada == partida.rodadas[i]._id) {
+                      var rodada = partida.rodadas[i];
+                      
+                      for(var j = 0; j < rodada.rounds.length; j++) {
                         
-                        Estado_Painel.findById(id_painel).exec(function(err, painel) {
-                            if(err) {
-                             console.log(err);
-                            } else {
-                            //console.log('here SMDF');
-                            var aux_rodada = painel.rodadas.length-1;
-                            var aux_round = painel.rodadas[aux_rodada].rounds.length-1;   
-                            painel.rodadas[aux_rodada].rounds[aux_round].bt_prox_rodada_click = true;
-                            painel.save();
-                            }
-                        });
-                      }
-                    
-                    }
+                        if(data__.id_round == rodada.rounds[j]._id) {
+                          var round = rodada.rounds[j];
+                          round.count_change_round++;
+                          partida.rodadas[i].rounds[j].count_change_round = Number(round.count_change_round);
+                          partida.save();
 
-                  }
+                          if(round.count_change_round == qtde_jogadores) {
+                            var data = {
+                              id_partida: data__.id_partida,
+                              next_round: true
+                            };
+
+                            if (partida.num_rodada_atual < 6) {
+                                partida.num_rodada_atual++;
+                                partida.num_round_atual = 1;
+                                partida.indice_valor++;
+                                partida.save();
+                            }
+
+                            socket.emit('iniciar_nova_rodada', data);
+                            socket.broadcast.emit('iniciar_nova_rodada', data);
+                         
+                          } else {
+                            console.log('wrong');
+                          }
+                        
+                        }
+
+                      }
+                    }
                 }
-            }
-           } else {
-            console.log(err);
-           }
-         });           
+               } else {
+                console.log(err);
+               }
+             }); 
+         }, time);           
+        
         });
 // *** Mudança de rodada *** //
 
 
         socket.on('enviar_aceite', function(data) {
-          //estado painel//////////////////////////////////////////////////////////// 
-          var id_painel = data.id_painel;
-          Estado_Painel.findById(id_painel).exec(function(err, painel) {
-              if(err) {
-
-              } else {
-                var aux_rodada = painel.rodadas.length-1;
-                var aux_round = data.num_round-1;
-                var p_adversarios = painel.rodadas[aux_rodada].rounds[aux_round].adversarios;
-                
-
-                for(var i = 0; i < p_adversarios.length; i++) {
-                   //console.log(p_adversarios[i].id_usuario+' = '+data.id_adversario);
-                   if(p_adversarios[i].id_usuario == data.id_adversario) {
-                      var p_adversario = {
-                          id_usuario: p_adversarios[i].id_usuario,
-                          valor_total_adv: p_adversarios[i].valor_total_adv,
-                          valor_oferta_adv: p_adversarios[i].valor_oferta_adv,
-                          total_pontos: p_adversarios[i].total_pontos,
-                          percent_ganho: p_adversarios[i].percent_ganho,
-                          bt_aceite: true
-                      };
-                      painel.rodadas[aux_rodada].rounds[aux_round].adversarios[i] = p_adversario;
-                      //estado painel////////////////////////////////////////////////////////////
-
-
-                      painel.save(function() {
-                      //jogo//////////////////////////////////////////////////////////////////////  
-                          var query = data.id_partida;
-                          Partida.findById(query).exec(function(err, partida) {
-                             
-                             //console.log(data);
-                             if(partida) {
-                               var rodadas = [];
-                               rodadas = partida.rodadas;
-                               var rodada = null;
-                               var indiceRodada = 0;
-
-                               for(var i = 0; i < rodadas.length; i++) {
-                                 if(data.id_rodada == rodadas[i]._id) {
-                                     rodada = rodadas[i];
-                                     indiceRodada = i;
-                                 }
-
-                               }
-                               
-                               if(data.num_round == 1) {
-                                 
-                                 rodada.rounds[0].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
-
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                     var id_jogador = jogadores[j]._id;
-                                     
-                                      
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
-                                         
-                                         jogador.ofertas_recebidas.push(ofertado);
-
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-
-                                        } else {
-
-                                        }
-
-                                     });
-                                       
-
-                                   }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
-                                         
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
-
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
-
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-
-                                }
-                                 
-                                 if(rodada.rounds[0].qtdeAtualJogadas == rodada
-                                                               .rounds[0].qtdeTotalJogadas) {
-                                     var finalizar_round = {
-                                         id_partida: data.id_partida,
-                                         id_rodada: data.id_rodada,
-                                         id_round: data.id_round,
-                                         num_round: data.num_round,
-                                         num_rodada: data.num_rodada,
-                                         indice_valor: data.indice_valor
-                                     };
-                                     
-                                     socket.emit('final_round', finalizar_round);
-                                     socket.broadcast.emit('final_round', finalizar_round);
-                                     //jogo//////////////////////////////////////////////////////////////////////
-
-                                     //estado painel////////////////////////////////////////////////////////////
-                                     socket.emit('salvar_bt_novo_round_show');
-                                     socket.broadcast.emit('salvar_bt_novo_round_show');
-                                     //estado painel////////////////////////////////////////////////////////////
-                                  }
-                               
-                               }
-                               
-                               //jogo//////////////////////////////////////////////////////////////////////
-                               if(data.num_round == 2) {
-                                   
-                                 rodada.rounds[1].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
-
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                   var id_jogador = jogadores[j]._id;
-                                     
-                                      
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
-
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
-                                         
-                                         jogador.ofertas_recebidas.push(ofertado);
-
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-
-                                        } else {
-
-                                        }
-
-                                     });
-                                       
-
-                                   }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
-                                         
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
-
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
-
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-                                }
-                                 
-                                 if(rodada.rounds[1].qtdeAtualJogadas == rodada
-                                                               .rounds[1].qtdeTotalJogadas) {
-                                     var finalizar_round = {
-                                         id_partida: data.id_partida,
-                                         id_rodada: data.id_rodada,
-                                         id_round: data.id_round,
-                                         num_round: data.num_round,
-                                         num_rodada: data.num_rodada,
-                                         indice_valor: data.indice_valor
-                                     };
-                                                            
-                                     socket.emit('final_round', finalizar_round);
-                                     socket.broadcast.emit('final_round', finalizar_round);
-                                     //jogo////////////////////////////////////////////////////////////////////// 
-
-                                     //estado painel//////////////////////////////////////////////////////////// 
-                                     socket.emit('salvar_bt_novo_round_show');
-                                     socket.broadcast.emit('salvar_bt_novo_round_show');
-                                     //estado painel////////////////////////////////////////////////////////////
-                                  }
-
-                               }
-
-                               //jogo////////////////////////////////////////////////////////////////////// 
-                               if(data.num_round == 3) {
-                                   
-                                 rodada.rounds[2].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
-
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                   var id_jogador = jogadores[j]._id;
-                                     
-                                      
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
-
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
-                                         
-                                         jogador.ofertas_recebidas.push(ofertado);
-
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-
-                                        } else {
-
-                                        }
-
-                                     });
-                                       
-
-                                   }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
-                                         
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
-
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
-
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-                                }
-                                 
-                                 if(rodada.rounds[2].qtdeAtualJogadas == rodada
-                                                               .rounds[2].qtdeTotalJogadas) {
-                                     var finalizar_round = {
-                                         id_partida: data.id_partida,
-                                         id_rodada: data.id_rodada,
-                                         id_round: data.id_round,
-                                         num_round: data.num_round,
-                                         num_rodada: data.num_rodada,
-                                         indice_valor: data.indice_valor
-                                     };
-                                                            
-                                     socket.emit('final_round', finalizar_round);
-                                     socket.broadcast.emit('final_round', finalizar_round);
-                                     //jogo////////////////////////////////////////////////////////////////////// 
-
-                                     //estado painel////////////////////////////////////////////////////////////  
-                                     socket.emit('salvar_bt_novo_round_show');
-                                     socket.broadcast.emit('salvar_bt_novo_round_show');
-                                     //estado painel////////////////////////////////////////////////////////////
-                                  }
-
-                               }
-
-                               //jogo//////////////////////////////////////////////////////////////////////
-                               if(data.num_round == 4) {
-                                   
-                                 rodada.rounds[3].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
-
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                   var id_jogador = jogadores[j]._id;
-                                     
-                                      
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
-
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
-                                         
-                                         jogador.ofertas_recebidas.push(ofertado);
-
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-
-                                        } else {
-
-                                        }
-
-                                     });
-                                       
-
-                                   }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
-                                         
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
-
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
-
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-                                }
-                                 
-                                 if(rodada.rounds[3].qtdeAtualJogadas == rodada
-                                                               .rounds[3].qtdeTotalJogadas) {
-                                     var finalizar_round = {
-                                         id_partida: data.id_partida,
-                                         id_rodada: data.id_rodada,
-                                         id_round: data.id_round,
-                                         num_round: data.num_round,
-                                         num_rodada: data.num_rodada,
-                                         indice_valor: data.indice_valor
-                                     };
-                                                            
-                                     socket.emit('final_round', finalizar_round);
-                                     socket.broadcast.emit('final_round', finalizar_round);
-                                     //jogo//////////////////////////////////////////////////////////////////////
-
-                                     //estado painel////////////////////////////////////////////////////////////
-                                     socket.emit('salvar_bt_novo_round_show');
-                                     socket.broadcast.emit('salvar_bt_novo_round_show');
-                                     //estado painel////////////////////////////////////////////////////////////
-                                  }
-
-                               }
-                               
-                              //jogo//////////////////////////////////////////////////////////////////////
-                              if(data.num_round == 5) {
-                                   
-                                 rodada.rounds[4].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
-
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                   var id_jogador = jogadores[j]._id;
-                                     
-                                      
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
-
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
-                                         
-                                         jogador.ofertas_recebidas.push(ofertado);
-
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-
-                                        } else {
-
-                                        }
-
-                                     });
-                                       
-
-                                   }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
-                                         
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
-
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
-
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-                                }
-                                 
-                                 if(rodada.rounds[4].qtdeAtualJogadas == rodada
-                                                               .rounds[4].qtdeTotalJogadas) {
-                                     var finalizar_round = {
-                                         id_partida: data.id_partida,
-                                         id_rodada: data.id_rodada,
-                                         id_round: data.id_round,
-                                         num_round: data.num_round,
-                                         num_rodada: data.num_rodada,
-                                         indice_valor: data.indice_valor
-                                     };
-                                                            
-                                     socket.emit('final_round', finalizar_round);
-                                     socket.broadcast.emit('final_round', finalizar_round);
-                                     //jogo////////////////////////////////////////////////////////////////////// 
-
-                                     //estado painel////////////////////////////////////////////////////////////
-                                     socket.emit('salvar_bt_novo_round_show');
-                                     socket.broadcast.emit('salvar_bt_novo_round_show');
-                                     //estado painel////////////////////////////////////////////////////////////
-                                  }
-
-                               }
-                               
+          //estado painel////////////////////////////////////////////////////////////
+          var time = Math.floor((Math.random() * 5000) + 1);
+          var time2 = Math.floor((Math.random() * 100) + 1);
+          var time3 = Math.floor((Math.random() * 10) + 1);
+          
+          time = ((time - time2) + time3);
+
+          setTimeout(function(){ 
+             console.log('here '+time);
+             var id_painel = data.id_painel;
+             Estado_Painel.findById(id_painel).exec(function(err, painel) {
+                 if(err) {
+
+                 } else {
+                   var aux_rodada = painel.rodadas.length-1;
+                   var aux_round = data.num_round-1;
+                   var p_adversarios = painel.rodadas[aux_rodada].rounds[aux_round].adversarios;
+                   
+
+                   for(var i = 0; i < p_adversarios.length; i++) {
+                      //console.log(p_adversarios[i].id_usuario+' = '+data.id_adversario);
+                      if(p_adversarios[i].id_usuario == data.id_adversario) {
+                         var p_adversario = {
+                             id_usuario: p_adversarios[i].id_usuario,
+                             valor_total_adv: p_adversarios[i].valor_total_adv,
+                             valor_oferta_adv: p_adversarios[i].valor_oferta_adv,
+                             total_pontos: p_adversarios[i].total_pontos,
+                             percent_ganho: p_adversarios[i].percent_ganho,
+                             bt_aceite: true
+                         };
+                         painel.rodadas[aux_rodada].rounds[aux_round].adversarios[i] = p_adversario;
+                         //estado painel////////////////////////////////////////////////////////////
+
+
+                         painel.save(function() {
+                         //jogo//////////////////////////////////////////////////////////////////////  
+                             var query = data.id_partida;
+                             Partida.findById(query).exec(function(err, partida) {
                                 
-                              //jogo//////////////////////////////////////////////////////////////////////
-                               if(data.num_round == 6) {
-                                   
-                                 rodada.rounds[5].qtdeAtualJogadas++;
-                                 var jogadores = [];
-                                 jogadores = partida.jogadores;
-                               
+                                //console.log(data);
+                                if(partida) {
+                                  var rodadas = [];
+                                  rodadas = partida.rodadas;
+                                  var rodada = null;
+                                  var indiceRodada = 0;
 
-                                 for(var j = 0; j < jogadores.length; j++) {
-                                   
-                                   if(data.meu_id == jogadores[j].usuario._id) {
-                                        
-                                   var id_jogador = jogadores[j]._id;
-                                     
+                                  for(var i = 0; i < rodadas.length; i++) {
+                                    if(data.id_rodada == rodadas[i]._id) {
+                                        rodada = rodadas[i];
+                                        indiceRodada = i;
+                                    }
+
+                                  }
+                                  
+                                  if(data.num_round == 1) {
+
+                                    rodada.rounds[0].qtdeAtualJogadas++;//varialvel para contar o mumero de jogadas
+                                    //para quando atingir o numero de jogadores o round ser finalizado, ou seja,
+                                    //como cada jogador faz uma unica oferta, o numero de ofertas(jogadas)
+                                    //deve ser igual ao de jogadores todo round
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
                                       
-                                    Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var ofertado = new Ofertado(data.id_partida, 
-                                                                    data.id_rodada,
-                                                                    data.num_round,
-                                                                    data.valor_total,
-                                                                    data.oferta,
-                                                                    data.id_adversario,
-                                                                    data.aceite);
-
-                                         if(data.aceite == 'sim') {
-                                           var a = Number(jogador.pontuacao_max);
-                                           var b = Number(data.oferta);
-                                           jogador.pontuacao_max = Number(a + b);
+                                      if(data.meu_id == jogadores[j].usuario._id) {
                                            
-                                           jogador.num_ofertas_aceitou++;
-                                         } else {
-                                           jogador.num_ofertas_recusou++;
-                                         }
+                                        var id_jogador = jogadores[j]._id;
+                                        
                                          
-                                         jogador.ofertas_recebidas.push(ofertado);
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                                           
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
+                                              jogador.num_ofertas_aceitou++;
+                                            } else {
+                                              jogador.num_ofertas_recusou++;
+                                            }
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
 
-                                         jogador.save();
-                                         
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
 
-                                        } else {
+                                           } else {
 
-                                        }
+                                           }
 
-                                     });
+                                        });
+                                          
+
+                                      }
                                        
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+
+                             
 
                                    }
-                                    
-                                    if(data.id_adversario == jogadores[j].usuario._id) {
-                                        var id_jogador = jogadores[j]._id;
-                                     
-                                      Jogador.findById(id_jogador).exec(function(err, jogador) {
-                                       if(jogador) {
-                          
-                                        var oferta = new Oferta(data.id_partida, 
-                                                                data.id_rodada,
-                                                                data.num_round,
-                                                                data.valor_total,
-                                                                data.oferta,
-                                                                data.id_adversario,
-                                                                data.aceite);
+
+                                    if(rodada.rounds[0].qtdeAtualJogadas == rodada
+                                                                  .rounds[0].qtdeTotalJogadas) {
+                                        var finalizar_round = {
+                                            id_partida: data.id_partida,
+                                            id_rodada: data.id_rodada,
+                                            id_round: data.id_round,
+                                            num_round: data.num_round,
+                                            num_rodada: data.num_rodada,
+                                            indice_valor: data.indice_valor
+                                        };
+                                        
+                                        socket.emit('final_round', finalizar_round);
+                                        socket.broadcast.emit('final_round', finalizar_round);
+                                        //jogo//////////////////////////////////////////////////////////////////////
+
+                                        //estado painel////////////////////////////////////////////////////////////
+                                        socket.emit('salvar_bt_novo_round_show');
+                                        socket.broadcast.emit('salvar_bt_novo_round_show');
+                                        //estado painel////////////////////////////////////////////////////////////
+                                     }
+                                  
+                                  }
+                                  
+                                  //jogo//////////////////////////////////////////////////////////////////////
+                                  if(data.num_round == 2) {
+                                      
+                                    rodada.rounds[1].qtdeAtualJogadas++;
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
+                                      
+                                      if(data.meu_id == jogadores[j].usuario._id) {
+                                           
+                                      var id_jogador = jogadores[j]._id;
+                                        
                                          
-                                         if(data.aceite == 'sim') {
-                                           var vr_parcial = Number(data.valor_total - data.oferta);
-                                           jogador.pontuacao_max = Number(jogador.pontuacao_max
-                                                                                      +vr_parcial);
-                                         } 
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
 
-                                         
-                                         jogador.ofertas_realizadas.push(oferta);
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
 
-                                         jogador.save();
-
-                                         partida.jogadores[j] = jogador; 
-                                         
-                                         partida.save();
-                                        } else {
-
-                                        }
-                               
-                                       });
-                                    }
-                          
-                                }
-
-                                if(rodada.rounds[5].qtdeAtualJogadas == rodada
-                                                               .rounds[5].qtdeTotalJogadas) {
-                                              
-                                                                           
-                                      var id_partida = 0;
-                                      Partida.findById(query).exec(function(err, partida_) {
-                                       if(partida_) { 
-                                        if(partida_.rodadas.length < 6) {
-                                         id_partida = partida_._id;
-                                         var num_nova_rodada = rodada.numero_rodada;
-                                         num_nova_rodada++;  
-                                         var nova_rodada = new Rodada(num_nova_rodada);
-                                         var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
-                                         
-                                         var round1 = new c_round(1, qtde_total_jogadas);
-                                         var round2 = new c_round(2, qtde_total_jogadas);
-                                         var round3 = new c_round(3, qtde_total_jogadas);
-                                         var round4 = new c_round(4, qtde_total_jogadas);
-                                         var round5 = new c_round(5, qtde_total_jogadas);
-                                         var round6 = new c_round(6, qtde_total_jogadas);                    
-
-                                          nova_rodada.rounds.push(round1);
-                                          nova_rodada.rounds.push(round2);
-                                          nova_rodada.rounds.push(round3);
-                                          nova_rodada.rounds.push(round4);
-                                          nova_rodada.rounds.push(round5);
-                                          nova_rodada.rounds.push(round6);
-                                          
-                                          partida_.rodadas.push(nova_rodada)
-                                          
-                                          partida_.save(function() {
-                                            var id_rodada = null;
-
-                                            Partida.findById(query).exec(function(err, partida__) {
-                                             if(partida__) {
-                                              var id_partida = partida__._id;
-                                              id_rodada = partida__.rodadas[partida__.rodadas
-                                                                         .length-1]._id;
-                                              var data = {
-                                               nova_rodada: nova_rodada,
-                                               id_partida: id_partida,
-                                               id_rodada: id_rodada,
-                                               num_round: 6,
-                                              };
-                                                
-                                               socket.emit('final_rodada', data);
-                                               socket.broadcast.emit('final_rodada', data);
-                                               //jogo//////////////////////////////////////////////////////////////////////
-
-                                               //estado painel////////////////////////////////////////////////////////////
-                                               socket.emit('salvar_flag_round1', id_partida);
-                                               socket.broadcast.emit('salvar_flag_round1', id_partida);                           
-                                               //estado painel////////////////////////////////////////////////////////////
+                                              jogador.num_ofertas_aceitou++;
                                             } else {
-                                              console.log(err);
+                                              jogador.num_ofertas_recusou++;
                                             }
-                                          });
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
 
-                                          });
-                                        //jogo//////////////////////////////////////////////////////////////////////
-                                        } else {
-                                              
-                                           var data = {
-                                               id_partida: query, 
-                                               msg: 'Partida finalizada!',
-                                               msg2: 'Obrigado por participar!'
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+
+                                           } else {
+
                                            }
-                                           //console.log(data);       
-                                           socket.emit('fim_de_jogo', data);
-                                           socket.broadcast.emit('fim_de_jogo', data);
-                                           socket.emit('salvar_percentual_ganho', query);
-                                           socket.broadcast.emit('salvar_percentual_ganho', query);
-                                           finalizar_partida(query);
-                                        }
+
+                                        });
+                                          
+
+                                      }
+                                       
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+                             
+                                   }
+                                    
+                                    if(rodada.rounds[1].qtdeAtualJogadas == rodada
+                                                                  .rounds[1].qtdeTotalJogadas) {
+                                        var finalizar_round = {
+                                            id_partida: data.id_partida,
+                                            id_rodada: data.id_rodada,
+                                            id_round: data.id_round,
+                                            num_round: data.num_round,
+                                            num_rodada: data.num_rodada,
+                                            indice_valor: data.indice_valor
+                                        };
+                                                               
+                                        socket.emit('final_round', finalizar_round);
+                                        socket.broadcast.emit('final_round', finalizar_round);
+                                        //jogo////////////////////////////////////////////////////////////////////// 
+
+                                        //estado painel//////////////////////////////////////////////////////////// 
+                                        socket.emit('salvar_bt_novo_round_show');
+                                        socket.broadcast.emit('salvar_bt_novo_round_show');
+                                        //estado painel////////////////////////////////////////////////////////////
+                                     }
+
+                                  }
+
+                                  //jogo////////////////////////////////////////////////////////////////////// 
+                                  if(data.num_round == 3) {
+                                      
+                                    rodada.rounds[2].qtdeAtualJogadas++;
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
+                                      
+                                      if(data.meu_id == jogadores[j].usuario._id) {
+                                           
+                                      var id_jogador = jogadores[j]._id;
+                                        
+                                         
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
+
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
+
+                                              jogador.num_ofertas_aceitou++;
+                                            } else {
+                                              jogador.num_ofertas_recusou++;
+                                            }
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
+
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+
+                                           } else {
+
+                                           }
+
+                                        });
+                                          
+
+                                      }
+                                       
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+                             
+                                   }
+                                    
+                                    if(rodada.rounds[2].qtdeAtualJogadas == rodada
+                                                                  .rounds[2].qtdeTotalJogadas) {
+                                        var finalizar_round = {
+                                            id_partida: data.id_partida,
+                                            id_rodada: data.id_rodada,
+                                            id_round: data.id_round,
+                                            num_round: data.num_round,
+                                            num_rodada: data.num_rodada,
+                                            indice_valor: data.indice_valor
+                                        };
+                                                               
+                                        socket.emit('final_round', finalizar_round);
+                                        socket.broadcast.emit('final_round', finalizar_round);
+                                        //jogo////////////////////////////////////////////////////////////////////// 
+
+                                        //estado painel////////////////////////////////////////////////////////////  
+                                        socket.emit('salvar_bt_novo_round_show');
+                                        socket.broadcast.emit('salvar_bt_novo_round_show');
+                                        //estado painel////////////////////////////////////////////////////////////
+                                     }
+
+                                  }
+
+                                  //jogo//////////////////////////////////////////////////////////////////////
+                                  if(data.num_round == 4) {
+                                      
+                                    rodada.rounds[3].qtdeAtualJogadas++;
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
+                                      
+                                      if(data.meu_id == jogadores[j].usuario._id) {
+                                           
+                                      var id_jogador = jogadores[j]._id;
+                                        
+                                         
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
+
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
+
+                                              jogador.num_ofertas_aceitou++;
+                                            } else {
+                                              jogador.num_ofertas_recusou++;
+                                            }
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
+
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+
+                                           } else {
+
+                                           }
+
+                                        });
+                                          
+
+                                      }
+                                       
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+                             
+                                   }
+                                    
+                                    if(rodada.rounds[3].qtdeAtualJogadas == rodada
+                                                                  .rounds[3].qtdeTotalJogadas) {
+                                        var finalizar_round = {
+                                            id_partida: data.id_partida,
+                                            id_rodada: data.id_rodada,
+                                            id_round: data.id_round,
+                                            num_round: data.num_round,
+                                            num_rodada: data.num_rodada,
+                                            indice_valor: data.indice_valor
+                                        };
+                                                               
+                                        socket.emit('final_round', finalizar_round);
+                                        socket.broadcast.emit('final_round', finalizar_round);
                                         //jogo//////////////////////////////////////////////////////////////////////
-                                        } else {
-                                          console.log(err);     
-                                        }
 
-                                      });
+                                        //estado painel////////////////////////////////////////////////////////////
+                                        socket.emit('salvar_bt_novo_round_show');
+                                        socket.broadcast.emit('salvar_bt_novo_round_show');
+                                        //estado painel////////////////////////////////////////////////////////////
+                                     }
 
+                                  }
+                                  
+                                 //jogo//////////////////////////////////////////////////////////////////////
+                                 if(data.num_round == 5) {
+                                      
+                                    rodada.rounds[4].qtdeAtualJogadas++;
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
+                                      
+                                      if(data.meu_id == jogadores[j].usuario._id) {
+                                           
+                                      var id_jogador = jogadores[j]._id;
+                                        
+                                         
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
+
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
+
+                                              jogador.num_ofertas_aceitou++;
+                                            } else {
+                                              jogador.num_ofertas_recusou++;
+                                            }
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
+
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+
+                                           } else {
+
+                                           }
+
+                                        });
+                                          
+
+                                      }
+                                       
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+                             
+                                   }
+                                    
+                                    if(rodada.rounds[4].qtdeAtualJogadas == rodada
+                                                                  .rounds[4].qtdeTotalJogadas) {
+                                        var finalizar_round = {
+                                            id_partida: data.id_partida,
+                                            id_rodada: data.id_rodada,
+                                            id_round: data.id_round,
+                                            num_round: data.num_round,
+                                            num_rodada: data.num_rodada,
+                                            indice_valor: data.indice_valor
+                                        };
+                                                               
+                                        socket.emit('final_round', finalizar_round);
+                                        socket.broadcast.emit('final_round', finalizar_round);
+                                        //jogo////////////////////////////////////////////////////////////////////// 
+
+                                        //estado painel////////////////////////////////////////////////////////////
+                                        socket.emit('salvar_bt_novo_round_show');
+                                        socket.broadcast.emit('salvar_bt_novo_round_show');
+                                        //estado painel////////////////////////////////////////////////////////////
+                                     }
+
+                                  }
+                                  
+                                   
+                                 //jogo//////////////////////////////////////////////////////////////////////
+                                  if(data.num_round == 6) {
+                                      
+                                    rodada.rounds[5].qtdeAtualJogadas++;
+                                    var jogadores = [];
+                                    jogadores = partida.jogadores;
+                                  
+
+                                    for(var j = 0; j < jogadores.length; j++) {
+                                      
+                                      if(data.meu_id == jogadores[j].usuario._id) {
+                                           
+                                      var id_jogador = jogadores[j]._id;
+                                        
+                                         
+                                       Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var ofertado = new Ofertado(data.id_partida, 
+                                                                       data.id_rodada,
+                                                                       data.num_round,
+                                                                       data.valor_total,
+                                                                       data.oferta,
+                                                                       data.id_adversario,
+                                                                       data.aceite);
+
+                                            if(data.aceite == 'sim') {
+                                              var a = Number(jogador.pontuacao_max);
+                                              var b = Number(data.oferta);
+                                              jogador.pontuacao_max = Number(a + b);
+                                              
+                                              jogador.num_ofertas_aceitou++;
+                                            } else {
+                                              jogador.num_ofertas_recusou++;
+                                            }
+                                            
+                                            jogador.ofertas_recebidas.push(ofertado);
+
+                                            jogador.save();
+                                            
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+
+                                           } else {
+
+                                           }
+
+                                        });
+                                          
+
+                                      }
+                                       
+                                       if(data.id_adversario == jogadores[j].usuario._id) {
+                                           var id_jogador = jogadores[j]._id;
+                                        
+                                         Jogador.findById(id_jogador).exec(function(err, jogador) {
+                                          if(jogador) {
+                             
+                                           var oferta = new Oferta(data.id_partida, 
+                                                                   data.id_rodada,
+                                                                   data.num_round,
+                                                                   data.valor_total,
+                                                                   data.oferta,
+                                                                   data.id_adversario,
+                                                                   data.aceite);
+                                            
+                                            if(data.aceite == 'sim') {
+                                              var vr_parcial = Number(data.valor_total - data.oferta);
+                                              jogador.pontuacao_max = Number(jogador.pontuacao_max
+                                                                                         +vr_parcial);
+                                            } 
+
+                                            
+                                            jogador.ofertas_realizadas.push(oferta);
+
+                                            jogador.save();
+
+                                            partida.jogadores[j] = jogador; 
+                                            
+                                            partida.save();
+                                           } else {
+
+                                           }
+                                  
+                                          });
+                                       }
+                             
+                                   }
+
+                                   if(rodada.rounds[5].qtdeAtualJogadas == rodada
+                                                                  .rounds[5].qtdeTotalJogadas) {
+                                                 
+                                                                              
+                                         var id_partida = 0;
+                                         Partida.findById(query).exec(function(err, partida_) {
+                                          if(partida_) { 
+                                           if(partida_.rodadas.length < 6) {
+                                            id_partida = partida_._id;
+                                            var num_nova_rodada = rodada.numero_rodada;
+                                            num_nova_rodada++;  
+                                            var nova_rodada = new Rodada(num_nova_rodada);
+                                            var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                            
+                                            var round1 = new c_round(1, qtde_total_jogadas);
+                                            var round2 = new c_round(2, qtde_total_jogadas);
+                                            var round3 = new c_round(3, qtde_total_jogadas);
+                                            var round4 = new c_round(4, qtde_total_jogadas);
+                                            var round5 = new c_round(5, qtde_total_jogadas);
+                                            var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                             nova_rodada.rounds.push(round1);
+                                             nova_rodada.rounds.push(round2);
+                                             nova_rodada.rounds.push(round3);
+                                             nova_rodada.rounds.push(round4);
+                                             nova_rodada.rounds.push(round5);
+                                             nova_rodada.rounds.push(round6);
+                                             
+                                             partida_.rodadas.push(nova_rodada)
+                                             
+                                             partida_.save(function() {
+                                               var id_rodada = null;
+
+                                               Partida.findById(query).exec(function(err, partida__) {
+                                                if(partida__) {
+                                                 var id_partida = partida__._id;
+                                                 id_rodada = partida__.rodadas[partida__.rodadas
+                                                                            .length-1]._id;
+                                                 var data = {
+                                                  nova_rodada: nova_rodada,
+                                                  id_partida: id_partida,
+                                                  id_rodada: id_rodada,
+                                                  num_round: 6,
+                                                 };
+                                                   
+                                                  //socket.emit('final_rodada', data);
+                                                  //socket.broadcast.emit('final_rodada', data);
+                                                  //jogo//////////////////////////////////////////////////////////////////////
+
+                                                  //estado painel////////////////////////////////////////////////////////////
+                                                  socket.emit('salvar_flag_round1', data);
+                                                  socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                  //estado painel////////////////////////////////////////////////////////////
+                                               } else {
+                                                 console.log(err);
+                                               }
+                                             });
+
+                                             });
+                                           //jogo//////////////////////////////////////////////////////////////////////
+                                           } else {
+                                                 
+                                              var data = {
+                                                  id_partida: query, 
+                                                  msg: 'Partida finalizada!',
+                                                  msg2: 'Obrigado por participar!'
+                                              }
+                                              //console.log(data);       
+                                              socket.emit('fim_de_jogo', data);
+                                              socket.broadcast.emit('fim_de_jogo', data);
+                                              socket.emit('salvar_percentual_ganho', query);
+                                              socket.broadcast.emit('salvar_percentual_ganho', query);
+                                              finalizar_partida(query);
+                                           }
+                                           //jogo//////////////////////////////////////////////////////////////////////
+                                           } else {
+                                             console.log(err);     
+                                           }
+
+                                         });
+
+                                   }
+
+                                  }
+
+
+                                } else {
+                                  console.log(err);
                                 }
-
-                               }
-
-
-                             } else {
-                               console.log(err);
-                             }
-                          });
-                      });
-                   }
-                }                
-              }
-          });
-
+                             });
+                         });
+                      }
+                   }                
+                 }
+             });
+          }, time);
+        
         });
     //jogo//////////////////////////////////////////////////////////////////////
     socket.on('save_percent', function(id_jogador) {
         salvar_percentual_ganho(id_jogador);
     });
     //jogo//////////////////////////////////////////////////////////////////////
+
+
+
+
+     //persuasao//////////////////////////////////////////////////////////////////////
+       socket.on('salvar_persuasoes_padrao', function(data) {
+          var id_partida = data.id_partida;
+          Partida.findById(id_partida).exec(function(err, partida) {
+              if (err) {
+                console.log(err);
+              } else {
+                partida.persuasoes_padrao = data.configuracoes;
+                partida.save();
+              }
+          });
+       });  
+     //persuasao//////////////////////////////////////////////////////////////////////
+
+
   });
 //socket.io
 

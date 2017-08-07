@@ -15,7 +15,7 @@ var Round = {
   numero: Number,
   qtdeTotalJogadas: Number,
   qtdeAtualJogadas: Number,
-  count_change_round: Number,
+  count_change_round: Number
 }
 
 
@@ -32,7 +32,12 @@ var Partida = new Schema({
 	tipo_sala: Sala,
 	num_jogadores: Number,
   jogadores: Array,
-  rodadas: [Rodada]
+  rodadas: [Rodada],
+  persuasoes_padrao: Array,
+  contador_iniciar_partida: Number,
+  num_rodada_atual: Number,
+  num_round_atual: Number,
+  indice_valor: Number
 });
 
 

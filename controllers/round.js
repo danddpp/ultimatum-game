@@ -5,6 +5,7 @@ var Round = function(numeroRound, qtdeTotalJogadas) {
   this.jogadores = [];
   this.count_change_round = 0;
   this.regras = [];
+  this.bt_prox_round = false;
 };
 
 module.exports = Round;
