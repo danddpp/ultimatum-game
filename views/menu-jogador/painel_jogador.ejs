@@ -9,10 +9,16 @@
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 <style type="text/css">
-
 ul , li {
       list-style-type: none;
+}
+
+#nome_jogador {
+  position: absolute;
+  margin-left: 80%;
+  margin-top: 0%;  
 }  
+
 #chat_id {
      width: 17em;
      height: 9em;
@@ -75,13 +81,13 @@ ul , li {
         $('.pontuacao').show();
       }
 
-      /*if('<%- params.num_rodada %>' < 4) {
+      if('<%- params.num_rodada %>' < 4) {
         $('#chat_').hide();
         $('#header_chat').hide();
       } else {
         $('#chat_').show();
         $('#header_chat').show();
-      }*/
+      }
 
       if('<%- params.num_rodada %>' < 5) {
         $('.percentual_ganho').hide();
@@ -100,6 +106,15 @@ ul , li {
           $('#game_over__').show();
           $('#ver_ranking_partida').show();
         });
+      }
+
+
+      function sair_do_jogo() {
+        var data = {
+          id_partida: '<%- params.id_partida %>',
+          id_jogador: '<%- params.eu._id %>'
+        } 
+        client.emit('sair_do_jogo', data);
       }
 
 
@@ -956,9 +971,22 @@ var mensagem = '';
   
   </script>
   <!--Controle Painel-->
-  </head>
+</head>
 <body id="painel">
 <div class="container">
+
+
+<div id="nome_jogador" class="btn-group">
+  <a style="width: 130px;" class="btn btn-primary btn-sm"><%- params.eu.nome %></a>
+  <a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li><a href="/" style="text-align: left;" onclick="sair_do_jogo()">Sair do jogo</a></li>
+    <li><a href="#" style="text-align: left;">help</a></li>
+  </ul>
+</div>
+
+
+
 <div id="numeroRodada">
   <h3>Rodada <%- params.rodada.numero_rodada %></h3> 
 </div>
@@ -967,8 +995,6 @@ var mensagem = '';
 </div>
 <h2 id="informar_fim_de_round"></h2>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
 
 
 <div id="mudar_round">
