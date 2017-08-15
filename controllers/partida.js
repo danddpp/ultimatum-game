@@ -1,7 +1,8 @@
-var Partida = function(tipo_sala, id_dono) {
+var Partida = function(tipo_sala, id_dono, num_rodadas) {
    this.id_dono = id_dono;
    this.data = new Date();
    this.status = 'Em andamento';
+   this.num_rodadas = num_rodadas;
    this.tipo_sala = tipo_sala;
    this.num_jogadores = 0;
    this.jogadores = [];

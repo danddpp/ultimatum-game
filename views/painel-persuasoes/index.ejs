@@ -33,16 +33,19 @@
      $('#botoes').children().children().prop('disabled', false);
       //document.getElementById(id).checked = false;
    };
-       //
-
-
+     
 
    var salvar_configuracoes = function() {  
 
         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
         var round_reciprocidade = $('#select_round_reciprocidade').val();
         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
- 
+        var id_destinatario_reciprocidade = $('#sel_jogadores_reciprocidade')
+                                                              .find(':selected').attr('id');
+        
+        alert(id_destinatario_reciprocidade);
+
+
         var rodada_coerencia = $('#select_rodada_coerencia').val();
         var round_coerencia = $('#select_round_coerencia').val();
         var opcao_coerencia = $('#check_coerencia').prop('checked');      
@@ -63,13 +66,12 @@
         var round_escassez = $('#select_round_escassez').val();
         var opcao_escassez = $('#check_escassez').prop('checked');
         
-        //var id_partida 
-        //var check_partidac
         
             var reciprocidade = {
                 jogador: '<%- nome_jogador %>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Reciprocidade',
+                id_destinatario: id_destinatario_reciprocidade, 
                 rodada: rodada_reciprocidade, 
                 round: round_reciprocidade,
                 opcao: opcao_reciprocidade,
@@ -182,6 +184,21 @@
                   <span class="help-block">Nos sentimos compelidos a retribuir, nem sempre de forma vantajosa</br> para nós, o que outra pessoa nos proporcionou.</span>
                   </div>
                  </div>
+                 <br><br>
+                 <div class="form-group">
+                  <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                   <div class="col-lg-10">
+                    <select class="form-control" id="sel_jogadores_reciprocidade" style="width:160px;">
+                     <% if(jogadores !== null) { 
+                         jogadores.forEach(function(jogador, index) { %>
+                          <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                       <% })
+                           } %>
+                           <option id="todos" selected="todos">todos</option>
+                    </select>
+                   </div>
+                  </div>
+                 <br><br>
                  <div class="form-group">
                   <label for="select" class="col-lg-2 control-label">Rodada</label>
                    <div class="col-lg-10">
@@ -195,7 +212,7 @@
                     </select>
                    </div>
                   </div>
-                  <br><br><br><br><br>
+                  <br><br>
                   <div class="form-group">
                    <label for="select" class="col-lg-2 control-label">Round</label>
                     <div class="col-lg-10">
@@ -208,7 +225,8 @@
                       <option>6</option>
                      </select>
                     </div>
-                   </div><br><br>
+                   </div>
+                   <br>
                    <div class="form-group">
                        <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                       <div class="col-lg-10">
@@ -474,34 +492,34 @@
   </div>
    <div id="tab_right" class="container-fluid">
      <fieldset>
-       <legend>Lista de partidas em andamento</legend>
+       <legend>Partida em andamento</legend>
         <table id="tabela" class="table table-striped table-hover">
         <thead>
          <tr>
           <th>Nº</th>
           <th>Curso</th>
           <th>Modulo</th>
+          <th>Nº rodadas</th>
           <th>Status</th>
           <th>Jogadores</th>
           <th>Opção</th>
          </tr>  
         </thead>
         <tbody>
-          <% if(partidas !== null) {  
-            partidas.forEach(function(partida, index) { %> 
+          <% if(partida !== null) { %>   
             <tr>
              <form action="/" method="POST">
-             <td><%- (index + 1) %></td>
+             <td>1</td>
              <td><%- partida.tipo_sala.curso %></td>
              <td><%- partida.tipo_sala.modulo %></td>
+             <td><%- partida.num_rodadas %></td>
              <td><%- partida.status %></td>
              <td ><%- partida.tipo_sala.capacidadeSala %></td>
              <td id="check_partida"><div class="checkbox"><label><input type="checkbox" id="check" onchange="muda(this, id);">Aplicar</label></div></td>
              <td id="<%- partida._id %>"><input type="hidden"></td>
              </form> 
             </tr>
-           <% }) 
-           } %>
+           <% } %>
         </tbody>
         </table>
      </fieldset>

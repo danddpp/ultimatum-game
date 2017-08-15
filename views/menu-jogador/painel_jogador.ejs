@@ -14,7 +14,7 @@ ul , li {
 }
 
 #nome_jogador {
-  position: absolute;
+  position: relative;
   margin-left: 80%;
   margin-top: 0%;  
 }  
@@ -81,13 +81,13 @@ ul , li {
         $('.pontuacao').show();
       }
 
-      if('<%- params.num_rodada %>' < 4) {
+      /*if('<%- params.num_rodada %>' < 4) {
         $('#chat_').hide();
         $('#header_chat').hide();
       } else {
         $('#chat_').show();
         $('#header_chat').show();
-      }
+      }*/
 
       if('<%- params.num_rodada %>' < 5) {
         $('.percentual_ganho').hide();
@@ -109,22 +109,13 @@ ul , li {
       }
 
 
-      function sair_do_jogo() {
-        var data = {
-          id_partida: '<%- params.id_partida %>',
-          id_jogador: '<%- params.eu._id %>'
-        } 
-        client.emit('sair_do_jogo', data);
-      }
-
-
       if('<%- params.persuasao_padrao %>') {
        
         var persuasao_padrao = '<%- params.persuasao_padrao %>';
         var temp = persuasao_padrao.split(',');
         var tipo = temp[0];
-           
-           if(tipo == 'Reciprocidade') {
+           alert(temp[4]);
+           if(tipo == 'Reciprocidade') {      
             var msg = temp[3]+' diz: '+'\n'+temp[1];
              var campo = $('#myModal').children().children().children().next().children();
              if(campo.attr('id') == 'msg') {
@@ -133,10 +124,18 @@ ul , li {
                $('.modal-footer').children().next().text('Não');
                //alert(campo.attr('id'));
              }
-             if(temp[4] != '<%- params.eu._id %>') {
+            if(temp[5] == 'todos') {
+              if(temp[4] != '<%- params.eu._id %>') {
                $('#myModal').modal(); 
-             }
+             } 
+            }
+            //aqui params.eu._id é o painel e id do destinatario
+            else if(temp[5] == '<%- params.eu._id %>') {
+               $('#myModal').modal();
+            }
            }
+
+
 
            if(tipo == 'Coerência') {
                if(temp[3] == '') {

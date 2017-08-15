@@ -17,7 +17,7 @@ router.get('/menu_partida', function(req, res) {
        var curso = req.user.curso;
        var modulo = req.user.modulo;
        var nivel = req.user.nivel;
-       var id_usuario = req.user._id;
+       var id_usuario = req.user._id;''
        
       Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
        if(partidas) {
@@ -89,8 +89,11 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                     //recebendo da sessao o obj com os dados do usuario/jogador
                     //criador da sala
                     var dono_da_sala = req.user;
+                    
+                    var num_rodadas = Number(req.body.partida.num_rodadas);
+
                     //instanciando uma nova partida(obj classe js) passando por param o tipo de sala
-                    var nova_partida = new c_partida(tipo_sala, dono_da_sala._id);
+                    var nova_partida = new c_partida(tipo_sala, dono_da_sala._id, num_rodadas);
                     nova_partida.num_jogadores = 1;
                     //instanciando a primeira rodada (obj classe js) que contem 6 rounds
                     var rodada1 = new c_rodada(Number(1));
@@ -155,6 +158,7 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                         id_dono: nova_partida.id_dono, 
                         data: nova_partida.data,
                         status: nova_partida.status,
+                        num_rodadas: num_rodadas,
                         tipo_sala: nova_partida.tipo_sala,
                         num_jogadores: nova_partida.num_jogadores,
                         jogadores: nova_partida.jogadores,

@@ -29,6 +29,7 @@ var Partida = new Schema({
 	id_dono: String,
 	data: Date,
 	status: String,
+  num_rodadas: Number,
 	tipo_sala: Sala,
 	num_jogadores: Number,
   jogadores: Array,

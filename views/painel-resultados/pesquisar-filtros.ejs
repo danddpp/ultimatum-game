@@ -63,6 +63,7 @@
       	<th>Nº</th>
       	<th>Curso</th>
       	<th>Modulo</th>
+        <th>Nº de rodadas</th>
       	<th>Status</th>
       	<th>Capacidade da Sala</th>
       	<th>Visualizar resultados</th>
@@ -76,6 +77,7 @@
           <td><%- (index + 1) %></td>
           <td><%- partida.tipo_sala.curso %></td>
           <td><%- partida.tipo_sala.modulo %></td>
+          <td><%- partida.num_rodadas %></td>
           <td><%- partida.status %></td>
           <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
           <td><button type="submit" id="btEntrar" class="btn btn-default">Resultados</button></td>

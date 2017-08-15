@@ -383,7 +383,8 @@ router.post('/iniciar_partida', function(req, res) {
                                    persuasao_padrao += ','+partida.persuasoes_padrao[0].msg;
                                    persuasao_padrao += ','+partida.persuasoes_padrao[0].msg2;
                                    persuasao_padrao += ','+partida.persuasoes_padrao[0].jogador;
-                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;   
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;
+                                   persuasao_padrao += ','+partida.persuasoes_padrao[0].id_destinatario;   
                                 }
 
                                 if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
@@ -467,7 +468,8 @@ router.post('/iniciar_partida', function(req, res) {
                                  persuasao_padrao += ','+partida.persuasoes_padrao[0].msg;
                                  persuasao_padrao += ','+partida.persuasoes_padrao[0].msg2;
                                  persuasao_padrao += ','+partida.persuasoes_padrao[0].jogador;
-                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;   
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].id_usuario;
+                                 persuasao_padrao += ','+partida.persuasoes_padrao[0].id_destinatario;   
                                 } 
 
                                if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
@@ -599,7 +601,8 @@ router.post('/iniciar_partida', function(req, res) {
                                   persuasao_padrao += ','+persuasoes_padrao[k].msg;
                                   persuasao_padrao += ','+persuasoes_padrao[k].msg2;
                                   persuasao_padrao += ','+persuasoes_padrao[k].jogador;
-                                  persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                  persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;
+                                  persuasao_padrao += ','+persuasoes_padrao[k].id_destinatario;
                                  } 
 
                                  if(persuasoes_padrao[k].tipo == 'Coerência') {
@@ -804,20 +807,23 @@ router.post('/iniciar_novoRound', function(req, res) {
                          
                          for(var k = 0; k < persuasoes_padrao.length; k++ ) {
                              if(persuasoes_padrao[k].opcao != false) {
+                              
                                if(persuasoes_padrao[k].rodada == n_rodada &&
                                   persuasoes_padrao[k].round == n_round) {
+
                                   if(persuasoes_padrao[k].tipo == 'Reciprocidade') {
                                     persuasao_padrao = persuasoes_padrao[k].tipo;
                                     persuasao_padrao += ','+persuasoes_padrao[k].msg;
                                     persuasao_padrao += ','+persuasoes_padrao[k].msg2;
                                     persuasao_padrao += ','+persuasoes_padrao[k].jogador;
-                                    persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                    persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;
+                                    persuasao_padrao += ','+persuasoes_padrao[k].id_destinatario;   
                                    } 
 
                                    if(persuasoes_padrao[k].tipo == 'Coerência') {
-                                     console.log('here persuasao '+persuasoes_padrao[k].resposta);
+                                     
                                      if(persuasoes_padrao[k].resposta == null) {
-                                      console.log('here persuasao hbhbbhbhbhbhh'); 
+                                      
                                       persuasao_padrao = persuasoes_padrao[k].tipo;
                                       persuasao_padrao += ','+persuasoes_padrao[k].msg;
                                       persuasao_padrao += ','+persuasoes_padrao[k].jogador;
@@ -912,7 +918,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
       
        Jogador.find().where('id_partida').equals(id_partida)
                                                     .exec(function(err, jogadores) {
-                  //console.log('7');
+                  
                   var eu = req.user._id;
                   var valor_total = 0;
                   var aux_p_adversarios = [];
@@ -928,11 +934,11 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                            aux_p_adversarios.push(jogadores[i]);
 
                        for(var j = 0; j < jogador.ofertas_recebidas.length; j++) {
-                          //soma total das ofertas recebidas
+                          
                           soma_ofertas_recebidas += 
                                   Number(jogador.ofertas_recebidas[j].ofertaRecebida);
 
-                          //soma das ofertas que foram aceitas 
+                           
                           if(jogador.ofertas_recebidas[j].aceitei == 'sim') {
                            soma_valores += Number(jogador.ofertas_recebidas[j].ofertaRecebida);
                           } 
@@ -973,10 +979,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                      }
                    }
 
-                   
-                   
-                   console.log(indice_rodada);
-                   console.log(indice_round);
+
                    Estado_Painel.findById(id_painel_).exec(function(err, painel) { 
                     
                     if(err) {
@@ -989,7 +992,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                         var id_rodada_ = p_id_rodada;
                         var p_round = painel.rodadas[aux_rodada].rounds[0];
                         
-                        //console.log(p_round);
+                        
                         var aux_id_partida = painel.aux_id_partida;
                         var aux_num_round = painel.aux_num_round;
                         var aux_num_rodada = painel.aux_num_rodada;
@@ -1023,7 +1026,8 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                       persuasao_padrao += ','+persuasoes_padrao[k].msg;
                                       persuasao_padrao += ','+persuasoes_padrao[k].msg2;
                                       persuasao_padrao += ','+persuasoes_padrao[k].jogador;
-                                      persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;   
+                                      persuasao_padrao += ','+persuasoes_padrao[k].id_usuario;
+                                      persuasao_padrao += ','+persuasoes_padrao[k].id_destinatario;   
                                      } 
 
                                      if(persuasoes_padrao[k].tipo == 'Coerência') {

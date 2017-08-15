@@ -9,9 +9,60 @@
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 <body>
 <% include ../barraMenu %>
+<script>
+  $(document).ready(function() {
+    var data = '<%- dados_partida.data %>'; 
+    data = data.split(' ');
+    
+    switch(data[1]) {
+        case 'Jan':
+            data[1] = '01';
+            break;
+        case 'Feb':
+            data[1] = '02';
+            break;
+        case 'Mar':
+            data[1] = '03';
+            break;
+        case 'Apr':
+            data[1] = '04';
+            break;
+        case 'May':
+            data[1] = '05';
+            break;
+        case 'Jun':
+            data[1] = '06';
+            break;
+        case 'Jul':
+            data[1] = '07';
+            break;
+        case 'Aug':
+            data[1] = '08';
+            break;
+        case 'Sep':
+            data[1] = '09';
+            break;s
+        case 'Oct':
+            data[1] = '10';
+            break;
+        case 'Nov':
+            data[1] = '11';
+            break;
+        case 'Dec':
+            data[1] = '12';
+            break;                                        
+        default:
+            break;
+    }
 
+    $('#data').text('Data da partida: '+data[2]+'/'+data[1]+'/'+data[3]);
+  });
+</script>
 <div class="container">
-  
+   <dir id="dados_partida" style="text-align: right;">
+      <label id="data"></label>&nbsp;&nbsp;&nbsp;
+      <label>Nº de rodadas: <%- dados_partida.num_rodadas %> </label> 
+   </dir>
    <div class="container" id="menu-partidas-resultados">
     <legend>Ranking</legend>
      <table id="tabela" class="table table-striped table-hover">

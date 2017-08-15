@@ -200,55 +200,6 @@ passport.use(new LocalStrategy({
         //deletando o jogador do vetor pois saiu da aplicação
         delete onlines[usuario._id];
        });
-
-
-
-       socket.on('reincluir_jogador_partida', function(data_) {
-          Partida.findById(data_.id_partida).exec(function(err, partida) {
-             if (partida) {
-               var temp = partida.num_jogadores + 1;
-               if (temp <= partida.num_jogadores) {
-                 partida.num_jogadores++;
-                 Jogador.find().where('usuario._id').equals(data_.id_usuario).exec(function(err, jogador) {
-                    if (jogador) {
-                       jogador[0].on_off = true;
-                       var aux = jogador[0];
-                       jogador[0].save();
-                       
-                       var jogadores = [];
-                       jogadores = partida.jogadores;
-
-                       for(var i = 0; i < jogadores.length; i++) {
-                           if(jogadores[i].usuario._id == data_.id_jogador) {
-                              jogadores[i] = aux;
-                           }
-                       }
-                       partida.jogadores = jogadores;
-                       partida.save();
-                    }
-                 });
-               }
-             }
-          });
-     });
-     
-     socket.on('excluir_jogador_partida', function(data_) {
-         Partida.findById(data_.id_partida).exec(function(err, partida) {
-             if (partida) {
-               var temp = partida.num_jogadores - 1;
-               if (temp >= 0) {
-                 partida.num_jogadores--;
-                 partida.save();
-                 Jogador.findById(data_.id_usuario).exec(function(err, jogador) {
-                    if (jogador) {
-                       jogador.on_off = false;
-                    }
-                 });
-               }
-             }
-          });
-     });
-
      
       socket.on('qtde_atual_jogadores', function(data) {
          socket.emit('qtde_atual_jogadores_send', data);
@@ -576,32 +527,6 @@ passport.use(new LocalStrategy({
           });
         });
 
-        /*socket.on('salvar_bt_nova_rodada_click_ok', function(data) {
-          var id_painel = data.id_painel;
-
-          Estado_Painel.findById(id_painel).exec(function(err, painel) {
-              if(err) {
-               console.log(err);
-              } else {
-              var num_round = data.num_round-1;
-              var num_rodada = data.num_rodada-1;   
-              painel.rodadas[num_rodada].rounds[num_round].bt_prox_rodada_click = true;
-              painel.save(function() {
-                var id_usuario = data.id_usuario;
-                Jogador.find().where('usuario._id').equals(id_usuario).exec(function(err, jogador) {
-                  if(err) {
-                    console.log(err);
-                  } else {
-                    //console.log(jogador[0]);
-                    jogador[0].flag_rodada_round1 = false;
-                    jogador[0].save();
-                  }
-                });
-              });
-              }
-          }); 
-        });*/
-        //estado painel////////////////////////////////////////////////////////////
 
         //estado painel////////////////////////////////////////////////////////////
         socket.on('carregar_jogadores_prox_rodada', function(data__) {
@@ -648,7 +573,7 @@ passport.use(new LocalStrategy({
                             socket.broadcast.emit('iniciar_nova_rodada', data);
                          
                           } else {
-                            console.log('wrong');
+                            //console.log('wrong');
                           }
                         
                         }
@@ -675,7 +600,7 @@ passport.use(new LocalStrategy({
           time = ((time - time2) + time3);
 
           setTimeout(function(){ 
-             console.log('here '+time);
+             //console.log('here '+time);
              var id_painel = data.id_painel;
              Estado_Painel.findById(id_painel).exec(function(err, painel) {
                  if(err) {
@@ -1386,61 +1311,8 @@ passport.use(new LocalStrategy({
                                          var id_partida = 0;
                                          Partida.findById(query).exec(function(err, partida_) {
                                           if(partida_) { 
-                                           if(partida_.rodadas.length < 6) {
-                                            id_partida = partida_._id;
-                                            var num_nova_rodada = rodada.numero_rodada;
-                                            num_nova_rodada++;  
-                                            var nova_rodada = new Rodada(num_nova_rodada);
-                                            var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
-                                            
-                                            var round1 = new c_round(1, qtde_total_jogadas);
-                                            var round2 = new c_round(2, qtde_total_jogadas);
-                                            var round3 = new c_round(3, qtde_total_jogadas);
-                                            var round4 = new c_round(4, qtde_total_jogadas);
-                                            var round5 = new c_round(5, qtde_total_jogadas);
-                                            var round6 = new c_round(6, qtde_total_jogadas);                    
-
-                                             nova_rodada.rounds.push(round1);
-                                             nova_rodada.rounds.push(round2);
-                                             nova_rodada.rounds.push(round3);
-                                             nova_rodada.rounds.push(round4);
-                                             nova_rodada.rounds.push(round5);
-                                             nova_rodada.rounds.push(round6);
-                                             
-                                             partida_.rodadas.push(nova_rodada)
-                                             
-                                             partida_.save(function() {
-                                               var id_rodada = null;
-
-                                               Partida.findById(query).exec(function(err, partida__) {
-                                                if(partida__) {
-                                                 var id_partida = partida__._id;
-                                                 id_rodada = partida__.rodadas[partida__.rodadas
-                                                                            .length-1]._id;
-                                                 var data = {
-                                                  nova_rodada: nova_rodada,
-                                                  id_partida: id_partida,
-                                                  id_rodada: id_rodada,
-                                                  num_round: 6,
-                                                 };
-                                                   
-                                                  //socket.emit('final_rodada', data);
-                                                  //socket.broadcast.emit('final_rodada', data);
-                                                  //jogo//////////////////////////////////////////////////////////////////////
-
-                                                  //estado painel////////////////////////////////////////////////////////////
-                                                  socket.emit('salvar_flag_round1', data);
-                                                  socket.broadcast.emit('salvar_flag_round1', data);                           
-                                                  //estado painel////////////////////////////////////////////////////////////
-                                               } else {
-                                                 console.log(err);
-                                               }
-                                             });
-
-                                             });
-                                           //jogo//////////////////////////////////////////////////////////////////////
-                                           } else {
-                                                 
+                                          
+                                           if(partida_.num_rodadas == 1) {
                                               var data = {
                                                   id_partida: query, 
                                                   msg: 'Partida finalizada!',
@@ -1452,6 +1324,356 @@ passport.use(new LocalStrategy({
                                               socket.emit('salvar_percentual_ganho', query);
                                               socket.broadcast.emit('salvar_percentual_ganho', query);
                                               finalizar_partida(query);
+                                           }
+
+                                           if(partida_.num_rodadas == 2) {
+                                             if(partida_.rodadas.length < 2) {
+                                              id_partida = partida_._id;
+                                              var num_nova_rodada = rodada.numero_rodada;
+                                              num_nova_rodada++;  
+                                              var nova_rodada = new Rodada(num_nova_rodada);
+                                              var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                              
+                                              var round1 = new c_round(1, qtde_total_jogadas);
+                                              var round2 = new c_round(2, qtde_total_jogadas);
+                                              var round3 = new c_round(3, qtde_total_jogadas);
+                                              var round4 = new c_round(4, qtde_total_jogadas);
+                                              var round5 = new c_round(5, qtde_total_jogadas);
+                                              var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                               nova_rodada.rounds.push(round1);
+                                               nova_rodada.rounds.push(round2);
+                                               nova_rodada.rounds.push(round3);
+                                               nova_rodada.rounds.push(round4);
+                                               nova_rodada.rounds.push(round5);
+                                               nova_rodada.rounds.push(round6);
+                                               
+                                               partida_.rodadas.push(nova_rodada)
+                                               
+                                               partida_.save(function() {
+                                                 var id_rodada = null;
+
+                                                 Partida.findById(query).exec(function(err, partida__) {
+                                                  if(partida__) {
+                                                   var id_partida = partida__._id;
+                                                   id_rodada = partida__.rodadas[partida__.rodadas
+                                                                              .length-1]._id;
+                                                   var data = {
+                                                    nova_rodada: nova_rodada,
+                                                    id_partida: id_partida,
+                                                    id_rodada: id_rodada,
+                                                    num_round: 6,
+                                                   };
+                                                     
+                                                    //socket.emit('final_rodada', data);
+                                                    //socket.broadcast.emit('final_rodada', data);
+                                                    //jogo//////////////////////////////////////////////////////////////////////
+
+                                                    //estado painel////////////////////////////////////////////////////////////
+                                                    socket.emit('salvar_flag_round1', data);
+                                                    socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                    //estado painel////////////////////////////////////////////////////////////
+                                                 } else {
+                                                   console.log(err);
+                                                 }
+                                               });
+
+                                               });
+                                             //jogo//////////////////////////////////////////////////////////////////////
+                                             } else {
+                                                   
+                                                var data = {
+                                                    id_partida: query, 
+                                                    msg: 'Partida finalizada!',
+                                                    msg2: 'Obrigado por participar!'
+                                                }
+                                                //console.log(data);       
+                                                socket.emit('fim_de_jogo', data);
+                                                socket.broadcast.emit('fim_de_jogo', data);
+                                                socket.emit('salvar_percentual_ganho', query);
+                                                socket.broadcast.emit('salvar_percentual_ganho', query);
+                                                finalizar_partida(query);
+                                             }
+                                           }
+
+                                           if(partida_.num_rodadas == 3) {
+                                              if(partida_.rodadas.length < 3) {
+                                               id_partida = partida_._id;
+                                               var num_nova_rodada = rodada.numero_rodada;
+                                               num_nova_rodada++;  
+                                               var nova_rodada = new Rodada(num_nova_rodada);
+                                               var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                               
+                                               var round1 = new c_round(1, qtde_total_jogadas);
+                                               var round2 = new c_round(2, qtde_total_jogadas);
+                                               var round3 = new c_round(3, qtde_total_jogadas);
+                                               var round4 = new c_round(4, qtde_total_jogadas);
+                                               var round5 = new c_round(5, qtde_total_jogadas);
+                                               var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                                nova_rodada.rounds.push(round1);
+                                                nova_rodada.rounds.push(round2);
+                                                nova_rodada.rounds.push(round3);
+                                                nova_rodada.rounds.push(round4);
+                                                nova_rodada.rounds.push(round5);
+                                                nova_rodada.rounds.push(round6);
+                                                
+                                                partida_.rodadas.push(nova_rodada)
+                                                
+                                                partida_.save(function() {
+                                                  var id_rodada = null;
+
+                                                  Partida.findById(query).exec(function(err, partida__) {
+                                                   if(partida__) {
+                                                    var id_partida = partida__._id;
+                                                    id_rodada = partida__.rodadas[partida__.rodadas
+                                                                               .length-1]._id;
+                                                    var data = {
+                                                     nova_rodada: nova_rodada,
+                                                     id_partida: id_partida,
+                                                     id_rodada: id_rodada,
+                                                     num_round: 6,
+                                                    };
+                                                      
+                                                     //socket.emit('final_rodada', data);
+                                                     //socket.broadcast.emit('final_rodada', data);
+                                                     //jogo//////////////////////////////////////////////////////////////////////
+
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                     socket.emit('salvar_flag_round1', data);
+                                                     socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                  } else {
+                                                    console.log(err);
+                                                  }
+                                                });
+
+                                                });
+                                              //jogo//////////////////////////////////////////////////////////////////////
+                                              } else {
+                                                    
+                                                 var data = {
+                                                     id_partida: query, 
+                                                     msg: 'Partida finalizada!',
+                                                     msg2: 'Obrigado por participar!'
+                                                 }
+                                                 //console.log(data);       
+                                                 socket.emit('fim_de_jogo', data);
+                                                 socket.broadcast.emit('fim_de_jogo', data);
+                                                 socket.emit('salvar_percentual_ganho', query);
+                                                 socket.broadcast.emit('salvar_percentual_ganho', query);
+                                                 finalizar_partida(query);
+                                              }
+                                           }
+
+                                           if(partida_.num_rodadas == 4) {
+                                              if(partida_.rodadas.length < 4) {
+                                               id_partida = partida_._id;
+                                               var num_nova_rodada = rodada.numero_rodada;
+                                               num_nova_rodada++;  
+                                               var nova_rodada = new Rodada(num_nova_rodada);
+                                               var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                               
+                                               var round1 = new c_round(1, qtde_total_jogadas);
+                                               var round2 = new c_round(2, qtde_total_jogadas);
+                                               var round3 = new c_round(3, qtde_total_jogadas);
+                                               var round4 = new c_round(4, qtde_total_jogadas);
+                                               var round5 = new c_round(5, qtde_total_jogadas);
+                                               var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                                nova_rodada.rounds.push(round1);
+                                                nova_rodada.rounds.push(round2);
+                                                nova_rodada.rounds.push(round3);
+                                                nova_rodada.rounds.push(round4);
+                                                nova_rodada.rounds.push(round5);
+                                                nova_rodada.rounds.push(round6);
+                                                
+                                                partida_.rodadas.push(nova_rodada)
+                                                
+                                                partida_.save(function() {
+                                                  var id_rodada = null;
+
+                                                  Partida.findById(query).exec(function(err, partida__) {
+                                                   if(partida__) {
+                                                    var id_partida = partida__._id;
+                                                    id_rodada = partida__.rodadas[partida__.rodadas
+                                                                               .length-1]._id;
+                                                    var data = {
+                                                     nova_rodada: nova_rodada,
+                                                     id_partida: id_partida,
+                                                     id_rodada: id_rodada,
+                                                     num_round: 6,
+                                                    };
+                                                      
+                                                     //socket.emit('final_rodada', data);
+                                                     //socket.broadcast.emit('final_rodada', data);
+                                                     //jogo//////////////////////////////////////////////////////////////////////
+
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                     socket.emit('salvar_flag_round1', data);
+                                                     socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                  } else {
+                                                    console.log(err);
+                                                  }
+                                                });
+
+                                                });
+                                              //jogo//////////////////////////////////////////////////////////////////////
+                                              } else {
+                                                    
+                                                 var data = {
+                                                     id_partida: query, 
+                                                     msg: 'Partida finalizada!',
+                                                     msg2: 'Obrigado por participar!'
+                                                 }
+                                                 //console.log(data);       
+                                                 socket.emit('fim_de_jogo', data);
+                                                 socket.broadcast.emit('fim_de_jogo', data);
+                                                 socket.emit('salvar_percentual_ganho', query);
+                                                 socket.broadcast.emit('salvar_percentual_ganho', query);
+                                                 finalizar_partida(query);
+                                              }
+                                           }
+
+                                           if(partida_.num_rodadas == 5) {
+                                              if(partida_.rodadas.length < 5) {
+                                               id_partida = partida_._id;
+                                               var num_nova_rodada = rodada.numero_rodada;
+                                               num_nova_rodada++;  
+                                               var nova_rodada = new Rodada(num_nova_rodada);
+                                               var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                               
+                                               var round1 = new c_round(1, qtde_total_jogadas);
+                                               var round2 = new c_round(2, qtde_total_jogadas);
+                                               var round3 = new c_round(3, qtde_total_jogadas);
+                                               var round4 = new c_round(4, qtde_total_jogadas);
+                                               var round5 = new c_round(5, qtde_total_jogadas);
+                                               var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                                nova_rodada.rounds.push(round1);
+                                                nova_rodada.rounds.push(round2);
+                                                nova_rodada.rounds.push(round3);
+                                                nova_rodada.rounds.push(round4);
+                                                nova_rodada.rounds.push(round5);
+                                                nova_rodada.rounds.push(round6);
+                                                
+                                                partida_.rodadas.push(nova_rodada)
+                                                
+                                                partida_.save(function() {
+                                                  var id_rodada = null;
+
+                                                  Partida.findById(query).exec(function(err, partida__) {
+                                                   if(partida__) {
+                                                    var id_partida = partida__._id;
+                                                    id_rodada = partida__.rodadas[partida__.rodadas
+                                                                               .length-1]._id;
+                                                    var data = {
+                                                     nova_rodada: nova_rodada,
+                                                     id_partida: id_partida,
+                                                     id_rodada: id_rodada,
+                                                     num_round: 6,
+                                                    };
+                                                      
+                                                     //socket.emit('final_rodada', data);
+                                                     //socket.broadcast.emit('final_rodada', data);
+                                                     //jogo//////////////////////////////////////////////////////////////////////
+
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                     socket.emit('salvar_flag_round1', data);
+                                                     socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                     //estado painel////////////////////////////////////////////////////////////
+                                                  } else {
+                                                    console.log(err);
+                                                  }
+                                                });
+
+                                                });
+                                              //jogo//////////////////////////////////////////////////////////////////////
+                                              } else {
+                                                    
+                                                 var data = {
+                                                     id_partida: query, 
+                                                     msg: 'Partida finalizada!',
+                                                     msg2: 'Obrigado por participar!'
+                                                 }
+                                                 //console.log(data);       
+                                                 socket.emit('fim_de_jogo', data);
+                                                 socket.broadcast.emit('fim_de_jogo', data);
+                                                 socket.emit('salvar_percentual_ganho', query);
+                                                 socket.broadcast.emit('salvar_percentual_ganho', query);
+                                                 finalizar_partida(query);
+                                              }
+                                           } 
+
+                                           if(partida_.num_rodadas == 6) {
+                                             if(partida_.rodadas.length < 6) {
+                                              id_partida = partida_._id;
+                                              var num_nova_rodada = rodada.numero_rodada;
+                                              num_nova_rodada++;  
+                                              var nova_rodada = new Rodada(num_nova_rodada);
+                                              var qtde_total_jogadas = rodada.rounds[5].qtdeAtualJogadas;
+                                              
+                                              var round1 = new c_round(1, qtde_total_jogadas);
+                                              var round2 = new c_round(2, qtde_total_jogadas);
+                                              var round3 = new c_round(3, qtde_total_jogadas);
+                                              var round4 = new c_round(4, qtde_total_jogadas);
+                                              var round5 = new c_round(5, qtde_total_jogadas);
+                                              var round6 = new c_round(6, qtde_total_jogadas);                    
+
+                                               nova_rodada.rounds.push(round1);
+                                               nova_rodada.rounds.push(round2);
+                                               nova_rodada.rounds.push(round3);
+                                               nova_rodada.rounds.push(round4);
+                                               nova_rodada.rounds.push(round5);
+                                               nova_rodada.rounds.push(round6);
+                                               
+                                               partida_.rodadas.push(nova_rodada)
+                                               
+                                               partida_.save(function() {
+                                                 var id_rodada = null;
+
+                                                 Partida.findById(query).exec(function(err, partida__) {
+                                                  if(partida__) {
+                                                   var id_partida = partida__._id;
+                                                   id_rodada = partida__.rodadas[partida__.rodadas
+                                                                              .length-1]._id;
+                                                   var data = {
+                                                    nova_rodada: nova_rodada,
+                                                    id_partida: id_partida,
+                                                    id_rodada: id_rodada,
+                                                    num_round: 6,
+                                                   };
+                                                     
+                                                    //socket.emit('final_rodada', data);
+                                                    //socket.broadcast.emit('final_rodada', data);
+                                                    //jogo//////////////////////////////////////////////////////////////////////
+
+                                                    //estado painel////////////////////////////////////////////////////////////
+                                                    socket.emit('salvar_flag_round1', data);
+                                                    socket.broadcast.emit('salvar_flag_round1', data);                           
+                                                    //estado painel////////////////////////////////////////////////////////////
+                                                 } else {
+                                                   console.log(err);
+                                                 }
+                                               });
+
+                                               });
+                                             //jogo//////////////////////////////////////////////////////////////////////
+                                             } else {
+                                                   
+                                                var data = {
+                                                    id_partida: query, 
+                                                    msg: 'Partida finalizada!',
+                                                    msg2: 'Obrigado por participar!'
+                                                }
+                                                //console.log(data);       
+                                                socket.emit('fim_de_jogo', data);
+                                                socket.broadcast.emit('fim_de_jogo', data);
+                                                socket.emit('salvar_percentual_ganho', query);
+                                                socket.broadcast.emit('salvar_percentual_ganho', query);
+                                                finalizar_partida(query);
+                                             }
                                            }
                                            //jogo//////////////////////////////////////////////////////////////////////
                                            } else {

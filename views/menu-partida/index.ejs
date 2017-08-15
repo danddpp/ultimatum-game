@@ -164,9 +164,20 @@
 	 <form action="/criar_partida" method="POST" class="navbar-form navbar-left" role="search">
 	   <div class="form-group"> 
 	      <label>Capacidade da sala</label>
-	      <input type="text" class="form-control" name="partida[capacidade]" 
-	      style="width:50px;">&nbsp;&nbsp;&nbsp;
-       </div>
+	      <input type="number" min="2" max="30" class="form-control" name="partida[capacidade]" 
+	      style="width:60px;">&nbsp;&nbsp;&nbsp;
+     </div>
+     <div class="form-group">
+      <label>Nº de rodadas</label>
+      <select class="form-control" name="partida[num_rodadas]" style="width:60px;">
+       <option>1</option>
+       <option>2</option>
+       <option>3</option>
+       <option>4</option>
+       <option>5</option>
+       <option>6</option>
+      </select>
+      </div>&nbsp;&nbsp;&nbsp;
 	   <div class="form-group">
 		 <label>Curso</label>
 		  <select class="form-control" name="partida[curso]" style="width:235px;"
@@ -179,7 +190,7 @@
 		   <option>Livre</option>
 		  </select>
 	   </div>&nbsp;&nbsp;&nbsp;
-	      <div class="form-group">
+	     <div class="form-group">
 	   	 <label>Módulo</label>
 	   	  <select class="form-control" name="partida[modulo]" style="width:60px;"
 	   	          id="modulos">
@@ -192,7 +203,7 @@
 	   	  </select>
 	      </div><br>
 	   <div class="form-group">      
-		 <button type="submit" id="bt_cadastrarSala" class="btn btn-default" style="margin-left: 620px;
+		 <button type="submit" id="bt_cadastrarSala" class="btn btn-default" style="margin-left: 800px;
 		 position: absolute; margin-top: -38px;">Criar nova sala</button><br><br>
 	   </div>
 	 </form>
@@ -208,9 +219,11 @@
          <th>Curso</th>
          <th>Modulo</th>
          <th>Status</th>
+         <th>Nº de rodadas</th>
          <th>Jogadores</th>
          <th>Cap. da Sala</th>
-         <th>Ação</th>
+         <th>Entrar na sala</th>
+         <th>Iniciar jogo</th>
       </tr>
   
     </thead>
@@ -223,6 +236,7 @@
           <td><%- partida.tipo_sala.curso %></td>
           <td><%- partida.tipo_sala.modulo %></td>
           <td><%- partida.status %></td>
+          <td><%- partida.num_rodadas %></td>
           <td class="qtde" value="<%= partida.num_jogadores %>"><%- partida.num_jogadores %></td>
           <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
           <td><button type="submit" id="btEntrar" class="btn btn-default">Entrar</button></td>
@@ -231,7 +245,7 @@
           <td><input type="hidden" name="params[modulo]" value="<%- partida.tipo_sala.modulo %>"></td>
          </form>
          <td id="<%- partida._id %>">
-             <button type="submit" class="btn btn-success"  disabled="true" id="linkJogar">Jogar</button>
+             <button type="submit" class="btn btn-success"  disabled="true" id="linkJogar" style="position: absolute; margin-left: -202px;">Jogar</button>
                <input type="hidden" name="idPartida" value="<%- partida._id %>">
          </td>
          <form action="/iniciar_partida" method="POST">

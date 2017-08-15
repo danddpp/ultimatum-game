@@ -496,6 +496,11 @@ router.post('/visualizar_resultados_por_partida', function(req, res) {
       if (err) {
       	req.next(err);
       } else {
+        var dados_partida = {
+          data: partida_.data,
+          num_rodadas: partida_.num_rodadas
+        }
+             console.log(dados_partida);
         Jogador.find().where('id_partida').equals(query).exec(function(err, jogadores) {
             if(err) {
             	req.next(err);
@@ -506,7 +511,8 @@ router.post('/visualizar_resultados_por_partida', function(req, res) {
             	res.render('painel-resultados/ranking-por-percentual', {nome_jogador: nome_jogador,
             	                                                        mensagem: '',
             	                                                        nivel_usuario: nivel,
-            	                                                        jogadores: ranking_jogadores}); 
+            	                                                        jogadores: ranking_jogadores,
+                                                                      dados_partida: dados_partida}); 
             }
         });
       }
