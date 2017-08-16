@@ -163,6 +163,7 @@ passport.use(new LocalStrategy({
   var p_round = require('./controllers/painel/p_round');
   var p_rodada = require('./controllers/painel/p_rodada');
   var Estado_Painel = require('./models/Estado_Painel');
+  var Persuasoes_Padrao_Resultados = require('./models/Persuasoes_Padrao_Resultados');
   //config socket.io
 
   var onlines = {};//armazena jogadores online
@@ -214,11 +215,20 @@ passport.use(new LocalStrategy({
 
 
       socket.on('verificar_jogador_iniciar_partida', function(data) {
-          var time = Math.floor((Math.random() * 5000) + 1);
+          var time1 = Math.floor((Math.random() * 5000) + 1);
           var time2 = Math.floor((Math.random() * 100) + 1);
-          var time3 = Math.floor((Math.random() * 10) + 1);
+          var time3 = Math.floor((Math.random() * 100) + 1);
+          var time4 = Math.floor((Math.random() * 100) + 1);
+          var time5 = Math.floor((Math.random() * 100) + 1);
+          var time6 = Math.floor((Math.random() * 100) + 1);
+          var time7 = Math.floor((Math.random() * 100) + 1);
+          var time8 = Math.floor((Math.random() * 100) + 1);
+          var time9 = Math.floor((Math.random() * 100) + 1);
+          var time10 = Math.floor((Math.random() * 100) + 1);
           
-          time = ((time - time2) + time3);
+          
+          var time = ((time1 - time2) + time3) + ((time4 - time5) + time6) + 
+                     ((time7 - time8) + time9) + time10;
 
           setTimeout(function(){
              var query = data.id_partida;
@@ -436,11 +446,20 @@ passport.use(new LocalStrategy({
 
         socket.on('carregar_jogadores', function(data_) {
          //jogo//////////////////////////////////////////////////////////////////////
-         var time = Math.floor((Math.random() * 5000) + 1);
-         var time2 = Math.floor((Math.random() * 100) + 1);
-         var time3 = Math.floor((Math.random() * 10) + 1);
+          var time1 = Math.floor((Math.random() * 5000) + 1);
+          var time2 = Math.floor((Math.random() * 100) + 1);
+          var time3 = Math.floor((Math.random() * 100) + 1);
+          var time4 = Math.floor((Math.random() * 100) + 1);
+          var time5 = Math.floor((Math.random() * 100) + 1);
+          var time6 = Math.floor((Math.random() * 100) + 1);
+          var time7 = Math.floor((Math.random() * 100) + 1);
+          var time8 = Math.floor((Math.random() * 100) + 1);
+          var time9 = Math.floor((Math.random() * 100) + 1);
+          var time10 = Math.floor((Math.random() * 100) + 1);
           
-         time = ((time - time2) + time3);
+          
+          var time = ((time1 - time2) + time3) + ((time4 - time5) + time6) + 
+                     ((time7 - time8) + time9) + time10;
 
          setTimeout(function() {
             var query = data_.id_partida;
@@ -531,11 +550,20 @@ passport.use(new LocalStrategy({
         //estado painel////////////////////////////////////////////////////////////
         socket.on('carregar_jogadores_prox_rodada', function(data__) {
          //jogo//////////////////////////////////////////////////////////////////////
-         var time = Math.floor((Math.random() * 5000) + 1);
-         var time2 = Math.floor((Math.random() * 100) + 1);
-         var time3 = Math.floor((Math.random() * 10) + 1);
-         
-         time = ((time - time2) + time3);
+          var time1 = Math.floor((Math.random() * 5000) + 1);
+          var time2 = Math.floor((Math.random() * 100) + 1);
+          var time3 = Math.floor((Math.random() * 100) + 1);
+          var time4 = Math.floor((Math.random() * 100) + 1);
+          var time5 = Math.floor((Math.random() * 100) + 1);
+          var time6 = Math.floor((Math.random() * 100) + 1);
+          var time7 = Math.floor((Math.random() * 100) + 1);
+          var time8 = Math.floor((Math.random() * 100) + 1);
+          var time9 = Math.floor((Math.random() * 100) + 1);
+          var time10 = Math.floor((Math.random() * 100) + 1);
+          
+          
+          var time = ((time1 - time2) + time3) + ((time4 - time5) + time6) + 
+                     ((time7 - time8) + time9) + time10;
 
          setTimeout(function() {
              var query = data__.id_partida;
@@ -593,11 +621,21 @@ passport.use(new LocalStrategy({
 
         socket.on('enviar_aceite', function(data) {
           //estado painel////////////////////////////////////////////////////////////
-          var time = Math.floor((Math.random() * 5000) + 1);
+          var time1 = Math.floor((Math.random() * 5000) + 1);
           var time2 = Math.floor((Math.random() * 100) + 1);
-          var time3 = Math.floor((Math.random() * 10) + 1);
+          var time3 = Math.floor((Math.random() * 100) + 1);
+          var time4 = Math.floor((Math.random() * 100) + 1);
+          var time5 = Math.floor((Math.random() * 100) + 1);
+          var time6 = Math.floor((Math.random() * 100) + 1);
+          var time7 = Math.floor((Math.random() * 100) + 1);
+          var time8 = Math.floor((Math.random() * 100) + 1);
+          var time9 = Math.floor((Math.random() * 100) + 1);
+          var time10 = Math.floor((Math.random() * 100) + 1);
           
-          time = ((time - time2) + time3);
+          
+          var time = ((time1 - time2) + time3) + ((time4 - time5) + time6) + 
+                     ((time7 - time8) + time9) + time10; 
+        
 
           setTimeout(function(){ 
              //console.log('here '+time);
@@ -1722,7 +1760,45 @@ passport.use(new LocalStrategy({
        });  
      //persuasao//////////////////////////////////////////////////////////////////////
 
+     
 
+    socket.on('salvar_reciprocidade_ok', function(data) {
+       var query = data.id_partida;
+
+       Partida.findById(query).exec(function(err, partida) {
+         if(err) {
+            console.log(err);
+         } else {
+            var persuasoes_padrao = partida.persuasoes_padrao;
+
+             for(var i = 0; i < persuasoes_padrao.length; i++) {
+                if(persuasoes_padrao[i].tipo == 'Reciprocidade') {
+                    if(persuasoes_padrao[i].id_destinatario != 'todos') {
+                        
+                        var resultado = {
+                           id_partida: data.id_partida,
+                           id_jogador: data.id_jogador,
+                           nome_jogador: data.nome_jogador,
+                           status: 'aceitou após manipulador baixar oferta'
+                        };
+
+                        var temp = [];
+
+                        temp.push(resultado);
+
+                        var ppr = new Persuasoes_Padrao_Resultados({
+                            reciprocidade: temp
+                        }); 
+                        
+                        Persuasoes_Padrao_Resultados.create(ppr);
+                             
+                    }
+                }              
+             }
+         }
+       });
+
+    });
   });
 //socket.io
 

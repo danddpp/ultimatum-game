@@ -43,9 +43,7 @@
         var id_destinatario_reciprocidade = $('#sel_jogadores_reciprocidade')
                                                               .find(':selected').attr('id');
         
-        alert(id_destinatario_reciprocidade);
-
-
+        
         var rodada_coerencia = $('#select_rodada_coerencia').val();
         var round_coerencia = $('#select_round_coerencia').val();
         var opcao_coerencia = $('#check_coerencia').prop('checked');      
@@ -77,8 +75,12 @@
                 opcao: opcao_reciprocidade,
                 msg: 'Olá!! Poderia me ofertar 90?',
                 msg2: 'Ok. Pedi muito mesmo. POderia então me ofertar 55?',
-                resposta1: null,
-                resposta2: null              
+                resposta: {
+                  id_partida: null,
+                  id_jogador: null,
+                  nome_jogador: null,
+                  status: null
+                }              
             };
             var coerencia = {
                 jogador: '<%-nome_jogador%>',

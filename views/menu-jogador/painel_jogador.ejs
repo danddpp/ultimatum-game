@@ -1,1226 +1,1238 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title></title>
-<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
-<link href="stylesheets/menu-jogador.css" rel="stylesheet"> 
-<link href='/stylesheets/submenu.css' rel='stylesheet'>
-<link href="stylesheets/chat.css" rel="stylesheet">
-<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
-<style type="text/css">
-ul , li {
-      list-style-type: none;
-}
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title></title>
+  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+  <link href="stylesheets/menu-jogador.css" rel="stylesheet"> 
+  <link href='/stylesheets/submenu.css' rel='stylesheet'>
+  <link href="stylesheets/chat.css" rel="stylesheet">
+  <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+  <style type="text/css">
+  ul , li {
+        list-style-type: none;
+  }
 
-#nome_jogador {
-  position: relative;
-  margin-left: 80%;
-  margin-top: 0%;  
-}  
+  #nome_jogador {
+    position: relative;
+    margin-left: 80%;
+    margin-top: 0%;  
+  }  
 
-#chat_id {
-     width: 17em;
-     height: 9em;
-     line-height: 1.5em;
-     border: 2px solid #ccc;
-     padding: 0;
-     margin: 0;
-     overflow: auto;
-     overflow-x: hidden;
-}
-#texto_chat {
-  font-family: "Comic Sans MS", cursive, sans-serif;
-  font-size: 15px;
-}
-#mudar_round {
-  display: none;
-}
-#mudar_round_OK {
-  display: none;
-}
-#mudar_rodada {
-  display: none;
-}
-#mudar_rodada_OK {
-  display: none;
-} 
-#game_over__ {
-  display: none;
-}
-#ver_ranking_partida {
-  display: none;
-}
-#p_table_advs {
-  display: none;
-}
-#bt_informacao {
-  display: none;
-}
-</style>
-  <!--Socket.io client-->
-  <script src="/socket.io/socket.io.js"></script>
-    <script>
-     var client = io(); 
-   
-   $(document).ready(function() {
-    $('#vrTotal').prop('disabled', true);
-    
-    
-          
-
-      if('<%- params.num_rodada %>' < 2) {
-        $('.vtotal').hide();
-      } else {
-        $('.vtotal').show();
-      } 
-
-      if('<%- params.num_rodada %>' < 3) {
-        $('.pontuacao').hide();
-      } else {
-        $('.pontuacao').show();
-      }
-
-      /*if('<%- params.num_rodada %>' < 4) {
-        $('#chat_').hide();
-        $('#header_chat').hide();
-      } else {
-        $('#chat_').show();
-        $('#header_chat').show();
-      }*/
-
-      if('<%- params.num_rodada %>' < 5) {
-        $('.percentual_ganho').hide();
-      } else {
-        $('.percentual_ganho').show();
-      }
-
+  #chat_id {
+       width: 17em;
+       height: 9em;
+       line-height: 1.5em;
+       border: 2px solid #ccc;
+       padding: 0;
+       margin: 0;
+       overflow: auto;
+       overflow-x: hidden;
+  }
+  #texto_chat {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 15px;
+  }
+  #mudar_round {
+    display: none;
+  }
+  #mudar_round_OK {
+    display: none;
+  }
+  #mudar_rodada {
+    display: none;
+  }
+  #mudar_rodada_OK {
+    display: none;
+  } 
+  #game_over__ {
+    display: none;
+  }
+  #ver_ranking_partida {
+    display: none;
+  }
+  #p_table_advs {
+    display: none;
+  }
+  #bt_informacao {
+    display: none;
+  }
+  </style>
+    <!--Socket.io client-->
+    <script src="/socket.io/socket.io.js"></script>
+      <script>
+       var client = io(); 
+     
+     $(document).ready(function() {
+      $('#vrTotal').prop('disabled', true);
       
-
-       //caso o jogador atualize a pagina apos partida terminar
-      if('<%- params.status_partida %>' == 'Finalizada') {
-        $(document).ready(function() {
-          $('.container').hide();
-          $('#game_over').text('Partida finalizada!');
-          $('#game_over_').text('Obrigado por participar!');
-          $('#game_over__').show();
-          $('#ver_ranking_partida').show();
-        });
-      }
-
-
-      if('<%- params.persuasao_padrao %>') {
-       
-        var persuasao_padrao = '<%- params.persuasao_padrao %>';
-        var temp = persuasao_padrao.split(',');
-        var tipo = temp[0];
-           alert(temp[4]);
-           if(tipo == 'Reciprocidade') {      
-            var msg = temp[3]+' diz: '+'\n'+temp[1];
-             var campo = $('#myModal').children().children().children().next().children();
-             if(campo.attr('id') == 'msg') {
-               campo.text(msg);
-               $('.modal-footer').children().text('Sim');
-               $('.modal-footer').children().next().text('Não');
-               //alert(campo.attr('id'));
-             }
-            if(temp[5] == 'todos') {
-              if(temp[4] != '<%- params.eu._id %>') {
-               $('#myModal').modal(); 
-             } 
-            }
-            //aqui params.eu._id é o painel e id do destinatario
-            else if(temp[5] == '<%- params.eu._id %>') {
-               $('#myModal').modal();
-            }
-           }
-
-
-
-           if(tipo == 'Coerência') {
-               if(temp[3] == '') {
-                  var msg = temp[2]+' diz: '+'\n'+temp[1];
-                   var campo = $('#myModal').children().children().children().next().children();
-                   if(campo.attr('id') == 'msg') {
-                     campo.text(msg);
-                     $('.modal-footer').children().text('Sim');
-                     $('.modal-footer').children().next().text('Não');
-                     //alert(campo.attr('id'));
-                   }
-                   if(temp[4] != '<%- params.eu._id %>') {
-                     $('#myModal').modal(); 
-                   }
-               }
-           }
-
-           if(tipo == 'Aprovação social') {
+      
             
-           }
 
-           if(tipo == 'Afinidade') {
-            
-           }
-
-           if(tipo == 'Autoridade') {
-            
-           }
-
-           if(tipo == 'Escassez') {
-            
-           }
-
-      }
-   });
-
-   
-var cont = 0;
-
-   function yes() {
-    var persuasao_padrao = '<%- params.persuasao_padrao %>';
-    var temp = persuasao_padrao.split(',');
-    var nome = temp[3];
-    $('#meus-adversarios').val( $('option:contains('+nome+')').val() );
-     if(cont > 0) {
-       $('#minha_oferta').val(50);
-       $('#bt_envOferta').click();
-
-     } else {
-      $('#minha_oferta').val(99);
-      $('#bt_envOferta').click();
-     }
-    
-   };
-   
-   function no() {
-       $('#myModal').modal('hide');
-     if(cont == 0) {
-        setTimeout(function(){
-          if('<%- params.persuasao_padrao %>' != '') {
-             cont++;
-             var persuasao_padrao = '<%- params.persuasao_padrao %>';
-             var temp = persuasao_padrao.split(',');
-             var tipo = temp[0];
-                
-                if(tipo == 'Reciprocidade') {
-                 var msg = temp[3]+' diz: '+'\n'+temp[2];
-                  var campo = $('#myModal').children().children().children().next().children();
-                  if(campo.attr('id') == 'msg') {
-                    campo.text(msg);
-                    $('.modal-footer').children().text('Sim');
-                    $('.modal-footer').children().next().text('Não');
-                    //alert(campo.attr('id'));
-                  }
-                  if(temp[4] != '<%- params.eu._id %>') {
-                     $('#myModal').modal(); 
-                  }
-                }
-          }
-        },10000); 
-      } else {
-          $('#myModal').modal('hide');
-       }
-   };
-
-
-  var notify = function(data) {
-     var id = data.id;
-     var notify_ = document.getElementById(id);
-     if(notify_) {
-       notify_.textContent = data.msg;
-       if(data.msg == 'Online') {
-         $("#meus-adversarios").find('option').each(function() {
-             if($(this).val() == data.id) {
-               $(this).prop('disabled', false);
-             }
-         });
-       }
-     }
-  }; 
-
-  client.on('notify-onlines', function(id) {
-     notify({id: id, msg: 'Online'});
-  });
-
-  client.on('notify-offlines', function(id) {
-     notify({id: id, msg: 'Offline'});
-  });
-
-
-var tag = 0;
-    client.on('send-client', function(message) {
-     
-    if('<%- params.eu._id %>' == message.id_destinatario) {   
-      var aux = '#';
-      aux += message.meu_id_painel_adversario;
-     
-     $('#tabela').find('tr').each(function(index) {
-       if(index > 0) {
-        if(message.meu_id_painel_adversario == $(this).children().attr('id')) {
-         var element = $(this).children().next().next().next().next()
-         .next().next().next().next().next();
-          
-          var new_message = element.children().children().children().children()
-         .children();
-
-         new_message.children().each(function() {
-            if ($(this).attr('id') == 'lb' && tag == 0) {
-                $(this).text('Nova mensagem!'); 
-            }
-         });
-          
-         var e = element.children().children().children().children()
-         .children().next().children().children().children();
-        
-         e.append(message.msg);
-         e.animate({scrollTop: e.prop("scrollHeight")}, 500);
-         //e.animate({ scrollTop: e.offset().top }, 2000);
-
-         var x = element.children().children().children().children().children().next().children().next().children();
-
-
-         x.children().each(function() {
-            if($(this).attr('id') == 'flag') {
-               $(this).children().each(function() {
-                  if($(this).attr('id') == 'del') {
-                     $(this).remove();
-                  }
-               });
-
-            }
-         });
-
-           
+        if('<%- params.num_rodada %>' < 2) {
+          $('.vtotal').hide();
+        } else {
+          $('.vtotal').show();
         } 
-       }
-     });
 
-    }
-  });
+        if('<%- params.num_rodada %>' < 3) {
+          $('.pontuacao').hide();
+        } else {
+          $('.pontuacao').show();
+        }
 
-   
-var abrir_chat = function() {
- $('#tabela').on('click',"#drop_down", function() {
-    var id_chat_advs = $(this).parent().attr('id');
-    
-    $('#tabela').find('tr').each(function(index) {
-      if(index > 0) {
-       if(id_chat_advs == $(this).children().attr('id')) {
-          //alert($(this).children().attr('id'));
-          var element = $(this).children().next().next().next().next().next().next().next().next().next();
-          //alert(element.children().children().children().children().next().attr('id'));
+        /*if('<%- params.num_rodada %>' < 4) {
+          $('#chat_').hide();
+          $('#header_chat').hide();
+        } else {
+          $('#chat_').show();
+          $('#header_chat').show();
+        }*/
+
+        if('<%- params.num_rodada %>' < 5) {
+          $('.percentual_ganho').hide();
+        } else {
+          $('.percentual_ganho').show();
+        }
+
         
 
+         //caso o jogador atualize a pagina apos partida terminar
+        if('<%- params.status_partida %>' == 'Finalizada') {
+          $(document).ready(function() {
+            $('.container').hide();
+            $('#game_over').text('Partida finalizada!');
+            $('#game_over_').text('Obrigado por participar!');
+            $('#game_over__').show();
+            $('#ver_ranking_partida').show();
+          });
+        }
 
-            if(tag == 0) {
-             var new_message = element.children().children().children().children().children();
-              new_message.children().each(function() {
-               if ($(this).attr('id') == 'lb') {
-                   $(this).text('Chat'); 
+
+        if('<%- params.persuasao_padrao %>') {
+         
+          var persuasao_padrao = '<%- params.persuasao_padrao %>';
+          var temp = persuasao_padrao.split(',');
+          var tipo = temp[0];
+             alert(temp[4]);
+             if(tipo == 'Reciprocidade') {      
+              var msg = temp[3]+' diz: '+'\n'+temp[1];
+               var campo = $('#myModal').children().children().children().next().children();
+               if(campo.attr('id') == 'msg') {
+                 campo.text(msg);
+                 $('.modal-footer').children().text('Sim');
+                 $('.modal-footer').children().next().text('Não');
+                 //alert(campo.attr('id'));
                }
-            });            
-            element.children().children().children().children().children().next().collapse('show');
-          }
-          
-          
-          if(tag == 1) {
-            element.children().children().children().children().children().next().collapse('hide');
-          }
-          
-          if(tag >= 1 ) {
-            tag = 0;
-          } else {
-            tag++;
-          }
-          
-
-
-
-       }//var id_adv_row = $(this).val();
-      }
-    });
-
- $('#tabela').on('click','#btn-chat').off();    
- }); 
-};
- 
-
-
-var mensagem = '';
-  var enviar_msg_chat = function() {     
-     $('#tabela').on('click','#btn-chat', function(event) {
-          if($(this).html() == 'Send') {
-             //alert($(this).html());
-             var temp = [];
-             temp = $(this).val().split(',');
-             
-              $('#tabela').find('tr').each(function(index) {
-                  if(index > 0) {
-                    if(temp[1] == $(this).children().attr('id')) {
-                      var element = $(this).children().next().next().next().next().next().next().next().next().next();
-                     
-                     var e = element.children().children().children().children().children().next().children().children().children();
-                     //alert(e.html());
-                     var mensagem = e.parent().parent().next().children().children().val();  
-                   
-                    var x = element.children().children().children().children().children().next().children().next().children();
-                    
-                   //quebra de mensagem longa
-                   var _msg = ""; 
-                   if(mensagem.length > 30) {
-                       var m = mensagem.split(" ");
-                       if(m.length > 1) {
-                         for(var i = 0; i < m.length; i++) {
-                          if(i > 0 && i % 3 == 0) {
-                            if(m[i].length < 30) {
-                                 _msg += m[i]+"<br>"; 
-                            } else {
-                                 var s = m[i];
-                                  for(var j = 0; j < s.length; j++) {
-                                   if(j > 0 && j % 15 == 0) {
-                                    _msg += s.substring(j,j+1);
-                                    _msg += '\n';          
-                                   } else {
-                                    _msg += s.substring(j,j+1);
-                                   }
-                                 }
-                                 _msg + "<br>";        
-                            }
-                          } else {
-                                if(m[i].length < 15) {
-                                  _msg += m[i]+" ";   
-                                } else {
-                                  var s = m[i];
-                                   for(var j = 0; j < s.length; j++) {
-                                    if(j > 0 && j % 15 == 0) {
-                                     _msg += s.substring(j,j+1);
-                                     _msg += '\n';          
-                                    } else {
-                                     _msg += s.substring(j,j+1);
-                                    }
-                                  }
-                                  _msg + "<br>";  
-                                }
-                               
-                             }
-                         }
-                       } else {
-                        alert('here');
-                        var s = m[0];
-                         for(var j = 0; j < s.length; j++) {
-                          if(j > 0 && j % 15 == 0) {
-                            _msg += s.substring(j,j+1);
-                            _msg += '\n';
-                          } else {
-                            _msg += s.substring(j,j+1);
-                          }
-                         }
-                       }    
-                   } else {
-                    _msg = mensagem;
-                   }
-
-
-
-                   var data = {
-                       nome: temp[0],
-                       id_destinatario: temp[1],
-                       meu_id_painel_adversario: '<%- params.eu._id %>',
-                       msg: _msg
-
-                   };
-
-                  var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
-                      "<div class="+"'chat-body clearfix'"+">"+
-                       "<div class="+"'header'"+">"+
-                        "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
-                         "<small class="+"'pull-right text-muted'"+">"+
-                       "</div>"+
-                         "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
-                      "</div>"+''
-                     "</li>";
-                       //alert(x.html());
-                     
-                     e.append(msg);
-                     e.animate({scrollTop: e.prop("scrollHeight")}, 500);
-                     //e.animate({ scrollTop: e.offset().top }, 20000); 
-
-                     x.children().each(function() {
-                        if($(this).attr('id') == 'flag') {
-                           $(this).children().each(function() {
-                              if($(this).attr('id') == 'del') {
-                                 $(this).remove();
-                              }
-                           });
-                        }
-                     });
-
-                     
-                   
-                  //alert(e.parent().html());
-                  
-
-
-                   $('#tabela').on('click','#btn-chat').off();
-                     e.parent().parent().next().children().children().val("");
-                     client.emit('send-server', data);      
-                    }
-                  } 
-              });
-          }
-     });
-  };
-
-
-
-
-   client.on('fim_de_jogo', function(data) {
-      if(data.id_partida == '<%- params.id_partida %>') {
-         $(document).ready(function() {
-           $('.container').hide();
-           $('#game_over').text(data.msg);
-           $('#game_over_').text(data.msg2);
-           $('#game_over__').show();
-           $('#ver_ranking_partida').show();
-         });
-      }
-   });
-
-//verificar n esta funcionando
-   client.on('salvar_percentual_ganho', function(id_partida) {
-      if(id_partida == '<%- params.id_partida %>') {
-         client.emit('save_percent', '<%- params.id_jogador %>');
-      }
-   });
-
-
-
-
-
-    var carregar_jogadores = null;
-
-
-     /*client.on('final_rodada', function(data) {
-      
-     });*/
-
-
-    client.on('finalizar_rodada', function(data_) {
-        
-     if(data_.id_partida == '<%- params.id_partida %>') {
-       $(document).ready(function() {
-         //if('<%- params.num_round %>' < 6) {
-           //$('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-         //}
-         $('#id_partida_').val(data_.id_partida);
-         $('#id_rodada_').val(data_.id_rodada);//id da prox rodada para a rota /nova_rodada
-         $('#numero_round').hide();
-         $('#bt_iniciar_novaRodada').children().text(data_.nova_rodada.numero_rodada);//num da nova rodad
-         //$('#bt_iniciar_novaRodada').prop('disabled', false);
-         var indice_valor = $('#indice_valor').val();
-         $('#indice_valor_').val(indice_valor);
-       });
-     
-        var data__ = {
-            id_partida: '<%- params.id_partida %>',
-            id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
-            id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
-            id_painel: '<%- params.painel.id_painel %>'
-        }; 
-        
-       client.emit('carregar_jogadores_prox_rodada', data__);
-
-     }
-    });
-
-      
-
-    client.on('salvar_flag_round1', function(data) {
-       if(data.id_partida == '<%- params.id_partida %>') {
-         var id_usuario = '<%- params.eu._id %>';
-         var data_ = {
-             nova_rodada: data.nova_rodada,
-             id_partida: data.id_partida,
-             id_rodada: data.id_rodada,
-             num_round: data.num_round,
-             id_usuario: id_usuario      
-         };
-         client.emit('salvar_flag_round1_ok', data_);
-       }
-    }); 
-
-
-    
-
-   client.on('iniciar_nova_rodada', function(data) {
-      if(data.id_partida == '<%- params.id_partida %>') {
-         $(document).ready(function() {
-           $('#bt_iniciar_novaRodada_OK').click();
-         });
-      }
-   });  
-
-
-
-
-
-   client.on('final_round', function(finalizar_round) {
-      var data = finalizar_round;
-      //alert('here');
-      if(data.id_partida == '<%- params.id_partida %>' &&
-         data.id_rodada == '<%- params.id_rodada %>' && 
-         data.id_round == '<%- params.id_round %>') {
-        $(document).ready(function() {
-          $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-          $('#numero_round').hide();
-          $('#mudar_round').show();
-          $('#bt_iniciar_novoRound').prop('disabled', false);
-          $('#id_partida').val(data.id_partida);
-          $('#num_round').val(data.num_round);
-          $('#num_rodada').val(data.num_rodada);
-          $('#indice_valor').val(data.indice_valor);     
-        }); 
-
-          var data_ = {
-              id_partida: data.id_partida,
-              id_rodada: '<%- params.id_rodada %>',
-              id_round: '<%- params.id_round %>',
-              num_round: data.num_round,
-              num_rodada: data.num_rodada,
-              indice_valor: data.indice_valor,
-              id_painel: '<%- params.painel.id_painel %>'
-          };
-
-          client.emit('salvar_dados_bt_mudar_round', data_);
-          
-          client.on('salvar_dados_bt_mudar_round_ok', function(data_) {
-             carregar_jogadores = function() {
-               $(document).ready(function() {
-                $('#bt_iniciar_novoRound').prop('disabled', true);
-               });
-               //alert('huaaakkkkkkkkkkkkkkkkkkkkkkkk');
-                client.emit('carregar_jogadores', data_);
-             };
-          });
-
-      }     
-      
-   });
-
-   client.on('salvar_bt_novo_round_show', function() {
-      var data = {
-          id_painel: '<%- params.painel.id_painel %>',
-          num_round: '<%- params.num_round %>',
-          num_rodada: '<%- params.num_rodada %>'
-      }; 
-
-      client.emit('salvar_bt_novo_round_show_ok', data);
-   });
-
-
-
-
-
-
-   client.on('iniciar_novo_round', function(data) {
-      if(data.id_partida == '<%- params.id_partida %>') {
-         $(document).ready(function() {
-           $('#bt_iniciar_novoRound_OK').click();
-         });
-      }
-   });
-
-
-
-   client.on('send-client-oferta', function(ofertaAdv) {
-    var meu_id = '<%- params.eu._id %>'
-    //alert('here');
-     // $(document).ready(function() {
-         var meu_idTable = ".";
-         meu_idTable += ofertaAdv.meu_id;
-         meu_idTable = meu_idTable.toString();
-
-
-         var id ="#";
-         id += ofertaAdv.meu_id;
-         id = id.toString();
-         
-
-         var id2 = '#vrTotal';
-         id2 += ofertaAdv.meu_id;
-         id2 = id2.toString();
-         
-
-         var temp = 0;
-          $('#tabela').find('tr').each(function() {
-              $(this).find('td').each(function() {
-                if(!(ofertaAdv.meu_id == meu_id) && ofertaAdv.adversario == meu_id){
-                 $(this).children(id2).text(ofertaAdv.vrTotal);
-                 $(this).children(id2).val(ofertaAdv.vrTotal);
-                 $(this).children(meu_idTable).val(ofertaAdv.minhaOferta);
-                 //$(this).children('#valorTotal').val(ofertaAdv.vrTotal);
-                 $(this).children(id).prop('disabled', false);
-                 $(this).children(id).prop('disabled', false);
-                 temp++;
-                 if(temp == 9) {
-                   //alert('<%- params.painel.id_painel %>');
-                    var data = {
-                             id_painel: '<%- params.painel.id_painel %>',
-                             id_adv: ofertaAdv.meu_id,
-                             vr_total: ofertaAdv.vrTotal,
-                             vr_ofertado: ofertaAdv.minhaOferta,
-                             num_p_round: '<%- params.painel.p_round.numero %>'           
-                         }
-                    client.emit('salvar_vr_oferta_recebida_adv_painel', data);
-                 } 
-                }
-              });
-          });
-          
-     //});
-
-    });
-
-   var enviarOferta = function() {
-       
-       var vrTotal = Number(document.getElementById('vrTotal').value);
-       var minhaOferta = document.getElementById('minha_oferta').value;
-       var subtotal = 0;
-       var e = document.getElementById('meus-adversarios');
-       var id_adversario = e.options[e.selectedIndex].value;
-       var meu_id = '<%- params.eu._id %>'
-
-       if(!isNaN(minhaOferta)) {
-          if(minhaOferta % 1 != 0 && !isNaN(minhaOferta % 1)) {
-           alert('O valor ofertado deve ser um número inteiro maior que zero');
-           $('#minha_oferta').val('');
-          } else {
-
-              if(minhaOferta > 0){
-                if(minhaOferta <= vrTotal) {
-                  subtotal = vrTotal - minhaOferta;
-                  document.getElementById('subtotal').innerHTML = subtotal;
-                  document.getElementById('subtotal').value = subtotal;
-                  
-                  var oferta = {
-                      vrTotal: vrTotal,
-                      minhaOferta: minhaOferta,
-                      meu_id: meu_id, 
-                      adversario: id_adversario,
-                      aceite: null,
-                      num_p_round: '<%- params.painel.p_round.numero %>',
-                      id_painel: '<%- params.painel.id_painel %>',
-                      nome_adversario: e.options[e.selectedIndex].text,
-                      subtotal: document.getElementById('subtotal').value 
-                  };
-
-                  //alert(oferta.subtotal)
-                  client.emit('send-server-oferta', oferta);
-                  //$(document).ready(function() {
-                     $('#minha_oferta').prop('disabled', true);
-                     $('#bt_envOferta').prop('disabled', true);
-                  //});
-                } else {
-                  alert('Oferta não pode ser maior que o valor total!');
-                  $('#minha_oferta').val('');
-                }
-              } else {
-                  alert('Oferta não pode ser nula ou menor que zero!');
-                  $('#minha_oferta').val('');
+              if(temp[5] == 'todos') {
+                if(temp[4] != '<%- params.eu._id %>') {
+                 $('#myModal').modal(); 
+               } 
               }
-          }
+              //aqui params.eu._id é o painel e id do destinatario
+              else if(temp[5] == '<%- params.eu._id %>') {
+                 $('#myModal').modal();
+              }
+             }
+
+
+
+             if(tipo == 'Coerência') {
+                 if(temp[3] == '') {
+                    var msg = temp[2]+' diz: '+'\n'+temp[1];
+                     var campo = $('#myModal').children().children().children().next().children();
+                     if(campo.attr('id') == 'msg') {
+                       campo.text(msg);
+                       $('.modal-footer').children().text('Sim');
+                       $('.modal-footer').children().next().text('Não');
+                       //alert(campo.attr('id'));
+                     }
+                     if(temp[4] != '<%- params.eu._id %>') {
+                       $('#myModal').modal(); 
+                     }
+                 }
+             }
+
+             if(tipo == 'Aprovação social') {
+              
+             }
+
+             if(tipo == 'Afinidade') {
+              
+             }
+
+             if(tipo == 'Autoridade') {
+              
+             }
+
+             if(tipo == 'Escassez') {
+              
+             }
+
+        }
+     });
+
+     
+  var cont = 0;
+
+     function yes() {
+      var persuasao_padrao = '<%- params.persuasao_padrao %>';
+      var temp = persuasao_padrao.split(',');
+      var nome = temp[3];
+      $('#meus-adversarios').val( $('option:contains('+nome+')').val() );
+       if(cont > 0) {
+         $('#minha_oferta').val(50);
+         $('#bt_envOferta').click();
+         var data = {
+             id_partida: '<%- params.id_partida %>',
+             id_jogador: '<%- params.eu._id %>',
+             nome_jogador: '<%- params.eu.nome %>'
+         };
+         client.emit('salvar_reciprocidade_ok', data);
+
        } else {
-        alert('O valor ofertado deve ser um número inteiro maior que zero');
-        $('#minha_oferta').val('');
+        $('#minha_oferta').val(99);
+        $('#bt_envOferta').click();
        }
+      
+     };
+     
+     function no() {
+         $('#myModal').modal('hide');
+       if(cont == 0) {
+          setTimeout(function(){
+            if('<%- params.persuasao_padrao %>' != '') {
+               cont++;
+               var persuasao_padrao = '<%- params.persuasao_padrao %>';
+               var temp = persuasao_padrao.split(',');
+               var tipo = temp[0];
+                  
+                  if(tipo == 'Reciprocidade') {
+                   var msg = temp[3]+' diz: '+'\n'+temp[2];
+                    var campo = $('#myModal').children().children().children().next().children();
+                    if(campo.attr('id') == 'msg') {
+                      campo.text(msg);
+                      $('.modal-footer').children().text('Sim');
+                      $('.modal-footer').children().next().text('Não');
+                      //alert(campo.attr('id'));
+                    }
+                    if(temp[4] != '<%- params.eu._id %>') {
+                       $('#myModal').modal(); 
+                    }
+                  }
+            }
+          },10000); 
+        } else {
+            $('#myModal').modal('hide');
+            var data = {
+                id_partida: '<%- params.id_partida %>',
+                id_jogador: '<%- params.eu._id %>',
+                nome_jogador: '<%- params.eu.nome %>'
+            };
+           client.emit('salvar_reciprocidade_no', data);
+         }
+     };
+
+
+    var notify = function(data) {
+       var id = data.id;
+       var notify_ = document.getElementById(id);
+       if(notify_) {
+         notify_.textContent = data.msg;
+         if(data.msg == 'Online') {
+           $("#meus-adversarios").find('option').each(function() {
+               if($(this).val() == data.id) {
+                 $(this).prop('disabled', false);
+               }
+           });
+         }
+       }
+    }; 
+
+    client.on('notify-onlines', function(id) {
+       notify({id: id, msg: 'Online'});
+    });
+
+    client.on('notify-offlines', function(id) {
+       notify({id: id, msg: 'Offline'});
+    });
+
+
+  var tag = 0;
+      client.on('send-client', function(message) {
        
+      if('<%- params.eu._id %>' == message.id_destinatario) {   
+        var aux = '#';
+        aux += message.meu_id_painel_adversario;
        
-       
+       $('#tabela').find('tr').each(function(index) {
+         if(index > 0) {
+          if(message.meu_id_painel_adversario == $(this).children().attr('id')) {
+           var element = $(this).children().next().next().next().next()
+           .next().next().next().next().next();
+            
+            var new_message = element.children().children().children().children()
+           .children();
+
+           new_message.children().each(function() {
+              if ($(this).attr('id') == 'lb' && tag == 0) {
+                  $(this).text('Nova mensagem!'); 
+              }
+           });
+            
+           var e = element.children().children().children().children()
+           .children().next().children().children().children();
+          
+           e.append(message.msg);
+           e.animate({scrollTop: e.prop("scrollHeight")}, 500);
+           //e.animate({ scrollTop: e.offset().top }, 2000);
+
+           var x = element.children().children().children().children().children().next().children().next().children();
+
+
+           x.children().each(function() {
+              if($(this).attr('id') == 'flag') {
+                 $(this).children().each(function() {
+                    if($(this).attr('id') == 'del') {
+                       $(this).remove();
+                    }
+                 });
+
+              }
+           });
+
+             
+          } 
+         }
+       });
+
+      }
+    });
+
+     
+  var abrir_chat = function() {
+   $('#tabela').on('click',"#drop_down", function() {
+      var id_chat_advs = $(this).parent().attr('id');
+      
+      $('#tabela').find('tr').each(function(index) {
+        if(index > 0) {
+         if(id_chat_advs == $(this).children().attr('id')) {
+            //alert($(this).children().attr('id'));
+            var element = $(this).children().next().next().next().next().next().next().next().next().next();
+            //alert(element.children().children().children().children().next().attr('id'));
+          
+
+
+              if(tag == 0) {
+               var new_message = element.children().children().children().children().children();
+                new_message.children().each(function() {
+                 if ($(this).attr('id') == 'lb') {
+                     $(this).text('Chat'); 
+                 }
+              });            
+              element.children().children().children().children().children().next().collapse('show');
+            }
+            
+            
+            if(tag == 1) {
+              element.children().children().children().children().children().next().collapse('hide');
+            }
+            
+            if(tag >= 1 ) {
+              tag = 0;
+            } else {
+              tag++;
+            }
+            
+
+
+
+         }//var id_adv_row = $(this).val();
+        }
+      });
+
+   $('#tabela').on('click','#btn-chat').off();    
+   }); 
+  };
+   
+
+
+  var mensagem = '';
+    var enviar_msg_chat = function() {     
+       $('#tabela').on('click','#btn-chat', function(event) {
+            if($(this).html() == 'Send') {
+               //alert($(this).html());
+               var temp = [];
+               temp = $(this).val().split(',');
+               
+                $('#tabela').find('tr').each(function(index) {
+                    if(index > 0) {
+                      if(temp[1] == $(this).children().attr('id')) {
+                        var element = $(this).children().next().next().next().next().next().next().next().next().next();
+                       
+                       var e = element.children().children().children().children().children().next().children().children().children();
+                       //alert(e.html());
+                       var mensagem = e.parent().parent().next().children().children().val();  
+                     
+                      var x = element.children().children().children().children().children().next().children().next().children();
+                      
+                     //quebra de mensagem longa
+                     var _msg = ""; 
+                     if(mensagem.length > 30) {
+                         var m = mensagem.split(" ");
+                         if(m.length > 1) {
+                           for(var i = 0; i < m.length; i++) {
+                            if(i > 0 && i % 3 == 0) {
+                              if(m[i].length < 30) {
+                                   _msg += m[i]+"<br>"; 
+                              } else {
+                                   var s = m[i];
+                                    for(var j = 0; j < s.length; j++) {
+                                     if(j > 0 && j % 15 == 0) {
+                                      _msg += s.substring(j,j+1);
+                                      _msg += '\n';          
+                                     } else {
+                                      _msg += s.substring(j,j+1);
+                                     }
+                                   }
+                                   _msg + "<br>";        
+                              }
+                            } else {
+                                  if(m[i].length < 15) {
+                                    _msg += m[i]+" ";   
+                                  } else {
+                                    var s = m[i];
+                                     for(var j = 0; j < s.length; j++) {
+                                      if(j > 0 && j % 15 == 0) {
+                                       _msg += s.substring(j,j+1);
+                                       _msg += '\n';          
+                                      } else {
+                                       _msg += s.substring(j,j+1);
+                                      }
+                                    }
+                                    _msg + "<br>";  
+                                  }
+                                 
+                               }
+                           }
+                         } else {
+                          alert('here');
+                          var s = m[0];
+                           for(var j = 0; j < s.length; j++) {
+                            if(j > 0 && j % 15 == 0) {
+                              _msg += s.substring(j,j+1);
+                              _msg += '\n';
+                            } else {
+                              _msg += s.substring(j,j+1);
+                            }
+                           }
+                         }    
+                     } else {
+                      _msg = mensagem;
+                     }
+
+
+
+                     var data = {
+                         nome: temp[0],
+                         id_destinatario: temp[1],
+                         meu_id_painel_adversario: '<%- params.eu._id %>',
+                         msg: _msg
+
+                     };
+
+                    var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
+                        "<div class="+"'chat-body clearfix'"+">"+
+                         "<div class="+"'header'"+">"+
+                          "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                           "<small class="+"'pull-right text-muted'"+">"+
+                         "</div>"+
+                           "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                        "</div>"+''
+                       "</li>";
+                         //alert(x.html());
+                       
+                       e.append(msg);
+                       e.animate({scrollTop: e.prop("scrollHeight")}, 500);
+                       //e.animate({ scrollTop: e.offset().top }, 20000); 
+
+                       x.children().each(function() {
+                          if($(this).attr('id') == 'flag') {
+                             $(this).children().each(function() {
+                                if($(this).attr('id') == 'del') {
+                                   $(this).remove();
+                                }
+                             });
+                          }
+                       });
+
+                       
+                     
+                    //alert(e.parent().html());
+                    
+
+
+                     $('#tabela').on('click','#btn-chat').off();
+                       e.parent().parent().next().children().children().val("");
+                       client.emit('send-server', data);      
+                      }
+                    } 
+                });
+            }
+       });
     };
 
-    
-    
-    $(document).ready(function() {
-        $('#tabela button').on('click', function(event) {
-         
-         if($(this).html() == 'Aceitar' || $(this).html() == 'Não aceitar') {
-            var dadosAceite = [];
-            dadosAceite = $(this).val().split(','); 
-            var meu_id = '<%- params.eu._id %>';
-            var aceite = dadosAceite[0];
-            var id_adversario = dadosAceite[1];
-            var id_partida = dadosAceite[2];
-            var id_rodada = dadosAceite[3];
-            var num_round = dadosAceite[4];
-            var valor_total = $(this).next().val();
-            var oferta = $(this).next().next().val();   
-            
-            var data = {
-              aceite: aceite,
-              meu_id: meu_id,
-              id_adversario: id_adversario,
-              id_partida: id_partida,
-              id_rodada: id_rodada,
-              id_round: '<%- params.id_round %>',
-              num_rodada: '<%- params.num_rodada %>',
-              num_round: num_round,
-              valor_total: valor_total,
-              oferta: oferta,
-              indice_valor: '<%- params.indice_valor %>',
-              id_painel: '<%- params.painel.id_painel %>'
-            };
-            
-            
-            var id = "#"+id_adversario;
-            $('#tabela').find('tr').each(function() {
-               $(this).find('td').each(function() {
-                  $(this).children(id).prop('disabled', true); 
-               });
-            });
-            
-             client.emit('enviar_aceite', data);
-         } 
-         
-        }); 
-    });      
-  </script>
-  <!--Socket.io client-->
 
-  <!--Controle Painel-->
-  <script>
-    $(document).ready(function() { 
-      //alert('<%- params.painel.id_rodada %>');
-      //alert('<%- params.painel.p_round.numero %>');
-      //alert('<%- params.painel.p_round.jogador.valor_ofertado %>');
-      //alert('<%- params.painel.p_round.jogador.nome_adversario %>');
-      //alert('<%- params.painel.p_round.jogador.subtotal %>');
-      //alert('<%- params.painel.p_round.bt_prox_round_show %>');      
-      
-      
-     var num_round = '<%- params.num_round %>';
-     var bt_prox_rodada_show = '<%- params.painel.p_round.bt_prox_rodada_show %>';
-     var bt_prox_rodada_click = '<%- params.painel.p_round.bt_prox_rodada_click %>';
-     
-     if(bt_prox_rodada_show == 'true' && num_round == 6) {
-       
-       if(bt_prox_rodada_click == 'true') {
-         
-          $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-          $('#id_partida_').val('<%- params.painel.aux_id_partida %>');
 
-          $('#id_rodada_').val('<%- params.painel.aux_id_nova_rodada %>');//id da nova rodada
+
+     client.on('fim_de_jogo', function(data) {
+        if(data.id_partida == '<%- params.id_partida %>') {
+           $(document).ready(function() {
+             $('.container').hide();
+             $('#game_over').text(data.msg);
+             $('#game_over_').text(data.msg2);
+             $('#game_over__').show();
+             $('#ver_ranking_partida').show();
+           });
+        }
+     });
+
+  //verificar n esta funcionando
+     client.on('salvar_percentual_ganho', function(id_partida) {
+        if(id_partida == '<%- params.id_partida %>') {
+           client.emit('save_percent', '<%- params.id_jogador %>');
+        }
+     });
+
+
+
+
+
+      var carregar_jogadores = null;
+
+
+       /*client.on('final_rodada', function(data) {
+        
+       });*/
+
+
+      client.on('finalizar_rodada', function(data_) {
           
-          $('#numero_round').hide();
-          var num_rodada = Number('<%- params.num_rodada %>');
-          num_rodada++;
-          $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
-          $('#bt_iniciar_novaRodada').prop('disabled', true);
-          var indice_valor = $('#indice_valor').val();
-          $('#indice_valor_').val(indice_valor);           
+       if(data_.id_partida == '<%- params.id_partida %>') {
+         $(document).ready(function() {
+           //if('<%- params.num_round %>' < 6) {
+             //$('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+           //}
+           $('#id_partida_').val(data_.id_partida);
+           $('#id_rodada_').val(data_.id_rodada);//id da prox rodada para a rota /nova_rodada
+           $('#numero_round').hide();
+           $('#bt_iniciar_novaRodada').children().text(data_.nova_rodada.numero_rodada);//num da nova rodad
+           //$('#bt_iniciar_novaRodada').prop('disabled', false);
+           var indice_valor = $('#indice_valor').val();
+           $('#indice_valor_').val(indice_valor);
+         });
        
-       } else {
-         
-         $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-         $('#id_partida_').val('<%- params.painel.aux_id_partida %>');
-
-         $('#id_rodada_').val('<%- params.painel.aux_id_nova_rodada %>');//id da nova rodada
-         
-         $('#numero_round').hide();
-         var num_rodada = Number('<%- params.num_rodada %>');
-         num_rodada++;
-         $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
-         $('#bt_iniciar_novaRodada').prop('disabled', false);
-         var indice_valor = $('#indice_valor').val();
-         $('#indice_valor_').val(indice_valor);
-         
-         var data_ = {
-            id_partida: '<%- params.id_partida %>',
-            id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
-            id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
-            id_painel: '<%- params.painel.id_painel %>'
-        };
-
-        carregar_jogadores_ = function() {
-          $(document).ready(function() {
-           $('#bt_iniciar_novaRodada').prop('disabled', true);
-          });
-           client.emit('carregar_jogadores_prox_rodada', data_);
-        };
+          var data__ = {
+              id_partida: '<%- params.id_partida %>',
+              id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
+              id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
+              id_painel: '<%- params.painel.id_painel %>'
+          }; 
+          
+         client.emit('carregar_jogadores_prox_rodada', data__);
 
        }
-     }
-         var bt_prox_round_show = '<%- params.painel.p_round.bt_prox_round_show %>';
-         var bt_prox_round_click = '<%- params.painel.p_round.bt_prox_round_click %>';
-         
-         if(bt_prox_round_click == 'true' && bt_prox_rodada_show == 'false') {
-            //alert('heey '+ '<%- params.painel.aux_id_partida %>');
-            //alert('heey '+ '<%- params.painel.aux_num_round %>');
-            //alert('heey '+ '<%- params.painel.aux_num_rodada %>');
-            //alert('heey '+ '<%- params.painel.aux_indice_valor %>');
+      });
+
+        
+
+      client.on('salvar_flag_round1', function(data) {
+         if(data.id_partida == '<%- params.id_partida %>') {
+           var id_usuario = '<%- params.eu._id %>';
+           var data_ = {
+               nova_rodada: data.nova_rodada,
+               id_partida: data.id_partida,
+               id_rodada: data.id_rodada,
+               num_round: data.num_round,
+               id_usuario: id_usuario      
+           };
+           client.emit('salvar_flag_round1_ok', data_);
+         }
+      }); 
+
+
+      
+
+     client.on('iniciar_nova_rodada', function(data) {
+        if(data.id_partida == '<%- params.id_partida %>') {
+           $(document).ready(function() {
+             $('#bt_iniciar_novaRodada_OK').click();
+           });
+        }
+     });  
+
+
+
+
+
+     client.on('final_round', function(finalizar_round) {
+        var data = finalizar_round;
+        //alert('here');
+        if(data.id_partida == '<%- params.id_partida %>' &&
+           data.id_rodada == '<%- params.id_rodada %>' && 
+           data.id_round == '<%- params.id_round %>') {
+          $(document).ready(function() {
             $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
             $('#numero_round').hide();
             $('#mudar_round').show();
-            $('#bt_iniciar_novoRound').prop('disabled', true);
-            $('#id_partida').val('<%- params.painel.aux_id_partida %>');
-            $('#num_round').val('<%- params.painel.aux_num_round %>');
-            $('#num_rodada').val('<%- params.painel.aux_num_rodada %>');
-            $('#indice_valor').val('<%- params.painel.aux_indice_valor %>');
-         }
+            $('#bt_iniciar_novoRound').prop('disabled', false);
+            $('#id_partida').val(data.id_partida);
+            $('#num_round').val(data.num_round);
+            $('#num_rodada').val(data.num_rodada);
+            $('#indice_valor').val(data.indice_valor);     
+          }); 
 
-         if(bt_prox_round_show == 'true' && bt_prox_round_click == 'false') {
-           
-             $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
-             $('#numero_round').hide();
-             $('#mudar_round').show();
-             $('#bt_iniciar_novoRound').prop('disabled', false);
-             $('#id_partida').val('<%- params.painel.aux_id_partida %>');
-             $('#num_round').val('<%- params.painel.aux_num_round %>');
-             $('#num_rodada').val('<%- params.painel.aux_num_rodada %>');
-             $('#indice_valor').val('<%- params.painel.aux_indice_valor %>');
-              
+            var data_ = {
+                id_partida: data.id_partida,
+                id_rodada: '<%- params.id_rodada %>',
+                id_round: '<%- params.id_round %>',
+                num_round: data.num_round,
+                num_rodada: data.num_rodada,
+                indice_valor: data.indice_valor,
+                id_painel: '<%- params.painel.id_painel %>'
+            };
 
-              var data_ = {
-                  id_partida: '<%- params.painel.aux_id_partida %>',
-                  id_rodada: '<%- params.id_rodada %>',
-                  id_round: '<%- params.id_round %>',
-                  num_round: '<%- params.painel.aux_num_round %>',
-                  num_rodada: '<%- params.painel.aux_num_rodada %>',
-                  indice_valor: '<%- params.painel.aux_indice_valor %>',
-                  id_painel: '<%- params.painel.id_painel %>',
-              };
-
-
-             carregar_jogadores = function() {
-               $(document).ready(function() {
-                $('#bt_iniciar_novoRound').prop('disabled', true);
-               });
-                client.emit('carregar_jogadores', data_);
-             };     
-
-         }
-
-
-
-      var vr_ofertado = '<%- params.painel.p_round.jogador.valor_ofertado %>';
-      var nome_adversario = '<%- params.painel.p_round.jogador.nome_adversario %>';
-      var subtotal = '<%- params.painel.p_round.jogador.subtotal %>';
-       //alert(vr_ofertado);
-
-      if(vr_ofertado != 0) {
-        $("#minha_oferta").val(vr_ofertado);
-        $('#meus-adversarios option').each(function() {
-           if($(this).text() == nome_adversario) {
-              $(this).prop("selected", true);
-           }  
-        });  
-        $("#subtotal").text(subtotal);
-        $("#minha_oferta").prop('disabled', true);
-        $("#bt_envOferta").prop('disabled', true);
-      }
-
-
-      var p_table_advs = $("#p_table_advs");
-      var table_ = $("#tabela");
-
-      p_table_advs.find("tr").each(function(index) {
-        if(index > 0) {
-          
-          var id_adv = ".";
-          id_adv += $(this).children("#p_id_adv").text();
-          id_adv = id_adv.toString();
-          var p_oferta_adv = $(this).children("#p_oferta").text();
-          //alert(p_oferta_adv);
-          var id_p_bt = "#";
-          id_p_bt += $(this).children("#p_id_adv").text();
-          id_p_bt = id_p_bt.toString();
-          var val_bt_aceite = $(this).children("#p_bt_aceite").children().val();
-
-          var id_vr_total = "#vrTotal";
-          id_vr_total += $(this).children("#p_id_adv").text(); 
-          var p_oferta_vr_total = $(this).children("#p_vr_total").text();
-
-          //alert(val_bt_aceite);
-          //alert(p_oferta_vr_total);
-
-          if(p_oferta_adv != 0) {
-             table_.find("tr").each(function(index_) {
-                if(index_ > 0) {
-                  $(this).find("td").each(function() {
-                     $(this).children(id_adv).val(p_oferta_adv);
-                     $(this).children(id_vr_total).val(p_oferta_vr_total);
-                     //inserir aqui tambem os valores do valor total da oferta e outros
-                  });
-                }
-             });       
-          }
+            client.emit('salvar_dados_bt_mudar_round', data_);
             
-          if(p_oferta_adv != 0 && val_bt_aceite == 'false') {
-            //alert('wqewqewqe');
-             table_.find("tr").each(function(index_) {
-                if(index_ > 0) {
-                  $(this).find("td").each(function() {
-                     $(this).children(id_p_bt).prop('disabled', false);
-                  });
-                }
-             });       
-          }
+            client.on('salvar_dados_bt_mudar_round_ok', function(data_) {
+               carregar_jogadores = function() {
+                 $(document).ready(function() {
+                  $('#bt_iniciar_novoRound').prop('disabled', true);
+                 });
+                 //alert('huaaakkkkkkkkkkkkkkkkkkkkkkkk');
+                  client.emit('carregar_jogadores', data_);
+               };
+            });
 
-        }
-      });
-});
-  
-  </script>
-  <!--Controle Painel-->
-</head>
-<body id="painel">
-<div class="container">
-
-
-<div id="nome_jogador" class="btn-group">
-  <a style="width: 130px;" class="btn btn-primary btn-sm"><%- params.eu.nome %></a>
-  <a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
-  <ul class="dropdown-menu">
-    <li><a href="/" style="text-align: left;" onclick="sair_do_jogo()">Sair do jogo</a></li>
-    <li><a href="#" style="text-align: left;">help</a></li>
-  </ul>
-</div>
-
-
-
-<div id="numeroRodada">
-  <h3>Rodada <%- params.rodada.numero_rodada %></h3> 
-</div>
-<div id="numero_round">
-  <h4>Round <%- params.num_round %></h4> 
-</div>
-<h2 id="informar_fim_de_round"></h2>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-<div id="mudar_round">
- <form><!-- action="/iniciar_novoRound" method="POST"-->
-  <div class="form-group">
-       <button type="submit" onclick="carregar_jogadores()" id="bt_iniciar_novoRound" class="btn btn-success"
-        name="params">Iniciar round <%- params.num_round + 1 %></button><br><br>
-  </div>
- </form>
-</div>
-
-<div id="mudar_round_OK">
- <form action="/iniciar_novoRound" method="POST">
-  <div class="form-group">
-       <input type="hidden" id="id_partida" name="data[id_partida]">
-       <input type="hidden" id="num_round" name="data[num_round]">
-       <input type="hidden" id="num_rodada" name="data[num_rodada]">
-       <input type="hidden" id="indice_valor" value="<%- params.indice_valor %>" name="data[indice_valor]">
-       <input type="hidden" value="<%- params.painel.id_painel %>" name="data[id_painel]">
-       <button type="submit" id="bt_iniciar_novoRound_OK" class="btn btn-success" name="params"></button><br><br>
-  </div>
- </form>
-</div>
-
-
-
-<div id="mudar_rodada">
-  <div class="form-group">
-       <button type="submit" onclick="carregar_jogadores_()" id="bt_iniciar_novaRodada" class="btn btn-success" name="params">Iniciar rodada <h5></h5></button><br><br>
-  </div>
-</div>
-
-
-<div id="mudar_rodada_OK">
- <form action="/iniciar_novaRodada" method="POST">
-  <div class="form-group">
-       <input type="hidden" id="id_partida_" name="data[id_partida]">
-       <input type="hidden" id="id_rodada_" name="data[id_rodada]">
-       <input type="hidden" id="indice_valor_" name="data[indice_valor]">
-       <input type="hidden" value="<%- params.painel.id_painel %>" name="data[id_painel]">
-       <button type="submit" id="bt_iniciar_novaRodada_OK" class="btn btn-success"
-        name="params">Iniciar rodada <h5></h5></button><br><br>
-  </div>
- </form>
-</div>
-
-<div id="jogador">
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-     <legend>Realizar Oferta</legend>
-     <form class="navbar-form navbar-left" role="search">
+        }     
         
-       <div class="form-group">
-         <label>Valor total</label>
-         <input type="text" id="vrTotal" class="form-control" name="" value="<%= params.valor_total %>">
-       </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     });
+
+     client.on('salvar_bt_novo_round_show', function() {
+        var data = {
+            id_painel: '<%- params.painel.id_painel %>',
+            num_round: '<%- params.num_round %>',
+            num_rodada: '<%- params.num_rodada %>'
+        }; 
+
+        client.emit('salvar_bt_novo_round_show_ok', data);
+     });
+
+
+
+
+
+
+     client.on('iniciar_novo_round', function(data) {
+        if(data.id_partida == '<%- params.id_partida %>') {
+           $(document).ready(function() {
+             $('#bt_iniciar_novoRound_OK').click();
+           });
+        }
+     });
+
+
+
+     client.on('send-client-oferta', function(ofertaAdv) {
+      var meu_id = '<%- params.eu._id %>'
+      //alert('here');
+       // $(document).ready(function() {
+           var meu_idTable = ".";
+           meu_idTable += ofertaAdv.meu_id;
+           meu_idTable = meu_idTable.toString();
+
+
+           var id ="#";
+           id += ofertaAdv.meu_id;
+           id = id.toString();
+           
+
+           var id2 = '#vrTotal';
+           id2 += ofertaAdv.meu_id;
+           id2 = id2.toString();
+           
+
+           var temp = 0;
+            $('#tabela').find('tr').each(function() {
+                $(this).find('td').each(function() {
+                  if(!(ofertaAdv.meu_id == meu_id) && ofertaAdv.adversario == meu_id){
+                   $(this).children(id2).text(ofertaAdv.vrTotal);
+                   $(this).children(id2).val(ofertaAdv.vrTotal);
+                   $(this).children(meu_idTable).val(ofertaAdv.minhaOferta);
+                   //$(this).children('#valorTotal').val(ofertaAdv.vrTotal);
+                   $(this).children(id).prop('disabled', false);
+                   $(this).children(id).prop('disabled', false);
+                   temp++;
+                   if(temp == 9) {
+                     //alert('<%- params.painel.id_painel %>');
+                      var data = {
+                               id_painel: '<%- params.painel.id_painel %>',
+                               id_adv: ofertaAdv.meu_id,
+                               vr_total: ofertaAdv.vrTotal,
+                               vr_ofertado: ofertaAdv.minhaOferta,
+                               num_p_round: '<%- params.painel.p_round.numero %>'           
+                           }
+                      client.emit('salvar_vr_oferta_recebida_adv_painel', data);
+                   } 
+                  }
+                });
+            });
+            
+       //});
+
+      });
+
+     var enviarOferta = function() {
+         
+         var vrTotal = Number(document.getElementById('vrTotal').value);
+         var minhaOferta = document.getElementById('minha_oferta').value;
+         var subtotal = 0;
+         var e = document.getElementById('meus-adversarios');
+         var id_adversario = e.options[e.selectedIndex].value;
+         var meu_id = '<%- params.eu._id %>'
+
+         if(!isNaN(minhaOferta)) {
+            if(minhaOferta % 1 != 0 && !isNaN(minhaOferta % 1)) {
+             alert('O valor ofertado deve ser um número inteiro maior que zero');
+             $('#minha_oferta').val('');
+            } else {
+
+                if(minhaOferta > 0){
+                  if(minhaOferta <= vrTotal) {
+                    subtotal = vrTotal - minhaOferta;
+                    document.getElementById('subtotal').innerHTML = subtotal;
+                    document.getElementById('subtotal').value = subtotal;
+                    
+                    var oferta = {
+                        vrTotal: vrTotal,
+                        minhaOferta: minhaOferta,
+                        meu_id: meu_id, 
+                        adversario: id_adversario,
+                        aceite: null,
+                        num_p_round: '<%- params.painel.p_round.numero %>',
+                        id_painel: '<%- params.painel.id_painel %>',
+                        nome_adversario: e.options[e.selectedIndex].text,
+                        subtotal: document.getElementById('subtotal').value 
+                    };
+
+                    //alert(oferta.subtotal)
+                    client.emit('send-server-oferta', oferta);
+                    //$(document).ready(function() {
+                       $('#minha_oferta').prop('disabled', true);
+                       $('#bt_envOferta').prop('disabled', true);
+                    //});
+                  } else {
+                    alert('Oferta não pode ser maior que o valor total!');
+                    $('#minha_oferta').val('');
+                  }
+                } else {
+                    alert('Oferta não pode ser nula ou menor que zero!');
+                    $('#minha_oferta').val('');
+                }
+            }
+         } else {
+          alert('O valor ofertado deve ser um número inteiro maior que zero');
+          $('#minha_oferta').val('');
+         }
+         
+         
+         
+      };
+
+      
+      
+      $(document).ready(function() {
+          $('#tabela button').on('click', function(event) {
+           
+           if($(this).html() == 'Aceitar' || $(this).html() == 'Não aceitar') {
+              var dadosAceite = [];
+              dadosAceite = $(this).val().split(','); 
+              var meu_id = '<%- params.eu._id %>';
+              var aceite = dadosAceite[0];
+              var id_adversario = dadosAceite[1];
+              var id_partida = dadosAceite[2];
+              var id_rodada = dadosAceite[3];
+              var num_round = dadosAceite[4];
+              var valor_total = $(this).next().val();
+              var oferta = $(this).next().next().val();   
+              
+              var data = {
+                aceite: aceite,
+                meu_id: meu_id,
+                id_adversario: id_adversario,
+                id_partida: id_partida,
+                id_rodada: id_rodada,
+                id_round: '<%- params.id_round %>',
+                num_rodada: '<%- params.num_rodada %>',
+                num_round: num_round,
+                valor_total: valor_total,
+                oferta: oferta,
+                indice_valor: '<%- params.indice_valor %>',
+                id_painel: '<%- params.painel.id_painel %>'
+              };
+              
+              
+              var id = "#"+id_adversario;
+              $('#tabela').find('tr').each(function() {
+                 $(this).find('td').each(function() {
+                    $(this).children(id).prop('disabled', true); 
+                 });
+              });
+              
+               client.emit('enviar_aceite', data);
+           } 
+           
+          }); 
+      });      
+    </script>
+    <!--Socket.io client-->
+
+    <!--Controle Painel-->
+    <script>
+      $(document).ready(function() { 
+        //alert('<%- params.painel.id_rodada %>');
+        //alert('<%- params.painel.p_round.numero %>');
+        //alert('<%- params.painel.p_round.jogador.valor_ofertado %>');
+        //alert('<%- params.painel.p_round.jogador.nome_adversario %>');
+        //alert('<%- params.painel.p_round.jogador.subtotal %>');
+        //alert('<%- params.painel.p_round.bt_prox_round_show %>');      
+        
+        
+       var num_round = '<%- params.num_round %>';
+       var bt_prox_rodada_show = '<%- params.painel.p_round.bt_prox_rodada_show %>';
+       var bt_prox_rodada_click = '<%- params.painel.p_round.bt_prox_rodada_click %>';
        
-       <div class="form-group">
-         <label>Oferta</label> 
-         <input type="text" id="minha_oferta" class="form-control" name="minha-oferta">
-       </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-       
-        <div class="form-group">
-          <label>Adversário</label>
-            <select class="form-control" id="meus-adversarios" name="">
-              <% if(params.adversarios !== null) {  
-              params.adversarios.forEach(function(adversario) { %> 
-               <option value="<%- adversario.usuario._id %>" disabled="true"><%- adversario.usuario.nome %></option>
-              <% }) 
-              } %>
-            </select>
-        </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-       
-       <div class="form-group" style="margin-top: 20px;">      
-       <button type="button" id="bt_envOferta" class="btn btn-default" onclick="enviarOferta();" style="width: 102px;">Ofertar</button><br><br>
-       </div>
-      </form>
-       <fieldset>
-           <label>Subtotal: <p id="subtotal"></p></label>
-       </fieldset>
-   </div>
-</div>
-  
-<div id="adversarios">  
-   <legend>Ofertas recebidas</legend>
-    <table id="tabela" class="table table-striped table-hover">
-    <thead>
-      <tr>
-         <th>Status</th>
-         <th>Nº</th>
-         <th>Nome</th>
-         <th class="vtotal">Valor total</th>
-         <th class="pontuacao">Pontuação</th>
-         <th class="percentual_ganho">Ganho %</th>
-         <th>Oferta</th>
-         <th>Aceitar Oferta</th>
-         <th>Não Aceitar Oferta</th>
-         <th id="header_chat">Chat</th>
-      </tr>
-  
-    </thead>
-    <tbody>
-       <% if(params.adversarios !== null) {  
-          params.adversarios.forEach(function(adversario, index) { %> 
-        <tr>
-         <td id="<%- adversario.usuario._id %>"><label id="<%- adversario.usuario._id %>">Offline</label></td>
-         <td><%- (index + 1) %></td>
-         <td><%- adversario.usuario.nome %></td>
-         <td class="vtotal"><label id="vrTotal<%- adversario.usuario._id %>"></label></td>
-         <td class="pontuacao"><label><%- adversario.pontuacao_max %></label></td>
-         <td class="percentual_ganho"><label><%-adversario.percentual_ganho%></label></td>
-         <td><input disabled="true" type="text" id="ofertaRecebida" class="<%- adversario.usuario._id %>"></td>
-         <td><button type="button" value="sim,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-success" disabled="true" style="width:102px;">Aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
-         <td id="btn<%- adversario.usuario._id %>"><button type="button" value="nao,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-danger" disabled="true">Não aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
-         <td id="chat_">
-         <div class="container-fluid">
-          <div class="row">
-           <div class="col-md-5" style="width: 300px;">
-            <div class="panel panel-primary">
+       if(bt_prox_rodada_show == 'true' && num_round == 6) {
+         
+         if(bt_prox_rodada_click == 'true') {
+           
+            $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+            $('#id_partida_').val('<%- params.painel.aux_id_partida %>');
 
-             <div class="panel-heading" id="accordion" style="height:40px;">
-              <span class="glyphicon glyphicon-comment"></span> <label id="lb">Chat</label> 
-               <div class="btn-group pull-right" id="<%- adversario.usuario._id %>">
-                <a type="button" onclick="abrir_chat()" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" id="drop_down"  href="#collapseOne">
-                 <span class="glyphicon glyphicon-chevron-down"></span>
-                </a>
-               </div>
-              </div>
+            $('#id_rodada_').val('<%- params.painel.aux_id_nova_rodada %>');//id da nova rodada
+            
+            $('#numero_round').hide();
+            var num_rodada = Number('<%- params.num_rodada %>');
+            num_rodada++;
+            $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
+            $('#bt_iniciar_novaRodada').prop('disabled', true);
+            var indice_valor = $('#indice_valor').val();
+            $('#indice_valor_').val(indice_valor);           
+         
+         } else {
+           
+           $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+           $('#id_partida_').val('<%- params.painel.aux_id_partida %>');
 
-              <div class="panel-collapse collapse" id="<%- adversario.usuario._id %>">
-               <div class="panel-body">
-                <div class="panel" style="height:100px;">
-                    <ul id="chat_id" class="chat">
+           $('#id_rodada_').val('<%- params.painel.aux_id_nova_rodada %>');//id da nova rodada
+           
+           $('#numero_round').hide();
+           var num_rodada = Number('<%- params.num_rodada %>');
+           num_rodada++;
+           $('#bt_iniciar_novaRodada').children().text(num_rodada);//num da nova rodada
+           $('#bt_iniciar_novaRodada').prop('disabled', false);
+           var indice_valor = $('#indice_valor').val();
+           $('#indice_valor_').val(indice_valor);
+           
+           var data_ = {
+              id_partida: '<%- params.id_partida %>',
+              id_rodada: '<%- params.id_rodada %>',//id rodada atual para socket 'car_jogadores_prox_rodada'
+              id_round: '<%- params.id_round %>',//id round atual para socket 'car_jogadores_prox_rodada'
+              id_painel: '<%- params.painel.id_painel %>'
+          };
 
-                    </ul>
-                </div>
-                </div>
-                 <div class="panel-footer">
-                  <div class="input-group">
-                   <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." style="width:170px; border: 2px solid #ccc;" />
-                   <span class="input-group-btn" id="flag">
-                   <button onclick="enviar_msg_chat()" class="btn btn-warning btn-sm" id="btn-chat" value="<%- params.eu.nome %>,<%- adversario.usuario._id %>">Send</button>
-                   </span>
-                  </div>
-                 </div>
-               </div>
+          carregar_jogadores_ = function() {
+            $(document).ready(function() {
+             $('#bt_iniciar_novaRodada').prop('disabled', true);
+            });
+             client.emit('carregar_jogadores_prox_rodada', data_);
+          };
 
-              </div>
-              </div>
-             </div>
-             </div>
-         </td>
-        </tr>
-        <% }) 
-        } %>
-    </tbody>
-   </table>
+         }
+       }
+           var bt_prox_round_show = '<%- params.painel.p_round.bt_prox_round_show %>';
+           var bt_prox_round_click = '<%- params.painel.p_round.bt_prox_round_click %>';
+           
+           if(bt_prox_round_click == 'true' && bt_prox_rodada_show == 'false') {
+              //alert('heey '+ '<%- params.painel.aux_id_partida %>');
+              //alert('heey '+ '<%- params.painel.aux_num_round %>');
+              //alert('heey '+ '<%- params.painel.aux_num_rodada %>');
+              //alert('heey '+ '<%- params.painel.aux_indice_valor %>');
+              $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+              $('#numero_round').hide();
+              $('#mudar_round').show();
+              $('#bt_iniciar_novoRound').prop('disabled', true);
+              $('#id_partida').val('<%- params.painel.aux_id_partida %>');
+              $('#num_round').val('<%- params.painel.aux_num_round %>');
+              $('#num_rodada').val('<%- params.painel.aux_num_rodada %>');
+              $('#indice_valor').val('<%- params.painel.aux_indice_valor %>');
+           }
+
+           if(bt_prox_round_show == 'true' && bt_prox_round_click == 'false') {
+             
+               $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
+               $('#numero_round').hide();
+               $('#mudar_round').show();
+               $('#bt_iniciar_novoRound').prop('disabled', false);
+               $('#id_partida').val('<%- params.painel.aux_id_partida %>');
+               $('#num_round').val('<%- params.painel.aux_num_round %>');
+               $('#num_rodada').val('<%- params.painel.aux_num_rodada %>');
+               $('#indice_valor').val('<%- params.painel.aux_indice_valor %>');
+                
+
+                var data_ = {
+                    id_partida: '<%- params.painel.aux_id_partida %>',
+                    id_rodada: '<%- params.id_rodada %>',
+                    id_round: '<%- params.id_round %>',
+                    num_round: '<%- params.painel.aux_num_round %>',
+                    num_rodada: '<%- params.painel.aux_num_rodada %>',
+                    indice_valor: '<%- params.painel.aux_indice_valor %>',
+                    id_painel: '<%- params.painel.id_painel %>',
+                };
+
+
+               carregar_jogadores = function() {
+                 $(document).ready(function() {
+                  $('#bt_iniciar_novoRound').prop('disabled', true);
+                 });
+                  client.emit('carregar_jogadores', data_);
+               };     
+
+           }
+
+
+
+        var vr_ofertado = '<%- params.painel.p_round.jogador.valor_ofertado %>';
+        var nome_adversario = '<%- params.painel.p_round.jogador.nome_adversario %>';
+        var subtotal = '<%- params.painel.p_round.jogador.subtotal %>';
+         //alert(vr_ofertado);
+
+        if(vr_ofertado != 0) {
+          $("#minha_oferta").val(vr_ofertado);
+          $('#meus-adversarios option').each(function() {
+             if($(this).text() == nome_adversario) {
+                $(this).prop("selected", true);
+             }  
+          });  
+          $("#subtotal").text(subtotal);
+          $("#minha_oferta").prop('disabled', true);
+          $("#bt_envOferta").prop('disabled', true);
+        }
+
+
+        var p_table_advs = $("#p_table_advs");
+        var table_ = $("#tabela");
+
+        p_table_advs.find("tr").each(function(index) {
+          if(index > 0) {
+            
+            var id_adv = ".";
+            id_adv += $(this).children("#p_id_adv").text();
+            id_adv = id_adv.toString();
+            var p_oferta_adv = $(this).children("#p_oferta").text();
+            //alert(p_oferta_adv);
+            var id_p_bt = "#";
+            id_p_bt += $(this).children("#p_id_adv").text();
+            id_p_bt = id_p_bt.toString();
+            var val_bt_aceite = $(this).children("#p_bt_aceite").children().val();
+
+            var id_vr_total = "#vrTotal";
+            id_vr_total += $(this).children("#p_id_adv").text(); 
+            var p_oferta_vr_total = $(this).children("#p_vr_total").text();
+
+            //alert(val_bt_aceite);
+            //alert(p_oferta_vr_total);
+
+            if(p_oferta_adv != 0) {
+               table_.find("tr").each(function(index_) {
+                  if(index_ > 0) {
+                    $(this).find("td").each(function() {
+                       $(this).children(id_adv).val(p_oferta_adv);
+                       $(this).children(id_vr_total).val(p_oferta_vr_total);
+                       //inserir aqui tambem os valores do valor total da oferta e outros
+                    });
+                  }
+               });       
+            }
+              
+            if(p_oferta_adv != 0 && val_bt_aceite == 'false') {
+              //alert('wqewqewqe');
+               table_.find("tr").each(function(index_) {
+                  if(index_ > 0) {
+                    $(this).find("td").each(function() {
+                       $(this).children(id_p_bt).prop('disabled', false);
+                    });
+                  }
+               });       
+            }
+
+          }
+        });
+  });
+    
+    </script>
+    <!--Controle Painel-->
+  </head>
+  <body id="painel">
+  <div class="container">
+
+
+  <div id="nome_jogador" class="btn-group">
+    <a style="width: 130px;" class="btn btn-primary btn-sm"><%- params.eu.nome %></a>
+    <a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="/" style="text-align: left;" onclick="sair_do_jogo()">Sair do jogo</a></li>
+      <li><a href="#" style="text-align: left;">help</a></li>
+    </ul>
   </div>
 
 
-  <div>
-    <table id="p_table_advs">
-      <thead>
-        <th>id_usuario</th>
-        <th>vr_total_oferta</th>
-        <th>vr_oferta</th>
-        <th>total_pontos</th>
-        <th>percentual_ganho</th>
-        <th>bt_aceite</th>
-      </thead>
-      <tbody>
-     <% if(params.painel.p_round.adversarios !== null) {  
-        params.painel.p_round.adversarios.forEach(function(p_adv, index) { %>
-        <tr>
-          <td id="p_id_adv"><%- p_adv.id_usuario %></td>
-          <td id="p_vr_total"><%- p_adv.valor_total_adv %></td>
-          <td id="p_oferta"><%- p_adv.valor_oferta_adv %></td>
-          <td><%- p_adv.total_pontos %></td>
-          <td><%- p_adv.percent_ganho %></td>
-          <td id="p_bt_aceite"><input value="<%- p_adv.bt_aceite %>"></td>
-        </tr>          
-     <% })
-        } %>
-      </tbody>
-    </table>
+
+  <div id="numeroRodada">
+    <h3>Rodada <%- params.rodada.numero_rodada %></h3> 
+  </div>
+  <div id="numero_round">
+    <h4>Round <%- params.num_round %></h4> 
+  </div>
+  <h2 id="informar_fim_de_round"></h2>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+  <div id="mudar_round">
+   <form><!-- action="/iniciar_novoRound" method="POST"-->
+    <div class="form-group">
+         <button type="submit" onclick="carregar_jogadores()" id="bt_iniciar_novoRound" class="btn btn-success"
+          name="params">Iniciar round <%- params.num_round + 1 %></button><br><br>
+    </div>
+   </form>
+  </div>
+
+  <div id="mudar_round_OK">
+   <form action="/iniciar_novoRound" method="POST">
+    <div class="form-group">
+         <input type="hidden" id="id_partida" name="data[id_partida]">
+         <input type="hidden" id="num_round" name="data[num_round]">
+         <input type="hidden" id="num_rodada" name="data[num_rodada]">
+         <input type="hidden" id="indice_valor" value="<%- params.indice_valor %>" name="data[indice_valor]">
+         <input type="hidden" value="<%- params.painel.id_painel %>" name="data[id_painel]">
+         <button type="submit" id="bt_iniciar_novoRound_OK" class="btn btn-success" name="params"></button><br><br>
+    </div>
+   </form>
   </div>
 
 
-  <!-- Trigger the modal with a button -->
-  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="bt_informacao">Informação!</button>
 
-  <!-- Modal -->
-  <div id="myModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-      <!-- Modal content-->
-      <div class="modal-content" id="test">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Informação</h4>
-        </div>
-        <div class="modal-body">
-          <label id="msg">Some text in the modal.</label>
-        </div>
-        <div class="modal-footer">
-           <button type="button" onclick="yes()" id="bt_sim" class="btn btn-default" data-dismiss="modal">Close</button>
-           <button type="button" onclick="no()" id="bt_nao" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
+  <div id="mudar_rodada">
+    <div class="form-group">
+         <button type="submit" onclick="carregar_jogadores_()" id="bt_iniciar_novaRodada" class="btn btn-success" name="params">Iniciar rodada <h5></h5></button><br><br>
     </div>
   </div>
 
-</div>
-<h1 id="game_over" style="text-align: center;"></h1><br>
-<h3 id="game_over_" style="text-align: center;"></h3><br>
 
-
-
-<div id="ver_ranking_partida" style="text-align: center;">
-   <form action="/visualizar_resultados_por_partida" method="POST">
-     <button type="submit" class="btn btn-success">Visualizar Ranking</button>
-     <input type="hidden" name="params[idPartida]" value="<%- params.id_partida %>">
+  <div id="mudar_rodada_OK">
+   <form action="/iniciar_novaRodada" method="POST">
+    <div class="form-group">
+         <input type="hidden" id="id_partida_" name="data[id_partida]">
+         <input type="hidden" id="id_rodada_" name="data[id_rodada]">
+         <input type="hidden" id="indice_valor_" name="data[indice_valor]">
+         <input type="hidden" value="<%- params.painel.id_painel %>" name="data[id_painel]">
+         <button type="submit" id="bt_iniciar_novaRodada_OK" class="btn btn-success"
+          name="params">Iniciar rodada <h5></h5></button><br><br>
+    </div>
    </form>
-</div>
+  </div>
 
-   <a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
+  <div id="jogador">
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+       <legend>Realizar Oferta</legend>
+       <form class="navbar-form navbar-left" role="search">
+          
+         <div class="form-group">
+           <label>Valor total</label>
+           <input type="text" id="vrTotal" class="form-control" name="" value="<%= params.valor_total %>">
+         </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         
+         <div class="form-group">
+           <label>Oferta</label> 
+           <input type="text" id="minha_oferta" class="form-control" name="minha-oferta">
+         </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         
+          <div class="form-group">
+            <label>Adversário</label>
+              <select class="form-control" id="meus-adversarios" name="">
+                <% if(params.adversarios !== null) {  
+                params.adversarios.forEach(function(adversario) { %> 
+                 <option value="<%- adversario.usuario._id %>" disabled="true"><%- adversario.usuario.nome %></option>
+                <% }) 
+                } %>
+              </select>
+          </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         
+         <div class="form-group" style="margin-top: 20px;">      
+         <button type="button" id="bt_envOferta" class="btn btn-default" onclick="enviarOferta();" style="width: 102px;">Ofertar</button><br><br>
+         </div>
+        </form>
+         <fieldset>
+             <label>Subtotal: <p id="subtotal"></p></label>
+         </fieldset>
+     </div>
+  </div>
+    
+  <div id="adversarios">  
+     <legend>Ofertas recebidas</legend>
+      <table id="tabela" class="table table-striped table-hover">
+      <thead>
+        <tr>
+           <th>Status</th>
+           <th>Nº</th>
+           <th>Nome</th>
+           <th class="vtotal">Valor total</th>
+           <th class="pontuacao">Pontuação</th>
+           <th class="percentual_ganho">Ganho %</th>
+           <th>Oferta</th>
+           <th>Aceitar Oferta</th>
+           <th>Não Aceitar Oferta</th>
+           <th id="header_chat">Chat</th>
+        </tr>
+    
+      </thead>
+      <tbody>
+         <% if(params.adversarios !== null) {  
+            params.adversarios.forEach(function(adversario, index) { %> 
+          <tr>
+           <td id="<%- adversario.usuario._id %>"><label id="<%- adversario.usuario._id %>">Offline</label></td>
+           <td><%- (index + 1) %></td>
+           <td><%- adversario.usuario.nome %></td>
+           <td class="vtotal"><label id="vrTotal<%- adversario.usuario._id %>"></label></td>
+           <td class="pontuacao"><label><%- adversario.pontuacao_max %></label></td>
+           <td class="percentual_ganho"><label><%-adversario.percentual_ganho%></label></td>
+           <td><input disabled="true" type="text" id="ofertaRecebida" class="<%- adversario.usuario._id %>"></td>
+           <td><button type="button" value="sim,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-success" disabled="true" style="width:102px;">Aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
+           <td id="btn<%- adversario.usuario._id %>"><button type="button" value="nao,<%- adversario.usuario._id %>,<%- params.id_partida %>,<%- params.id_rodada %>,<%- params.num_round %>" id="<%- adversario.usuario._id %>" class="btn btn-danger" disabled="true">Não aceitar</button><input type="hidden" id="vrTotal<%- adversario.usuario._id %>"><input type="hidden" class="<%- adversario.usuario._id %>"></td>
+           <td id="chat_">
+           <div class="container-fluid">
+            <div class="row">
+             <div class="col-md-5" style="width: 300px;">
+              <div class="panel panel-primary">
 
-</body>
-</html>
-  
+               <div class="panel-heading" id="accordion" style="height:40px;">
+                <span class="glyphicon glyphicon-comment"></span> <label id="lb">Chat</label> 
+                 <div class="btn-group pull-right" id="<%- adversario.usuario._id %>">
+                  <a type="button" onclick="abrir_chat()" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" id="drop_down"  href="#collapseOne">
+                   <span class="glyphicon glyphicon-chevron-down"></span>
+                  </a>
+                 </div>
+                </div>
+
+                <div class="panel-collapse collapse" id="<%- adversario.usuario._id %>">
+                 <div class="panel-body">
+                  <div class="panel" style="height:100px;">
+                      <ul id="chat_id" class="chat">
+
+                      </ul>
+                  </div>
+                  </div>
+                   <div class="panel-footer">
+                    <div class="input-group">
+                     <input id="msg" type="text" class="form-control input-sm" placeholder="Type your message here..." style="width:170px; border: 2px solid #ccc;" />
+                     <span class="input-group-btn" id="flag">
+                     <button onclick="enviar_msg_chat()" class="btn btn-warning btn-sm" id="btn-chat" value="<%- params.eu.nome %>,<%- adversario.usuario._id %>">Send</button>
+                     </span>
+                    </div>
+                   </div>
+                 </div>
+
+                </div>
+                </div>
+               </div>
+               </div>
+           </td>
+          </tr>
+          <% }) 
+          } %>
+      </tbody>
+     </table>
+    </div>
+
+
+    <div>
+      <table id="p_table_advs">
+        <thead>
+          <th>id_usuario</th>
+          <th>vr_total_oferta</th>
+          <th>vr_oferta</th>
+          <th>total_pontos</th>
+          <th>percentual_ganho</th>
+          <th>bt_aceite</th>
+        </thead>
+        <tbody>
+       <% if(params.painel.p_round.adversarios !== null) {  
+          params.painel.p_round.adversarios.forEach(function(p_adv, index) { %>
+          <tr>
+            <td id="p_id_adv"><%- p_adv.id_usuario %></td>
+            <td id="p_vr_total"><%- p_adv.valor_total_adv %></td>
+            <td id="p_oferta"><%- p_adv.valor_oferta_adv %></td>
+            <td><%- p_adv.total_pontos %></td>
+            <td><%- p_adv.percent_ganho %></td>
+            <td id="p_bt_aceite"><input value="<%- p_adv.bt_aceite %>"></td>
+          </tr>          
+       <% })
+          } %>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="bt_informacao">Informação!</button>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" id="test">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Informação</h4>
+          </div>
+          <div class="modal-body">
+            <label id="msg">Some text in the modal.</label>
+          </div>
+          <div class="modal-footer">
+             <button type="button" onclick="yes()" id="bt_sim" class="btn btn-default" data-dismiss="modal">Close</button>
+             <button type="button" onclick="no()" id="bt_nao" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <h1 id="game_over" style="text-align: center;"></h1><br>
+  <h3 id="game_over_" style="text-align: center;"></h3><br>
+
+
+
+  <div id="ver_ranking_partida" style="text-align: center;">
+     <form action="/visualizar_resultados_por_partida" method="POST">
+       <button type="submit" class="btn btn-success">Visualizar Ranking</button>
+       <input type="hidden" name="params[idPartida]" value="<%- params.id_partida %>">
+     </form>
+  </div>
+
+     <a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
+
+  </body>
+  </html>
+    
 
