@@ -81,13 +81,29 @@
           $('.pontuacao').show();
         }
 
-        /*if('<%- params.num_rodada %>' < 4) {
-          $('#chat_').hide();
-          $('#header_chat').hide();
-        } else {
-          $('#chat_').show();
-          $('#header_chat').show();
-        }*/
+        if('<%- params.num_rodada %>' < 2) {
+        $('#header_chat').hide();
+        $('#tabela').find('tr').each(function(index) {
+           if(index > 0) {
+              $(this).find('td').each(function() {
+                  if($(this).attr('id') == 'chat_') {
+                      $(this).hide();
+                  } 
+              }); 
+           }
+        });
+      } else {
+        $('#header_chat').show();
+        $('#tabela').find('tr').each(function(index) {
+           if(index > 0) {
+              $(this).find('td').each(function() {
+                  if($(this).attr('id') == 'chat_') {
+                      $(this).show();
+                  } 
+              }); 
+           }
+        });
+      }
 
         if('<%- params.num_rodada %>' < 5) {
           $('.percentual_ganho').hide();
@@ -186,6 +202,8 @@
          var data = {
              id_partida: '<%- params.id_partida %>',
              id_jogador: '<%- params.eu._id %>',
+             num_rodada: '<%- params.num_rodada %>',
+             num_round: '<%- params.num_round %>',
              nome_jogador: '<%- params.eu.nome %>'
          };
          client.emit('salvar_reciprocidade_ok', data);
@@ -225,10 +243,12 @@
         } else {
             $('#myModal').modal('hide');
             var data = {
-                id_partida: '<%- params.id_partida %>',
-                id_jogador: '<%- params.eu._id %>',
-                nome_jogador: '<%- params.eu.nome %>'
-            };
+              id_partida: '<%- params.id_partida %>',
+              id_jogador: '<%- params.eu._id %>',
+              num_rodada: '<%- params.num_rodada %>',
+              num_round: '<%- params.num_round %>',
+              nome_jogador: '<%- params.eu.nome %>'
+             };
            client.emit('salvar_reciprocidade_no', data);
          }
      };
@@ -989,11 +1009,11 @@
 
   <div id="nome_jogador" class="btn-group">
     <a style="width: 130px;" class="btn btn-primary btn-sm"><%- params.eu.nome %></a>
-    <a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+    <!--<a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
     <ul class="dropdown-menu">
       <li><a href="/" style="text-align: left;" onclick="sair_do_jogo()">Sair do jogo</a></li>
       <li><a href="#" style="text-align: left;">help</a></li>
-    </ul>
+    </ul>-->
   </div>
 
 

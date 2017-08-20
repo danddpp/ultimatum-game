@@ -1,9 +1,75 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
 <head>
 	<title></title>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href="stylesheets/menu-jogador.css" rel="stylesheet">
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 </head>
+<style type="text/css">
+	header {
+		text-align: center;
+		margin-top: -12px;
+	}
+	#main {
+		margin-left: 20px;
+	}
+	#left {
+		float: left;
+	}
+	#left p{
+       font-size: 20px;
+	}
+	#right {
+		float: right;
+	}
+	img {
+	 border: 3px solid;
+	 width: 90%;
+	 margin-right: -90px; 	
+	}
+	h4 {
+		margin-top: 60px;
+	}
+	#ul1 {
+		list-style-type: square;
+		margin-top: 4px;
+		font-size: 15px;
+	}
+</style>
 <body>
-  <h1>hello</h1>
+<% include ../barraMenu %>
+<div class="container-fluid" id="main">
+<header>
+  <h1>Jogo do Ultimato</h1>	
+</header>
+<content>
+   <div id="left">
+   <br>   
+   	  	 <p>Originalmente, são dois participantes onde um deles<br> recebe uma quantia (valor) e deve realizar uma oferta<br> ao outro. Caso o jogador que recebeu a oferta aceite<br> o valor ofertado, ambos ficam com suas partes.<br> Caso recuse, ambos ficam sem nada.
+   	    </p>
+        <h4>Como jogar:</h4> 
+        <ul id="ul1">
+        	<li>1 - O jogador A recebe uma quantia</li>
+        	<li>2 - A faz uma oferta para o jogador B</li>
+        	<li>
+        	   3 - B tem duas opções:
+               <ul>
+               	<li>4.1 - Caso B recuse a oferta de A, ambos perdem tudo.</li>
+               	<li>4.2 - Caso B aceite a oferta, A ganha o que sobrou do valor<br> que ofertou a B e B ganha o valor que aceitou de A</li>
+               </ul>  
+        	</li>
+        </ul>
+
+   </div>
+   <div id="right">
+   <br>
+   	     <img src="img/ultimatum_image.png" class="jumbotron">
+   </div>
+</content>
+</div>  
 </body>
 </html>
+

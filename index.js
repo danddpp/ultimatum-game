@@ -1757,48 +1757,82 @@ passport.use(new LocalStrategy({
                 partida.save();
               }
           });
+       });
+
+
+       socket.on('salvar_reciprocidade_ok', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+            if(err) {
+               console.log(err);
+            } else {
+               var persuasoes_padrao = partida.persuasoes_padrao;
+
+                for(var i = 0; i < persuasoes_padrao.length; i++) {
+                   if(persuasoes_padrao[i].tipo == 'Reciprocidade') {
+                                                  
+                           var resultado = {
+                              id_partida: data.id_partida,
+                              id_jogador: data.id_jogador,
+                              num_rodada: data.num_rodada,
+                              num_round: data.num_round,
+                              tipo: 'reciprocidade',
+                              nome_jogador: data.nome_jogador,
+                              success: true,
+                              status: 'aceitou após manipulador baixar oferta'
+                           };
+
+                           var ppr = new Persuasoes_Padrao_Resultados({
+                               resultado: resultado
+                           }); 
+                           
+                           Persuasoes_Padrao_Resultados.create(ppr);
+                                 
+                   }              
+                }
+            }
+          });
+
+       });
+
+
+       socket.on('salvar_reciprocidade_no', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+            if(err) {
+               console.log(err);
+            } else {
+               var persuasoes_padrao = partida.persuasoes_padrao;
+
+                for(var i = 0; i < persuasoes_padrao.length; i++) {
+                   if(persuasoes_padrao[i].tipo == 'Reciprocidade') {
+                           
+                           var resultado = {
+                              id_partida: data.id_partida,
+                              id_jogador: data.id_jogador,
+                              num_rodada: data.num_rodada,
+                              num_round: data.num_round,
+                              tipo: 'reciprocidade',
+                              nome_jogador: data.nome_jogador,
+                              success: false,
+                              status: 'não aceitou após manipulador baixar oferta'
+                           };
+
+                           var ppr = new Persuasoes_Padrao_Resultados({
+                               resultado: resultado
+                           }); 
+                           
+                           Persuasoes_Padrao_Resultados.create(ppr);
+                   }              
+                }
+            }
+          });
+
        });  
      //persuasao//////////////////////////////////////////////////////////////////////
 
-     
-
-    socket.on('salvar_reciprocidade_ok', function(data) {
-       var query = data.id_partida;
-
-       Partida.findById(query).exec(function(err, partida) {
-         if(err) {
-            console.log(err);
-         } else {
-            var persuasoes_padrao = partida.persuasoes_padrao;
-
-             for(var i = 0; i < persuasoes_padrao.length; i++) {
-                if(persuasoes_padrao[i].tipo == 'Reciprocidade') {
-                    if(persuasoes_padrao[i].id_destinatario != 'todos') {
-                        
-                        var resultado = {
-                           id_partida: data.id_partida,
-                           id_jogador: data.id_jogador,
-                           nome_jogador: data.nome_jogador,
-                           status: 'aceitou após manipulador baixar oferta'
-                        };
-
-                        var temp = [];
-
-                        temp.push(resultado);
-
-                        var ppr = new Persuasoes_Padrao_Resultados({
-                            reciprocidade: temp
-                        }); 
-                        
-                        Persuasoes_Padrao_Resultados.create(ppr);
-                             
-                    }
-                }              
-             }
-         }
-       });
-
-    });
   });
 //socket.io
 

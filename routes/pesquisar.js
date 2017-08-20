@@ -483,7 +483,7 @@ router.post('/pesquisar', function(req, res) {
     }
 });
 
-
+  
 
 router.post('/visualizar_resultados_por_partida', function(req, res) {
    if(req.isAuthenticated()) {

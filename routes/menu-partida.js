@@ -17,7 +17,7 @@ router.get('/menu_partida', function(req, res) {
        var curso = req.user.curso;
        var modulo = req.user.modulo;
        var nivel = req.user.nivel;
-       var id_usuario = req.user._id;''
+       var id_usuario = req.user._id;
        
       Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
        if(partidas) {

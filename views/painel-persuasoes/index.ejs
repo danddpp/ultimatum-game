@@ -47,22 +47,32 @@
         var rodada_coerencia = $('#select_rodada_coerencia').val();
         var round_coerencia = $('#select_round_coerencia').val();
         var opcao_coerencia = $('#check_coerencia').prop('checked');      
+        var id_destinatario_coerencia = $('#sel_jogadores_coerencia')
+                                                              .find(':selected').attr('id');
 
         var rodada_ap_social = $('#select_rodada_ap_social').val();
         var round_ap_social = $('#select_round_ap_social').val();
         var opcao_ap_social = $('#check_ap_social').prop('checked');
+        var id_destinatario__ap_social = $('#sel_jogadores_ap_social')
+                                                              .find(':selected').attr('id');
 
         var rodada_afinidade = $('#select_rodada_afinidade').val();
         var round_afinidade = $('#select_round_afinidade').val();
         var opcao_afinidade = $('#check_afinidade').prop('checked');
+        var id_destinatario_afinidade = $('#sel_jogadores_afinidade')
+                                                              .find(':selected').attr('id');
 
         var rodada_autoridade = $('#select_rodada_autoridade').val();
         var round_autoridade = $('#select_round_autoridade').val();
         var opcao_autoridade = $('#check_autoridade').prop('checked');
+        var id_destinatario_autoridade = $('#sel_jogadores_autoridade')
+                                                              .find(':selected').attr('id');
 
         var rodada_escassez = $('#select_rodada_escassez').val();
         var round_escassez = $('#select_round_escassez').val();
         var opcao_escassez = $('#check_escassez').prop('checked');
+        var id_destinatario_escassez = $('#sel_jogadores_escassez')
+                                                              .find(':selected').attr('id');
         
         
             var reciprocidade = {
@@ -86,6 +96,7 @@
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Coerência',
+                id_destinatario: id_destinatario_coerencia,
                 rodada: rodada_coerencia, 
                 round: round_coerencia,
                 rodada_aux: rodada_coerencia + 2, 
@@ -95,12 +106,19 @@
                 +' a melhorar minha posição no ranking?.',
                 resposta: null,
                 acao: null,
-                msg2: 'Estou mal mesmo nessa partida. Poderia me dar aquela ajuda agora?'               
+                msg2: 'Estou mal mesmo nessa partida. Poderia me dar aquela ajuda agora?',
+                resposta: {
+                  id_partida: null,
+                  id_jogador: null,
+                  nome_jogador: null,
+                  status: null
+                }               
             };
             var aprovacao_social = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Aprovação social',
+                id_destinatario: id_destinatario__ap_social,
                 rodada: rodada_ap_social, 
                 round: round_ap_social,
                 opcao: opcao_ap_social,
@@ -110,6 +128,7 @@
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Afinidade',
+                id_destinatario: id_destinatario_afinidade,
                 rodada: rodada_afinidade, 
                 round: round_afinidade,
                 opcao: opcao_afinidade,
@@ -119,6 +138,7 @@
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Autoridade',
+                id_destinatario: id_destinatario_autoridade,
                 rodada: rodada_autoridade, 
                 round: round_autoridade,
                 opcao: opcao_autoridade,
@@ -128,6 +148,7 @@
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Escassez',
+                id_destinatario: id_destinatario_escassez,
                 rodada: rodada_escassez, 
                 round: round_escassez,
                 opcao: opcao_escassez,
@@ -250,6 +271,21 @@
                        <span class="help-block">Depois que fazemos uma escolha, enfrentamos pressões para nos</br> comportarmos de maneira condizente com o compromisso assumido.</span>
                        </div>
                       </div>
+                      <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_jogadores_coerencia" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
@@ -263,7 +299,7 @@
                          </select>
                         </div>
                        </div>
-                       <br><br><br><br><br>
+                       <br><br>
                        <div class="form-group">
                         <label for="select" class="col-lg-2 control-label">Round</label>
                          <div class="col-lg-10">
@@ -276,7 +312,8 @@
                            <option>6</option>
                           </select>
                          </div>
-                        </div><br><br>
+                        </div>
+                        <br><br>
                         <div class="form-group">
                             <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                            <div class="col-lg-10">
@@ -298,6 +335,21 @@
                        <span class="help-block">Buscamos nos outros indícios do comportamento mais apropriado a seguir.</span>
                        </div>
                       </div>
+                      <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_jogadores_ap_social" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
@@ -311,7 +363,7 @@
                          </select>
                         </div>
                        </div>
-                       <br><br><br><br>
+                       <br><br>
                        <div class="form-group">
                         <label for="select" class="col-lg-2 control-label">Round</label>
                          <div class="col-lg-10">
@@ -324,7 +376,8 @@
                            <option>6</option>
                           </select>
                          </div>
-                        </div><br><br>
+                        </div>
+                        <br><br>
                         <div class="form-group">
                             <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                            <div class="col-lg-10">
@@ -346,6 +399,21 @@
                        <span class="help-block">Preferimos acatar pedidos de pessoas que conhecemos e de que gostamos.</span>
                        </div>
                       </div>
+                      <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_jogadores_afinidade" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
@@ -359,7 +427,7 @@
                          </select>
                         </div>
                        </div>
-                       <br><br><br><br>
+                       <br><br>
                        <div class="form-group">
                         <label for="select" class="col-lg-2 control-label">Round</label>
                          <div class="col-lg-10">
@@ -372,7 +440,8 @@
                            <option>6</option>
                           </select>
                          </div>
-                        </div><br><br>
+                        </div>
+                        <br><br>
                         <div class="form-group">
                             <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                            <div class="col-lg-10">
@@ -394,6 +463,21 @@
                        <span class="help-block">Temos um arraigado senso de obediência à autoridade.</span>
                        </div>
                       </div>
+                      <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_jogadores_autoridade" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
@@ -407,7 +491,7 @@
                          </select>
                         </div>
                        </div>
-                       <br><br><br><br>
+                       <br><br>
                        <div class="form-group">
                         <label for="select" class="col-lg-2 control-label">Round</label>
                          <div class="col-lg-10">
@@ -420,7 +504,8 @@
                            <option>6</option>
                           </select>
                          </div>
-                        </div><br><br>
+                        </div>
+                        <br><br>
                         <div class="form-group">
                             <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                            <div class="col-lg-10">
@@ -442,6 +527,21 @@
                        <span class="help-block">Tudo se torna mais valioso quando fica menos disponível.</span>
                        </div>
                       </div>
+                      <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Destinatário</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_jogadores_escassez" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
@@ -455,7 +555,7 @@
                          </select>
                         </div>
                        </div>
-                       <br><br><br><br>
+                       <br><br>
                        <div class="form-group">
                         <label for="select" class="col-lg-2 control-label">Round</label>
                          <div class="col-lg-10">
@@ -468,7 +568,8 @@
                            <option>6</option>
                           </select>
                          </div>
-                        </div><br><br>
+                        </div>
+                        <br><br>
                         <div class="form-group">
                             <label for="inputPassword" class="col-lg-2 control-label">Ação</label>
                            <div class="col-lg-10">
