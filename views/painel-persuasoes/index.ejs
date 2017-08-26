@@ -102,10 +102,11 @@
                 rodada_aux: rodada_coerencia + 2, 
                 round_aux: round_coerencia,
                 opcao: opcao_coerencia,
-                msg: 'Olá!! Se eu estivesse numa posição ruim na partida, e você numa boa posição, me daria uma força?' + ' Me faria uma unica vez, uma oferta de valor alto para ajudar'
-                +' a melhorar minha posição no ranking?.',
-                resposta: null,
-                acao: null,
+                msg_quiz1: 'Em jogos contra adversários vc costuma utilizar uma tática individualista ou cooperativa?',
+                msg_quiz2: 'Caso um adversário seu, durante uma partida,solicitasse sua ajuda e lhe pedisse uma oferta alta, vc ajudaria?',
+                resposta_quiz1: null,
+                resposta_quiz2: null,
+                quiz_respondido: false,
                 msg2: 'Estou mal mesmo nessa partida. Poderia me dar aquela ajuda agora?',
                 resposta: {
                   id_partida: null,
@@ -290,7 +291,7 @@
                        <label for="select" class="col-lg-2 control-label">Rodada</label>
                         <div class="col-lg-10">
                          <select class="form-control" id="select_rodada_coerencia" style="width:60px;">
-                          <option disabled="true">1</option>
+                          <option>1</option>
                           <option>2</option>
                           <option disabled="true">3</option>
                           <option disabled="true">4</option>
