@@ -47,7 +47,7 @@ module.exports = function(id_jogador) {
         
         percentual_ganho = Number((ganho_obtido*100)/ganho_possivel);
         
-        jogador.percentual_ganho = percentual_ganho;
+        jogador.percentual_ganho = percentual_ganho.toFixed(2);
         
         jogador.save();
         

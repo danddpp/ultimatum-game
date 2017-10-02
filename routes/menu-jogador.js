@@ -45,13 +45,13 @@ router.get('/jogo_do_ultimato', function(req, res) {
 router.post('/iniciar_partida', function(req, res) {
     if(req.isAuthenticated()) {
       
-      var query = null;
+      var query = req.body.idPartida_ok;
 
-      if(req.user.id_partida == null) {
+      /*if(req.user.id_partida == null) {
         query = req.body.idPartida_ok;  
       } else {
         query = req.user.id_partida;
-      }
+      }*/
       
       var minha_pontuacao = 0;
       var meu_percentual_ganho = 0;
@@ -573,14 +573,14 @@ router.post('/iniciar_novoRound', function(req, res) {
                        var ganho_possivel =  subtotal_valores_ofertados + soma_ofertas_recebidas;
                        var ganho_obtido = soma_valores + subtotal_ofertas_aceitas;
                        var percentual_ganho = Number((ganho_obtido*100)/ganho_possivel);
-                       jogadores[i].percentual_ganho = percentual_ganho;
+                       jogadores[i].percentual_ganho = percentual_ganho.toFixed(2);
                        adversarios.push(jogadores[i]);
 
                        
                      } else {
                       valor_total = jogadores[i].valores_sorteados[indice_valor];
                       minha_pontuacao = jogadores[i].pontuacao_max;
-                      meu_percentual_ganho = jogadores[i].percentual_ganho;
+                      meu_percentual_ganho = jogadores[i].percentual_ganho.toFixed(2);
                       id_jogador = jogadores[i]._id;
                      }
                    }
@@ -720,7 +720,7 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
         
         partida.contador_prox_round = 0;        
         partida.save();
-        
+
         var adversarios = [];
         var id_partida = partida._id;
         var id_jogador = 0;
@@ -787,13 +787,13 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                        var ganho_possivel =  subtotal_valores_ofertados + soma_ofertas_recebidas;
                        var ganho_obtido = soma_valores + subtotal_ofertas_aceitas;
                        var percentual_ganho = Number((ganho_obtido*100)/ganho_possivel);
-                       jogadores[i].percentual_ganho = percentual_ganho;
+                       jogadores[i].percentual_ganho = percentual_ganho.toFixed(2);
                        adversarios.push(jogadores[i]);
                        
                      } else {
                       valor_total = jogadores[i].valores_sorteados[indice_valor];
                       minha_pontuacao = jogadores[i].pontuacao_max;
-                      meu_percentual_ganho = jogadores[i].percentual_ganho;
+                      meu_percentual_ganho = jogadores[i].percentual_ganho.toFixed(2);
                       id_jogador = jogadores[i]._id;
                      }
                    }
@@ -922,6 +922,7 @@ router.get('/retornar_ao_jogo', function(req, res) {
   if(req.isAuthenticated()) {
     
     var query = req.user.id_partida;
+
     var minha_pontuacao = 0;
     var meu_percentual_ganho = 0;
     
@@ -943,7 +944,7 @@ router.get('/retornar_ao_jogo', function(req, res) {
                  meu_id_jogador = jogadores[i]._id; 
               }   
             }
-             
+              
              var adversarios = [];
              var valor_total_R1_round1 = 0;
              

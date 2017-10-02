@@ -74,6 +74,6 @@ function sortear(valores, i, j) {
     i++;
     return sortear(valores, i, j);
   }
-}
+};
 
 

@@ -1457,7 +1457,7 @@ var fim_de_jogo = function(data, partida) {
           msg: 'Partida finalizada!',
           msg2: 'Obrigado por participar!'
        }
-                                                       
+   usuario.id_partida = null;                                                       
    socket.emit('fim_de_jogo', final_data);
    socket.broadcast.emit('fim_de_jogo', final_data);
    socket.emit('salvar_percentual_ganho', id_partida);
