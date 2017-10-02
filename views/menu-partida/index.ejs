@@ -39,7 +39,7 @@
          } else {
            $('#cursos').find('option').each(function() {
              if($('#curso').val() == $(this).text()){
-           	$('#modulos').find('option').each(function() {
+           $('#modulos').find('option').each(function() {
                   if($(this).text() != $('#modulo').val()){
                    $(this).prop('disabled', true);
                   } else {
@@ -52,101 +52,77 @@
      });
 
 
-     $('#tabela').find('tr').each(function(index) {
-       if(index) {
-        var qtde = Number($(this).find('.qtde').text());
-        var capacidade = Number($(this).find('.capacidade').text());
-        if (qtde != 0) {
-        	var id_partida = $(this).children().attr('id');
-          
-          data = {
-            id_partida: id_partida,
-            qtde_jogadores: qtde
-          };
-
-          if (qtde == capacidade) {
-            client.emit('habilitar_bt_jogar', data);
-        	} else {
-            client.emit('qtde_atual_jogadores', data);
-          }
-        }
-       }
+     $('#tabela').on('click','#btEntrar', function() {
+        
+        var id_partida_clicada = $(this).next().val();  
+          client.emit('verificar_se_jogador_esta_em_alguma_partida', id_partida_clicada); 
+          $('#tabela').find('tr').each(function(index) {
+            if(index > 0) {
+               $(this).find('#btEntrar').prop('disabled', true); 
+            }
+         });
      });
 
+     client.on('retorno_estou_numa_partida', function(data) {
+           if(data.flag == true) {
+              alert('Você já está participando de uma partida!');
+           } else {
 
-     client.on('qtde_atual_jogadores_send', function(data) {
+              if(data.curso == 'Livre' || 
+                 ('<%- curso %>' == data.curso && '<%- modulo %>' == data.modulo)) {
+                client.emit('entrar_na_sala', data); 
+              } else {
+                alert('Curso e/ou módulo não permitidos');
+
+                $('#tabela').find('tr').each(function(index) {
+                 if(index > 0) {
+                  $(this).find('#btEntrar').prop('disabled', false); 
+                 }
+                });
+
+              }
+           }
+     });
+
+     client.on('qtde_jogadores_atual', function(data) {
         $('#tabela').find('tr').each(function(index) {
            if(index > 0) {
               var id_partida = $(this).children().attr('id');
-              if(id_partida == data.id_partida) {
-                $(this).find('.qtde').text(data.qtde_jogadores);
+              if(id_partida == data.id_partida && data.meu_id == '<%- id_usuario %>') {
+                $(this).find('#btEntrar').prop('disabled', true);
+                $(this).find('.qtde').text(data.qtde_atual_de_jogadores);
               } 
            }
         });
-     });
-
-     client.on('habilitar_bt_jogar_ok', function(data) {
-        $('#tabela').find('tr').each(function() {
-            var id_partida_line = $(this).children().attr('id');
-            if(id_partida_line == data.id_partida) {
-                $(this).find('.qtde').text(data.qtde_jogadores);
-                $(this).find('#btEntrar').prop('disabled', true);
-                $(this).children().children('#linkJogar').prop('disabled', false);
-            }
-        });
-     });
-
-     $('#tabela').on('click','#linkJogar', function() {
-        //$(this).prop('disabled', true);
-        var id_usuario = '<%- id_usuario %>';
-        var id_partida = $(this).next().val();
-        var data = {
-            id_usuario: id_usuario,
-            id_partida: id_partida
-        };
-        /*var form = $(this).parent().parent().parent();
-         
-        form.submit(function(e){
-        e = e || window.event;
-        e.preventDefault();
-        });*/
-        client.emit('verificar_jogador_iniciar_partida', data);
      }); 
 
 
-     client.on('jogador_esta_nessa_partida', function(data_) {        
-        if(data_.habilitado == true) {  
-          $('#tabela').find('tr').each(function() {
-            $(this).find('td').each(function() {
-              if(data_.id_partida == $(this).attr('id')) {
-                $(this).children().prop('disabled', true);
-              }
-            });
-          });  
-        } else {
-          alert(data_.msg);
-        }
+     client.on('retorno_entrar_sala', function(data) {
+           $('#tabela').find('tr').each(function(index) {
+             if(index > 0) {
+              $(this).find('#btEntrar').prop('disabled', true); 
+             }
+           });
      });
+     
 
-     client.on('iniciar_partida_ok', function(id_partida) {
-       $('#tabela').find('tr').each(function() {
-         $(this).find('td').each(function() {
-           if(id_partida == $(this).attr('id')) {
-             $(this).next().next().children().click();//.click();
-           }
-         });
-       });
+     client.on('iniciar_jogo', function(data) {
+           $('#tabela').find('tr').each(function(index) {
+             if(index > 0) {
+              $(this).find('#btEntrar').prop('disabled', false); 
+             }
+           });
+             $('#tabela').find('tr').each(function() {
+               $(this).find('td').each(function() {
+                 if(data.id_partida == $(this).attr('id')) {
+                   $(this).next().next().children().click();
+                 }
+               });
+             });
      });
+     
 
-     client.on('voltou_ao_jogo', function(data_) {
-        $('#tabela').find('tr').each(function() {
-          $(this).find('td').each(function() {
-            if(data_.id_partida == $(this).attr('id')) {
-              $(this).next().next().children().click();//.click();
-            }
-          });
-        }); 
-     });
+     
 
    });	
  </script>
@@ -221,8 +197,8 @@
          <th>Nº de rodadas</th>
          <th>Jogadores</th>
          <th>Cap. da Sala</th>
-         <th>Entrar na sala</th>
          <th>Iniciar jogo</th>
+         <th style="display: none;">Iniciar jogo</th>
       </tr>
   
     </thead>
@@ -230,7 +206,7 @@
        <% if(partidas !== null) {  
           partidas.forEach(function(partida, index) { %> 
         <tr>
-         <form id="<%- partida._id %>" action="/entrar_sala" method="POST">
+         <form id="<%- partida._id %>">
           <td><%- (index + 1) %></td>
           <td><%- partida.tipo_sala.curso %></td>
           <td><%- partida.tipo_sala.modulo %></td>
@@ -238,20 +214,21 @@
           <td><%- partida.num_rodadas %></td>
           <td class="qtde" value="<%= partida.num_jogadores %>"><%- partida.num_jogadores %></td>
           <td class="capacidade" value="<%= partida.tipo_sala.capacidadeSala %>"><%- partida.tipo_sala.capacidadeSala %></td>
-          <td><button type="submit" id="btEntrar" class="btn btn-default">Entrar</button></td>
-          <td><input type="hidden" name="params[idPartida]" value="<%- partida._id %>"></td>
-          <td><input type="hidden" name="params[tipoCurso]" value="<%- partida.tipo_sala.curso %>"></td>
-          <td><input type="hidden" name="params[modulo]" value="<%- partida.tipo_sala.modulo %>"></td>
+          <td><button id="btEntrar" class="btn btn-success" style="width: 80px">Jogar</button>
+              <input type="hidden" name="params[idPartida]" value="<%- partida._id %>">
+              <input type="hidden" name="params[tipoCurso]" value="<%- partida.tipo_sala.curso %>">
+              <input type="hidden" name="params[modulo]" value="<%- partida.tipo_sala.modulo %>"> 
+          </td>
          </form>
-         <td id="<%- partida._id %>">
-             <button type="submit" class="btn btn-success"  disabled="true" id="linkJogar" style="position: absolute; margin-left: -202px;">Jogar</button>
+         <td id="<%- partida._id %>" style="display: none;">
+             <button type="button" class="btn btn-success"  disabled="true" id="linkJogar" style="position: absolute; margin-left: 0px;">Jogar</button>
                <input type="hidden" name="idPartida" value="<%- partida._id %>">
          </td>
-         <form action="/iniciar_partida" method="POST">
-         <td class='flag'>
+         <form id="ui" action="/iniciar_partida" method="POST">
+           <td class='flag'>
              <button type="submit" id="ok"></button>
              <input type="hidden" name="idPartida_ok" value="<%- partida._id %>">
-         </td>
+           </td>
          </form>
         </tr>
         <% }) 

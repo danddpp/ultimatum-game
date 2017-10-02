@@ -7,10 +7,11 @@ var c_rodada = require('./../controllers/rodada');
 var c_round = require('./../controllers/round');
 var sortearValores = require('./../functions/sortearValores');
 var verificarQtdeJogadoresSala = require('./../middlewares/verificaCamposCriarSala');
-var crypto = require('crypto');
+var retornar_ao_jogo = require('./../middlewares/retornar_ao_jogo');
 
-router.get('/menu_partida', function(req, res) {
-     
+
+router.get('/menu_partida', retornar_ao_jogo, function(req, res) {
+
      if(req.isAuthenticated()) {
        
        var nome_jogador = req.user.nome;
@@ -21,14 +22,38 @@ router.get('/menu_partida', function(req, res) {
        
       Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
        if(partidas) {
-       	//console.log(partidas);
-        res.render('menu-partida/index', { nome_jogador: nome_jogador,
-        	                                 curso: curso,
-        	                                 modulo: modulo,
-                                           mensagem: '',
-                                           partidas: partidas,
-                                           nivel_usuario: nivel,
-                                           id_usuario: id_usuario });
+         var flag_aux = false;
+         for(var i = 0; i < partidas.length; i++) {
+            var jogadores = partidas[i].jogadores;
+            for(var j = 0; j < jogadores.length; j++) {
+                if(jogadores[j].usuario._id == id_usuario) {
+                    flag_aux = true;                 
+                }
+            }
+         }
+
+         if(flag_aux == true) {
+           res.render('menu-partida/index', { nome_jogador: nome_jogador,
+                                             curso: curso,
+                                             modulo: modulo,
+                                              mensagem: '',
+                                              partidas: partidas,
+                                              nivel_usuario: nivel,
+                                              id_usuario: id_usuario,
+                                              flag_bt_entrar: true }); 
+
+         } else {
+             res.render('menu-partida/index', { nome_jogador: nome_jogador,
+                                               curso: curso,
+                                               modulo: modulo,
+                                                mensagem: '',
+                                                partidas: partidas,
+                                                nivel_usuario: nivel,
+                                                id_usuario: id_usuario,
+                                                flag_bt_entrar: false });    
+           }
+                
+        
        } else {
         res.render('menu-partida/index', { nome_jogador: nome_jogador,
         	                                 curso: curso,
@@ -36,7 +61,8 @@ router.get('/menu_partida', function(req, res) {
                                            mensagem: '',
                                            partidas: null,
                                            nivel_usuario: nivel,
-                                           id_usuario: id_usuario }); 
+                                           id_usuario: id_usuario,
+                                           flag_bt_entrar: false }); 
        }
       });
 
@@ -45,7 +71,7 @@ router.get('/menu_partida', function(req, res) {
      }
 });
 
-router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
+router.post('/criar_partida', function(req, res) {
        
        if (req.isAuthenticated()) {
        	  //recebendo do formlario os dados do tipo de sala a se criar
@@ -63,7 +89,7 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                  jogadores = partidas[i].jogadores;   
                  
                   for(var j = 0; j < jogadores.length; j++) {
-                     if(jogadores[j]._id == idJogador) {        
+                     if(jogadores[j].usuario._id == idJogador) {        
                         flag = true;
                      }
                   }
@@ -75,16 +101,12 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
 
                if(flag == false) {
                  
-                    var timestamp = new Date().toString();
-                    var md5 = crypto.createHash('md5');
-                    var id_sala = md5.update(timestamp).digest('hex');                       
-                 	  
                     var tipo_sala = {
-                        id_sala: id_sala,
+                        id_sala: null,
                         curso: req.body.partida.curso,
                         modulo: req.body.partida.modulo,
                         capacidadeSala: Number(req.body.partida.capacidade)
-                 	  };
+                    };
 
                     //recebendo da sessao o obj com os dados do usuario/jogador
                     //criador da sala
@@ -109,6 +131,7 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                       //console.log(novoJogador); 
                       var jogador = new Jogador({
                               flag_rodada_round1: novoJogador.flag_rodada_round1,
+                              flag_bt_entrar: novoJogador.flag_bt_entrar,
                               usuario: novoJogador.usuario,
                               id_partida: novoJogador.id_partida,
                               valores_sorteados: sortearValores(),
@@ -129,6 +152,9 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                                 //console.log(jogador.valores_sorteados);
                                 //nova_partida.jogadores.push(jogador);
                                 //return req.next(); 
+                               
+                               var id_jogador = jogador._id;
+
                                var qtde_total_jogadas = tipo_sala.capacidadeSala;
                                
                                var round1 = new c_round(1, qtde_total_jogadas);
@@ -165,28 +191,26 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                         rodadas: nova_partida.rodadas,
                         persuasoes_padrao: nova_partida.persuasoes_padrao,
                         contador_iniciar_partida: nova_partida.contador_iniciar_partida,
+                        iniciada: nova_partida.iniciada,
                         num_rodada_atual: nova_partida.num_rodada_atual,
                         num_round_atual: nova_partida.num_round_atual,
-                        indice_valor: nova_partida.indice_valor
+                        indice_valor: nova_partida.indice_valor,
+                        versao: nova_partida.versao,
+                        contador_aceite: nova_partida.contador_aceite,
+                        contador_prox_round: nova_partida.contador_prox_round
                     });
  
                        //inserindo no bd uma nova partida
                          Partida.create(partida, function(err, partida) {
                           if(err) {
                             return req.next(err);
-                          } else { 
-                            var query = req.user._id; 
-                            Jogador.find().where('usuario._id').equals(query)
-                            .exec(function(err, jogador) {
-                              jogador[0].id_partida = partida._id;
-                              jogador[0].save(function() {
-                                 partida.jogadores.pop();
-                                 partida.jogadores.push(jogador[0]);
+                          } else {  
+                              jogador.id_partida = partida._id;
+                              jogador.save(function() {
                                  partida.save(function() {
                                   res.redirect('/menu_partida');
                                  });
                               });
-                            });
 
                           }        
                        });
@@ -195,9 +219,7 @@ router.post('/criar_partida', verificarQtdeJogadoresSala, function(req, res) {
                     });
 
                } else {
-               	console.log('Não posso criar uma nova partida' 
-               		+ 'enquanto estiver jogando outra!!!');
-               	req.next();
+               	res.redirect('/menu_partida');
                }
 
              } else {

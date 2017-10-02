@@ -17,33 +17,33 @@ function sortear(valores, i, j) {
     
   var total = 0;
   while(valores[j] <= 0) {
-     valores[j] = Math.floor((Math.random() * 100) + 1);
+     valores[j] = Math.floor((Math.random() * 100) + 10);
      total = valores[j];  
   } 
   j++;
    while(valores[j] <= 0) {
-     valores[j] = Math.floor((Math.random() * 100) + 1);
+     valores[j] = Math.floor((Math.random() * 100) + 10);
      if(valores[j] > 0) {
       total += valores[j];
      }  
   }
   j++;
    while(valores[j] <= 0) {
-     valores[j] = Math.floor((Math.random() * 100) + 1);
+     valores[j] = Math.floor((Math.random() * 100) + 10);
      if(valores[j] > 0) {
       total += valores[j];
      }  
   }
   j++;
   while(valores[j] <= 0) {
-     valores[j] = Math.floor((Math.random() * 100) + 1);
+     valores[j] = Math.floor((Math.random() * 100) + 10);
      if(valores[j] > 0) {
       total += valores[j];
      }  
   }
   j++;
   while(valores[j] <= 0) {
-     valores[j] = Math.floor((Math.random() * 100) + 1);
+     valores[j] = Math.floor((Math.random() * 100) + 10);
      if(valores[j] > 0) {
       total += valores[j];
      }  

@@ -620,6 +620,7 @@
            data.id_rodada == '<%- params.id_rodada %>' && 
            data.id_round == '<%- params.id_round %>') {
           $(document).ready(function() {
+            $('html, body').scrollTop(0);
             $('#informar_fim_de_round').text("Round "+'<%- params.num_round %>'+" finalizado!" );
             $('#numero_round').hide();
             $('#mudar_round').show();
@@ -647,7 +648,6 @@
                  $(document).ready(function() {
                   $('#bt_iniciar_novoRound').prop('disabled', true);
                  });
-                 //alert('huaaakkkkkkkkkkkkkkkkkkkkkkkk');
                   client.emit('carregar_jogadores', data_);
                };
             });
@@ -1022,9 +1022,11 @@
     <!--Controle Painel-->
   </head>
   <body id="painel">
+  
+  <progress id="load" value="0" max="100">
+
   <div class="container">
-
-
+  
   <div id="numeroRodada">
     <h3>Rodada <%- params.rodada.numero_rodada %></h3> 
   </div>
@@ -1047,9 +1049,9 @@
   <div id="mudar_round_OK">
    <form action="/iniciar_novoRound" method="POST">
     <div class="form-group">
-         <input type="hidden" id="id_partida" name="data[id_partida]">
-         <input type="hidden" id="num_round" name="data[num_round]">
-         <input type="hidden" id="num_rodada" name="data[num_rodada]">
+         <input type="hidden" id="id_partida" value="<%- params.id_partida %>" name="data[id_partida]">
+         <input type="hidden" id="num_round" value="<%- params.num_round %>" name="data[num_round]">
+         <input type="hidden" id="num_rodada"  value="<%- params.num_rodada %>" name="data[num_rodada]">
          <input type="hidden" id="indice_valor" value="<%- params.indice_valor %>" name="data[indice_valor]">
          <input type="hidden" value="<%- params.painel.id_painel %>" name="data[id_painel]">
          <button type="submit" id="bt_iniciar_novoRound_OK" class="btn btn-success" name="params"></button><br><br>
@@ -1292,7 +1294,20 @@
 
      <a id="game_over__" href="/menu-jogador" style="text-align: center;"><h4>Voltar</h4></a>
 
-  </body>
-  </html>
+
+<script>
+ var $progress = document.querySelector('progress');
+ var MAXIMUM = $progress.max;
+
+ //aumentando o valor a cada 1 segundo
+ var interval = setInterval(function() {
+    $progress.value++;
+  if($progress.value >= MAXIMUM) {
+       clearInterval(interval);   
+  }
+ }, 100);
+</script>
+</body>
+</html>
     
 

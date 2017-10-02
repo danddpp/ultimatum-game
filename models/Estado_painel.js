@@ -52,4 +52,4 @@ var Estado_Painel = new Schema({
 
 
 
-module.exports = mongoose.model('Estado_Painel', Estado_Painel);
+module.exports = mongoose.model('Estado_painel', Estado_Painel);

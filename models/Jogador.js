@@ -40,6 +40,7 @@ var ofertado = {
 //dados do jogador
 var Jogador = new Schema({
     flag_rodada_round1: Boolean,
+    flag_bt_entrar: Boolean,
     usuario: usuario,
     id_partida: String,
     id_sala: String, 

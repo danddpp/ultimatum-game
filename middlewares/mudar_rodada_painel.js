@@ -1,4 +1,4 @@
-var Estado_painel = require('./../models/Estado_Painel');
+var Estado_painel = require('./../models/Estado_painel');
 var Jogador = require('./../models/Jogador');
 var p_adversario = require('./../controllers/painel/p_adversario');
 var p_round = require('./../controllers/painel/p_round');
