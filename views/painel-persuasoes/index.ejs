@@ -8,8 +8,8 @@
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
 <style type="text/css">
-  #tab_left {float: left; margin-left: 2px;}
-  #tab_right {float: right;}
+  #tab_left {float: left; width: 700px; margin-left: 2px;}
+  #tab_right {float: right; width: 550px}
   #botoes {text-align: right;}
 </style>
 <script src="/socket.io/socket.io.js"></script>
@@ -18,7 +18,7 @@
   var client = io();
 
    $(document).ready(function () {
-     
+      
      $('#myTabContent').hide();
      $('#botoes').hide();
      $('#botoes').children().children().prop('disabled', true);
@@ -26,16 +26,461 @@
        $('#myTabContent').show();
        $('#botoes').show();
      });
+
+
+     $("#select_round_reciprocidade").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if ((opcao_coerencia == true && (rodada_reciprocidade == rodada_coerencia)) ||
+            (opcao_coerencia == true && (rodada_reciprocidade == rodada_coerencia2)) ||
+            (opcao_ap_social == true && (rodada_reciprocidade == rodada_ap_social)) ||
+            (opcao_afinidade == true && (rodada_reciprocidade == rodada_afinidade)) ||
+            (opcao_autoridade == true && (rodada_reciprocidade == rodada_autoridade)) ||
+            (opcao_escassez == true && (rodada_reciprocidade == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_coerencia == true && (round_reciprocidade == round_coerencia)) ||
+            (opcao_coerencia == true && (round_reciprocidade == round_coerencia2)) ||
+            (opcao_ap_social == true && (round_reciprocidade == round_ap_social)) ||
+            (opcao_afinidade == true && (round_reciprocidade == round_afinidade)) ||
+            (opcao_autoridade == true && (round_reciprocidade == round_autoridade)) ||
+            (opcao_escassez == true && (round_reciprocidade == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
+
+
+     $("#select_round_coerencia").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if ((opcao_reciprocidade == true && (rodada_coerencia == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_coerencia == rodada_coerencia2)) ||
+            (opcao_ap_social == true && (rodada_coerencia == rodada_ap_social)) ||
+            (opcao_afinidade == true && (rodada_coerencia == rodada_afinidade)) ||
+            (opcao_autoridade == true && (rodada_coerencia == rodada_autoridade)) ||
+            (opcao_escassez == true && (rodada_coerencia == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_coerencia == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_coerencia == round_coerencia2)) ||
+            (opcao_ap_social == true && (round_coerencia == round_ap_social)) ||
+            (opcao_afinidade == true && (round_coerencia == round_afinidade)) ||
+            (opcao_autoridade == true && (round_coerencia == round_autoridade)) ||
+            (opcao_escassez == true && (round_coerencia == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
+
+
+     $("#select_round_coerencia2").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if ((opcao_reciprocidade == true && (rodada_coerencia2 == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_coerencia2 == rodada_coerencia)) ||
+            (opcao_ap_social == true && (rodada_coerencia2 == rodada_ap_social)) ||
+            (opcao_afinidade == true && (rodada_coerencia2 == rodada_afinidade)) ||
+            (opcao_autoridade == true && (rodada_coerencia2 == rodada_autoridade)) ||
+            (opcao_escassez == true && (rodada_coerencia2 == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_coerencia2 == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_coerencia2 == round_coerencia)) ||
+            (opcao_ap_social == true && (round_coerencia2 == round_ap_social)) ||
+            (opcao_afinidade == true && (round_coerencia2 == round_afinidade)) ||
+            (opcao_autoridade == true && (round_coerencia2 == round_autoridade)) ||
+            (opcao_escassez == true && (round_coerencia2 == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
+
+     $("#select_round_ap_social").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if ((opcao_reciprocidade == true && (rodada_ap_social == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_ap_social == rodada_coerencia)) ||
+            (opcao_coerencia == true && (rodada_ap_social == rodada_coerencia2)) ||
+            (opcao_afinidade == true && (rodada_ap_social == rodada_afinidade)) ||
+            (opcao_autoridade == true && (rodada_ap_social == rodada_autoridade)) ||
+            (opcao_escassez == true && (rodada_ap_social == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_ap_social == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_ap_social == round_coerencia)) ||
+            (opcao_coerencia == true && (round_ap_social == round_coerencia2)) ||
+            (opcao_afinidade == true && (round_ap_social == round_afinidade)) ||
+            (opcao_autoridade == true && (round_ap_social == round_autoridade)) ||
+            (opcao_escassez == true && (round_ap_social == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+     
+
+     $("#select_round_afinidade").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if ((opcao_reciprocidade == true && (rodada_afinidade == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_afinidade == rodada_coerencia)) ||
+            (opcao_coerencia == true && (rodada_afinidade == rodada_coerencia2)) ||
+            (opcao_ap_social == true && (rodada_afinidade == rodada_ap_social)) ||
+            (opcao_autoridade == true && (rodada_afinidade == rodada_autoridade)) ||
+            (opcao_escassez == true && (rodada_afinidade == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_afinidade == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_afinidade == round_coerencia)) ||
+            (opcao_coerencia == true && (round_afinidade == round_coerencia2)) ||
+            (opcao_ap_social == true && (round_afinidade == round_ap_social)) ||
+            (opcao_autoridade == true && (round_afinidade == round_autoridade)) ||
+            (opcao_escassez == true && (round_afinidade == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
+
+     $("#select_round_autoridade").click(function(){
+         
+
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if((opcao_reciprocidade == true && (rodada_autoridade == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_autoridade == rodada_coerencia)) ||
+            (opcao_coerencia == true && (rodada_autoridade == rodada_coerencia2)) ||
+            (opcao_ap_social == true && (rodada_autoridade == rodada_ap_social)) ||
+            (opcao_afinidade == true && (rodada_autoridade == rodada_afinidade)) ||
+            (opcao_escassez == true && (rodada_afinidade == rodada_escassez))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_autoridade == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_autoridade == round_coerencia)) ||
+            (opcao_coerencia == true && (round_autoridade == round_coerencia2)) ||
+            (opcao_ap_social == true && (round_autoridade == round_ap_social)) ||
+            (opcao_autoridade == true && (round_autoridade == round_autoridade)) ||
+            (opcao_escassez == true && (round_autoridade == round_escassez))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
+
+     $("#select_round_escassez").click(function(){
+         
+         var round = false;
+         var rodada = false; 
+
+         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
+         var round_reciprocidade = $('#select_round_reciprocidade').val();
+         var opcao_reciprocidade = $('#check_reciprocidade').prop('checked');
+          
+         var rodada_coerencia = $('#select_rodada_coerencia').val();
+         var round_coerencia = $('#select_round_coerencia').val();
+         var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+         var round_coerencia2 = $('#select_round_coerencia2').val();
+         var opcao_coerencia = $('#check_coerencia').prop('checked');
+
+         var rodada_ap_social = $('#select_rodada_ap_social').val();
+         var round_ap_social = $('#select_round_ap_social').val();
+         var opcao_ap_social = $('#check_ap_social').prop('checked'); 
+
+         var rodada_afinidade = $('#select_rodada_afinidade').val();
+         var round_afinidade = $('#select_round_afinidade').val();
+         var opcao_afinidade = $('#check_afinidade').prop('checked');
+
+         var rodada_autoridade = $('#select_rodada_autoridade').val();
+         var round_autoridade = $('#select_round_autoridade').val();
+         var opcao_autoridade = $('#check_autoridade').prop('checked');
+
+         var rodada_escassez = $('#select_rodada_escassez').val();
+         var round_escassez = $('#select_round_escassez').val();
+         var opcao_escassez = $('#check_escassez').prop('checked');
+
+         
+         if((opcao_reciprocidade == true && (rodada_escassez == rodada_reciprocidade)) ||
+            (opcao_coerencia == true && (rodada_escassez == rodada_coerencia)) ||
+            (opcao_coerencia == true && (rodada_escassez == rodada_coerencia2)) ||
+            (opcao_ap_social == true && (rodada_escassez == rodada_ap_social)) ||
+            (opcao_afinidade == true && (rodada_escassez == rodada_afinidade)) ||
+            (opcao_autoridade == true && (rodada_escassez == rodada_autoridade))) {
+            
+            rodada = true;
+         
+         }
+         
+         if((opcao_reciprocidade == true && (round_escassez == round_reciprocidade)) ||
+            (opcao_coerencia == true && (round_escassez == round_coerencia)) ||
+            (opcao_coerencia == true && (round_escassez == round_coerencia2)) ||
+            (opcao_ap_social == true && (round_escassez == round_ap_social)) ||
+            (opcao_autoridade == true && (round_escassez == round_autoridade)) ||
+            (opcao_autoridade == true && (round_escassez == round_autoridade))) {
+            
+            round = true;
+         
+         }  
+
+         if(rodada == true && round == true) {
+          alert('Já existe um método configurado nessa mesma rodada e round!');
+         }
+
+
+     });
+
    });
 
 
    function muda(check, id) {
      $('#botoes').children().children().prop('disabled', false);
-      //document.getElementById(id).checked = false;
+     //document.getElementById(id).checked = false;
    };
-     
+
+       
 
    var salvar_configuracoes = function() {  
+        
 
         var rodada_reciprocidade = $('#select_rodada_reciprocidade').val();
         var round_reciprocidade = $('#select_round_reciprocidade').val();
@@ -46,6 +491,8 @@
         
         var rodada_coerencia = $('#select_rodada_coerencia').val();
         var round_coerencia = $('#select_round_coerencia').val();
+        var rodada_coerencia2 = $('#select_rodada_coerencia2').val();
+        var round_coerencia2 = $('#select_round_coerencia2').val();
         var opcao_coerencia = $('#check_coerencia').prop('checked');      
         var id_destinatario_coerencia = $('#sel_jogadores_coerencia')
                                                               .find(':selected').attr('id');
@@ -99,15 +546,13 @@
                 id_destinatario: id_destinatario_coerencia,
                 rodada: rodada_coerencia, 
                 round: round_coerencia,
-                rodada_aux: rodada_coerencia + 2, 
-                round_aux: round_coerencia,
+                rodada_2: rodada_coerencia2, 
+                round_2: round_coerencia2,
                 opcao: opcao_coerencia,
-                msg_quiz1: 'Em jogos contra adversários vc costuma utilizar uma tática individualista ou cooperativa?',
-                msg_quiz2: 'Caso um adversário seu, durante uma partida,solicitasse sua ajuda e lhe pedisse uma oferta alta, vc ajudaria?',
+                msg_quiz1: 'Que tipo de tática você opta quando participa de alguma atividade onde outras pessoas também estão participando? individualista, visando uma colocação de destaque para si ou cooperativa, tentando manter todo o grupo em um mesmo nível?',
+                msg_quiz2: 'Analisando a situação de 3 participantes verificou-se que eles estão com uma pontuação muito baixa. Você aceitaria deistribuir entre eles 15% da sua pontuação?',
                 resposta_quiz1: null,
                 resposta_quiz2: null,
-                quiz_respondido: false,
-                msg2: 'Estou mal mesmo nessa partida. Poderia me dar aquela ajuda agora?',
                 resposta: {
                   id_partida: null,
                   id_jogador: null,
@@ -123,8 +568,11 @@
                 rodada: rodada_ap_social, 
                 round: round_ap_social,
                 opcao: opcao_ap_social,
-                msg: 'Texto persuasivo utilizando o método da aprovacao social.'              
+                msg: 'Olá!! O que vc acha de participar de um sorteio ao final da rodada?? Para que o sorteio ocorra é necessário que cada jogador contribua com 10% da sua pontuação. Até esse momento 90% dos jogadores já aceitaram. Vamos nessa??',
+                resposta: null               
             };
+
+
             var afinidade = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
@@ -156,28 +604,79 @@
                 msg: 'Texto persuasivo utilizando o método da escassez.'              
             };
 
+
         var configuracoes = [reciprocidade,coerencia,aprovacao_social,afinidade,autoridade,escassez];
 
-        $('#tabela').find('tr').each(function(index) {
-            if(index > 0) {
-              $(this).find('td').each(function(index) {
-                  if($(this).attr('id') == 'check_partida') {
-                    if($(this).children().children().children().prop('checked') == true) {
-                       var id_partida = $(this).next().attr('id');
+  if(((rodada_reciprocidade == rodada_coerencia)&&(opcao_reciprocidade && opcao_coerencia)) || ((rodada_reciprocidade == rodada_coerencia2)&&(opcao_reciprocidade && opcao_coerencia)) ||
+  ((rodada_reciprocidade == rodada_ap_social)&&(opcao_reciprocidade && opcao_ap_social)) ||
+  ((rodada_reciprocidade == rodada_afinidade)&&(opcao_reciprocidade && opcao_afinidade)) ||
+  ((rodada_reciprocidade == rodada_autoridade)&&(opcao_reciprocidade && opcao_autoridade)) ||
+  ((rodada_reciprocidade == rodada_escassez)&&(opcao_reciprocidade && opcao_escassez)) ||
+  ((rodada_coerencia == rodada_coerencia2)&&(opcao_coerencia)) ||
+  ((rodada_coerencia == rodada_ap_social)&&(opcao_coerencia && opcao_ap_social)) ||
+  ((rodada_coerencia == rodada_afinidade)&&(opcao_coerencia && opcao_afinidade)) ||
+  ((rodada_coerencia == rodada_autoridade)&&(opcao_coerencia && opcao_autoridade)) ||
+  ((rodada_coerencia == rodada_escassez)&&(opcao_coerencia && opcao_escassez)) ||
+  ((rodada_coerencia2 == rodada_ap_social)&&(opcao_coerencia && opcao_ap_social)) ||
+  ((rodada_coerencia2 == rodada_afinidade)&&(opcao_coerencia && opcao_afinidade)) ||
+  ((rodada_coerencia2 == rodada_autoridade)&&(opcao_coerencia && opcao_autoridade)) ||
+  ((rodada_coerencia2 == rodada_escassez)&&(opcao_coerencia && opcao_escassez)) ||
+  ((rodada_ap_social == rodada_afinidade)&&(opcao_ap_social && opcao_afinidade)) ||
+  ((rodada_ap_social == rodada_autoridade)&&(opcao_ap_social && opcao_autoridade)) ||
+  ((rodada_ap_social == rodada_escassez)&&(opcao_ap_social && opcao_escassez)) ||
+  ((rodada_afinidade == rodada_autoridade)&&(opcao_afinidade && opcao_escassez)) ||
+  ((rodada_autoridade == rodada_escassez)&&(opcao_autoridade && opcao_escassez))) {
+          var rodada = true;
+  }
 
-                       var data = {
-                          id_partida: id_partida,
-                          configuracoes: configuracoes
-                       };
-                       
-                       client.emit('salvar_persuasoes_padrao', data);
-                    }                    
-                  }
-              });
-            }
-        });
 
-   };
+  if(((round_reciprocidade == round_coerencia)&&(opcao_reciprocidade && opcao_coerencia)) || ((round_reciprocidade == round_coerencia2)&&(opcao_reciprocidade && opcao_coerencia)) ||
+  ((round_reciprocidade == round_ap_social)&&(opcao_reciprocidade && opcao_ap_social)) ||
+  ((round_reciprocidade == round_afinidade)&&(opcao_reciprocidade && opcao_afinidade)) ||
+  ((round_reciprocidade == round_autoridade)&&(opcao_reciprocidade && opcao_autoridade)) ||
+  ((round_reciprocidade == round_escassez)&&(opcao_reciprocidade && opcao_escassez)) ||
+  ((round_coerencia == round_coerencia2)&&(opcao_coerencia)) ||
+  ((round_coerencia == round_ap_social)&&(opcao_coerencia && opcao_ap_social)) ||
+  ((round_coerencia == round_afinidade)&&(opcao_coerencia && opcao_afinidade)) ||
+  ((round_coerencia == round_autoridade)&&(opcao_coerencia && opcao_autoridade)) ||
+  ((round_coerencia == round_escassez)&&(opcao_coerencia && opcao_escassez)) ||
+  ((round_coerencia2 == round_ap_social)&&(opcao_coerencia && opcao_ap_social)) ||
+  ((round_coerencia2 == round_afinidade)&&(opcao_coerencia && opcao_afinidade)) ||
+  ((round_coerencia2 == round_autoridade)&&(opcao_coerencia && opcao_autoridade)) ||
+  ((round_coerencia2 == round_escassez)&&(opcao_coerencia && opcao_escassez)) ||
+  ((round_ap_social == round_afinidade)&&(opcao_ap_social && opcao_afinidade)) ||
+  ((round_ap_social == round_autoridade)&&(opcao_ap_social && opcao_autoridade)) ||
+  ((round_ap_social == round_escassez)&&(opcao_ap_social && opcao_escassez)) ||
+  ((round_afinidade == round_autoridade)&&(opcao_afinidade && opcao_escassez)) ||
+  ((round_autoridade == round_escassez)&&(opcao_autoridade && opcao_escassez))) {
+          var round = true;
+  }
+
+
+  if(rodada && round) {
+    alert('Configuração não permitida! É permitido apenas um método por round');
+  } else {
+    $('#tabela').find('tr').each(function(index) {
+        if(index > 0) {
+          $(this).find('td').each(function(index) {
+              if($(this).attr('id') == 'check_partida') {
+                if($(this).children().children().children().prop('checked') == true) {
+                   var id_partida = $(this).next().attr('id');
+
+                   var data = {
+                      id_partida: id_partida,
+                      configuracoes: configuracoes
+                   };
+                   
+                   client.emit('salvar_persuasoes_padrao', data);
+                }                    
+              }
+          });
+        }
+    });
+  }
+
+};
 
 </script>
 <body>
@@ -228,11 +727,11 @@
                    <div class="col-lg-10">
                     <select class="form-control" id="select_rodada_reciprocidade" style="width:60px;">
                      <option>1</option>
-                     <option disabled="true">2</option>
-                     <option disabled="true">3</option>
-                     <option disabled="true">4</option>
-                     <option disabled="true">5</option>
-                     <option disabled="true">6</option>
+                     <option>2</option>
+                     <option>3</option>
+                     <option>4</option>
+                     <option>5</option>
+                     <option>6</option>
                     </select>
                    </div>
                   </div>
@@ -288,23 +787,51 @@
                        </div>
                        <br><br>
                       <div class="form-group">
-                       <label for="select" class="col-lg-2 control-label">Rodada</label>
+                       <label for="select" class="col-lg-2 control-label">Rodada 1ª pergunta</label>
                         <div class="col-lg-10">
                          <select class="form-control" id="select_rodada_coerencia" style="width:60px;">
                           <option>1</option>
                           <option>2</option>
-                          <option disabled="true">3</option>
-                          <option disabled="true">4</option>
-                          <option disabled="true">5</option>
-                          <option disabled="true">6</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
                          </select>
                         </div>
                        </div>
                        <br><br>
                        <div class="form-group">
-                        <label for="select" class="col-lg-2 control-label">Round</label>
+                        <label for="select" class="col-lg-2 control-label">Round 1ª pergunta</label>
                          <div class="col-lg-10">
                           <select class="form-control" id="select_round_coerencia" style="width:60px;">
+                           <option>1</option>
+                           <option>2</option>
+                           <option>3</option>
+                           <option>4</option>
+                           <option>5</option>
+                           <option>6</option>
+                          </select>
+                         </div>
+                        </div>
+                         <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Rodada 2ª pergunta</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="select_rodada_coerencia2" style="width:60px;">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
+                       <div class="form-group">
+                        <label for="select" class="col-lg-2 control-label">Round 2ª pergunta</label>
+                         <div class="col-lg-10">
+                          <select class="form-control" id="select_round_coerencia2" style="width:60px;">
                            <option>1</option>
                            <option>2</option>
                            <option>3</option>
@@ -631,22 +1158,3 @@
 </div>
 </body>
 </html>
-
-
-<!--
-<p>cada princípio é analisado em sua capacidade de produzir nas
-   pessoas um tipo singular de consentimento automático e impensado, ou
-   seja, uma disposição em dizer “sim” sem pensar primeiro. Indícios sugerem
-   que o ritmo acelerado e o bombardeio de informações da vida moderna tornarão
-   essa forma específica de persuasão cada vez mais predominante. Será
-   ainda mais importante para a sociedade, portanto, entender como e por que
-   a influência automática ocorre</p>
--->
-
-
-<!--
-<div class="form-group">      
-           <button type="submit" id="bt_pesquisar" class="btn btn-default" style="margin-left: 470px;
-           position: absolute; margin-top: 2px;">Aplicar</button><br><br>
-           </div>
--->

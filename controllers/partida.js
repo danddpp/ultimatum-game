@@ -16,6 +16,7 @@ var Partida = function(tipo_sala, id_dono, num_rodadas) {
    this.versao = 0;
    this.contador_aceite = 0;
    this.contador_prox_round = 0;
+   this.id_resultados = '';
 };
 
 

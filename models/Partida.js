@@ -42,7 +42,8 @@ var Partida = new Schema({
   indice_valor: Number,
   versao: Number,
   contador_aceite: Number,
-  contador_prox_round: Number
+  contador_prox_round: Number,
+  id_resultados: String
 });
 
 

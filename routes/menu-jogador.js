@@ -46,16 +46,8 @@ router.post('/iniciar_partida', function(req, res) {
     if(req.isAuthenticated()) {
       
       var query = req.body.idPartida_ok;
-
-      /*if(req.user.id_partida == null) {
-        query = req.body.idPartida_ok;  
-      } else {
-        query = req.user.id_partida;
-      }*/
-      
       var minha_pontuacao = 0;
       var meu_percentual_ganho = 0;
-      
       
       
         Partida.findById(query).exec(function(err, partida) {
@@ -111,9 +103,7 @@ router.post('/iniciar_partida', function(req, res) {
                          bt_enviar_oferta: false,
                          subtotal: 0
                        };                         
-                      
-
-
+                    
 
                       var p_adversarios = [];
                       for(var i = 0; i < adversarios.length; i++) {
@@ -209,15 +199,29 @@ router.post('/iniciar_partida', function(req, res) {
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;   
                                     }
 
-                                    if(partida.persuasoes_padrao[i].tipo == 'Coerência' && 
-                                       partida.persuasoes_padrao[i].quiz_respondido == false) {
-                                       persuasao_padrao = partida.persuasoes_padrao[i].tipo;
+                                    if(partida.persuasoes_padrao[i].tipo == 'Coerência') {
+
+                                      if(partida.persuasoes_padrao[i].quiz_respondido == false) {
+                                      
+                                       persuasao_padrao = persuasoes_padrao[i].tipo;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].quiz_respondido;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg_quiz1;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg_quiz2;
-                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].quiz_respondido;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].opcao_coerencia;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
-                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;   
+                                      
+                                      }  
+
                                     }
+
+                                    if(partida.persuasoes_padrao[i].tipo == 'Aprovação social') {
+                                        persuasao_padrao = partida.persuasoes_padrao[i].tipo;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                    }
+
                                  }
                                }
                              }
@@ -285,11 +289,26 @@ router.post('/iniciar_partida', function(req, res) {
                                   } 
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
-                                     persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                     
+                                     if(partida.persuasoes_padrao[0].quiz_respondido == false) {
+                                      
+                                      persuasao_padrao = partida.persuasoes_padrao[0].tipo;
+                                      persuasao_padrao += partida.persuasoes_padrao[0].quiz_respondido;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg_quiz1;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg_quiz2;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].opcao_coerencia;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;   
+                                      
+                                    }
+
                                  }
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Aprovação social') {
-                                     persuasao_padrao = partida.persuasoes_padrao[0].msg; 
+                                     persuasao_padrao = partida.persuasoes_padrao[0].tipo;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario; 
                                  }
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Afinidade') {
@@ -420,18 +439,27 @@ router.post('/iniciar_partida', function(req, res) {
                                    } 
 
                                    if(persuasoes_padrao[k].tipo == 'Coerência') {
-                                      if(persuasoes_padrao[k].resposta == null) {
-                                        persuasao_padrao = persuasoes_padrao[k].tipo;
-                                        persuasao_padrao += ';'+persuasoes_padrao[k].msg;
-                                        persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
-                                        persuasao_padrao += ';'+persuasoes_padrao[k].resposta;
-                                        persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;   
-                                      }  
-                                   }
+                                     
+                                     if(persuasoes_padrao[k].quiz_respondido == false) {
+                                      
+                                      persuasao_padrao = persuasoes_padrao[k].tipo;
+                                      persuasao_padrao += persuasoes_padrao[k].quiz_respondido;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz1;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz2;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].opcao_coerencia;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
+                                      
+                                    }
 
-                                   if(persuasoes_padrao[k].tipo == 'Aprovação social') {
-                                       persuasao_padrao = persuasoes_padrao[k].msg; 
-                                   }
+                                 }
+
+                                 if(persuasoes_padrao[k].tipo == 'Aprovação social') {
+                                     persuasao_padrao = persuasoes_padrao[k].tipo;
+                                     persuasao_padrao += ';'+persuasoes_padrao[k].msg;
+                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
+                                 }
 
                                    if(persuasoes_padrao[k].tipo == 'Afinidade') {
                                        persuasao_padrao = persuasoes_padrao[k].msg; 
@@ -621,8 +649,10 @@ router.post('/iniciar_novoRound', function(req, res) {
                          for(var k = 0; k < persuasoes_padrao.length; k++ ) {
                              if(persuasoes_padrao[k].opcao != false) {
                               
-                               if(persuasoes_padrao[k].rodada == n_rodada &&
-                                  persuasoes_padrao[k].round == n_round) {
+                               if((persuasoes_padrao[k].rodada == n_rodada &&
+                                   persuasoes_padrao[k].round == n_round) || 
+                                   (persuasoes_padrao[k].rodada_2 == n_rodada &&
+                                    persuasoes_padrao[k].round_2 == n_round)) {
 
                                   if(persuasoes_padrao[k].tipo == 'Reciprocidade') {
                                     persuasao_padrao = persuasoes_padrao[k].tipo;
@@ -634,19 +664,38 @@ router.post('/iniciar_novoRound', function(req, res) {
                                    } 
 
                                    if(persuasoes_padrao[k].tipo == 'Coerência') {
-                                     
-                                     if(persuasoes_padrao[k].resposta == null) {
-                                      
+                                     //console.log(persuasoes_padrao[k].quiz_respondido);
+                                     if(persuasoes_padrao[k].rodada == n_rodada &&
+                                                  persuasoes_padrao[k].round == n_round) {
+
                                       persuasao_padrao = persuasoes_padrao[k].tipo;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].msg;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].resposta;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;   
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].rodada;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].round;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz1;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
+                                                                                                   
                                     } 
+
+                                    else if(persuasoes_padrao[k].rodada_2 == n_rodada &&
+                                                 persuasoes_padrao[k].round_2 == n_round) {
+                                         
+                                          persuasao_padrao = persuasoes_padrao[k].tipo;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz2;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].rodada_2;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].round_2;
+
+                                    } 
+
                                    }
 
                                    if(persuasoes_padrao[k].tipo == 'Aprovação social') {
-                                       persuasao_padrao = persuasoes_padrao[k].msg; 
+                                       persuasao_padrao = persuasoes_padrao[k].tipo;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].msg;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
                                    }
 
                                    if(persuasoes_padrao[k].tipo == 'Afinidade') {
@@ -860,7 +909,10 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                      }
 
                                      if(persuasoes_padrao[k].tipo == 'Aprovação social') {
-                                         persuasao_padrao = persuasoes_padrao[k].msg; 
+                                         persuasao_padrao = persuasoes_padrao[k].tipo;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].msg;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
                                      }
 
                                      if(persuasoes_padrao[k].tipo == 'Afinidade') {
@@ -1084,6 +1136,13 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg_quiz1;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg_quiz2;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].quiz_respondido;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                  }
+
+                                  if(partida.persuasoes_padrao[i].tipo == 'Aprovação social') {
+                                     persuasao_padrao = partida.persuasoes_padrao[i].tipo;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
                                   }

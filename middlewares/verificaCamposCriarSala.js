@@ -69,7 +69,6 @@ module.exports = function(req, res, next) {
     });
  
    } else {
-   	//console.log('here now two');
    	 next();
    }
 };

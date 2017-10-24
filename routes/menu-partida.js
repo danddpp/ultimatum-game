@@ -8,6 +8,7 @@ var c_round = require('./../controllers/round');
 var sortearValores = require('./../functions/sortearValores');
 var verificarQtdeJogadoresSala = require('./../middlewares/verificaCamposCriarSala');
 var retornar_ao_jogo = require('./../middlewares/retornar_ao_jogo');
+var Persuasoes_Padrao_Resultados = require('./../models/Persuasoes_Padrao_Resultados');
 
 
 router.get('/menu_partida', retornar_ao_jogo, function(req, res) {
@@ -199,18 +200,51 @@ router.post('/criar_partida', function(req, res) {
                         contador_aceite: nova_partida.contador_aceite,
                         contador_prox_round: nova_partida.contador_prox_round
                     });
+
+                    var id_partida = null;
  
                        //inserindo no bd uma nova partida
                          Partida.create(partida, function(err, partida) {
                           if(err) {
                             return req.next(err);
                           } else {  
+                              
                               jogador.id_partida = partida._id;
-                              jogador.save(function() {
-                                 partida.save(function() {
-                                  res.redirect('/menu_partida');
-                                 });
-                              });
+                              id_partida = partida._id;
+
+                              jogador.save();
+                              
+                              partida.save();
+
+
+                              var reciprocidade_resultado = [];
+                              var coerencia_resultado = [];
+                              var aprovacao_social_resultado = [];
+                              var afinidade_resultado = [];
+                              var autoridade_resultado = [];
+                              var escassez_resultado = [];  
+
+
+                               var ppr = new Persuasoes_Padrao_Resultados({
+                                   id_partida: id_partida,
+                                   reciprocidade_resultado: reciprocidade_resultado,
+                                   coerencia_resultado: coerencia_resultado,
+                                   aprovacao_social_resultado: aprovacao_social_resultado,
+                                   afinidade_resultado: afinidade_resultado,
+                                   autoridade_resultado: autoridade_resultado,
+                                   escassez_resultado: escassez_resultado                                                                                                                                        
+                               }); 
+                               
+                               Persuasoes_Padrao_Resultados.create(ppr, function(err, ppr) {
+                                   if(err) {
+                                     console.log(err);
+                                   } else {
+                                      partida.id_resultados = ppr._id;
+                                      partida.save();
+                                      
+                                      res.redirect('/menu_partida'); 
+                                   }
+                               });
 
                           }        
                        });
