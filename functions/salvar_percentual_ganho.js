@@ -1,4 +1,5 @@
 var Jogador = require('.././models/Jogador'); 
+var atualizar_desempenho = require('./atualizar_desempenho');
 
 module.exports = function(id_jogador) {
     
@@ -49,7 +50,15 @@ module.exports = function(id_jogador) {
         
         jogador.percentual_ganho = percentual_ganho.toFixed(2);
         
-        jogador.save();
+        jogador.save().then(function() {
+            
+            Jogador.findById(query).exec(function(err, jogador) {
+              if (jogador) {
+                atualizar_desempenho(jogador);
+              }
+            });
+
+        });
         
 
    } else {

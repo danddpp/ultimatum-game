@@ -6,6 +6,7 @@ var routesMenuJogador = require('./routes/menu-jogador');
 var routesMenuPartida = require('./routes/menu-partida');
 var routesPesquisar = require('./routes/pesquisar');
 var routesPersuasao = require('./routes/painel-persuasao');
+var routesPerfilUsuario = require('./routes/perfil_usuario');
 var mongoose = require('mongoose');
 var path = require('path');
 var express = require('express');
@@ -88,6 +89,13 @@ app.post('/visualizar_resultados_por_partida', routesPesquisar);
 //config rotas persuasao
 app.get('/painel_persuasao', routesPersuasao);
 
+
+//rotas perfil usuario
+app.get('/perfil_usuario', routesPerfilUsuario);
+app.get('/editar_perfil', routesPerfilUsuario);
+app.post('/salvar_alteracoes', routesPerfilUsuario);
+app.post('/visitar_perfil', routesPerfilUsuario);
+
 //configuração do passport
 var Usuario = require('./models/Usuario');
 
@@ -165,6 +173,7 @@ passport.use(new LocalStrategy({
   var p_rodada = require('./controllers/painel/p_rodada');
   var Estado_Painel = require('./models/Estado_painel');
   var Persuasoes_Padrao_Resultados = require('./models/Persuasoes_Padrao_Resultados');
+  var Chat = require('./models/Chat');
   var sortearValores = require('./functions/sortearValores');
   var deduzir_quinze_por_cento = require('./functions/deduzir_quinze_por_cento');
   //config socket.io
@@ -997,7 +1006,7 @@ var salvar_aceite_db = function(data) {
           
            if(partida.contador_aceite == partida.num_jogadores) {
               
-              if(partida.num_rodadas == 1) { 
+              if(partida.num_rodadas == 1 && partida.status != 'Finalizada') {
                  fim_de_jogo(data, partida);
               }
 
@@ -1031,7 +1040,7 @@ var salvar_aceite_db = function(data) {
                         partida.contador_aceite = 0;
                                                                        
                         partida.save(function() {
-                          console.log(partida.rodadas);  
+                          //console.log(partida.rodadas);  
                           var id_rodada = null;
                           var id_partida = partida._id;
                           
@@ -1054,7 +1063,9 @@ var salvar_aceite_db = function(data) {
 
 
                 } else {
-                   fim_de_jogo(data, partida);
+                  if (partida.status != 'Finalizada') {
+                     fim_de_jogo(data, partida);
+                  }
                 }
               }///
 
@@ -1089,7 +1100,7 @@ var salvar_aceite_db = function(data) {
                         partida.contador_aceite = 0;
 
                         partida.save(function() {
-                          console.log(partida.rodadas);  
+                         // console.log(partida.rodadas);  
                           var id_rodada = null;
                           var id_partida = partida._id;
                           
@@ -1110,7 +1121,9 @@ var salvar_aceite_db = function(data) {
 
 
                 } else {
-                   fim_de_jogo(data, partida);
+                   if (partida.status != 'Finalizada') {
+                     fim_de_jogo(data, partida);
+                  }
                 }
               }///
 
@@ -1145,7 +1158,7 @@ var salvar_aceite_db = function(data) {
                         partida.contador_aceite = 0;
                                                                        
                         partida.save(function() {
-                          console.log(partida.rodadas);  
+                          //console.log(partida.rodadas);  
                           var id_rodada = null;
                           var id_partida = partida._id;
                           
@@ -1167,7 +1180,9 @@ var salvar_aceite_db = function(data) {
 
 
                 } else {
-                   fim_de_jogo(data, partida);
+                   if (partida.status != 'Finalizada') {
+                     fim_de_jogo(data, partida);
+                  }
                 }
               }///
 
@@ -1201,7 +1216,7 @@ var salvar_aceite_db = function(data) {
                         partida.contador_aceite = 0;
                                                                        
                         partida.save(function() {
-                          console.log(partida.rodadas);  
+                          //console.log(partida.rodadas);  
                           var id_rodada = null;
                           var id_partida = partida._id;
                           
@@ -1223,7 +1238,9 @@ var salvar_aceite_db = function(data) {
 
 
                 } else {
-                   fim_de_jogo(data, partida);
+                   if (partida.status != 'Finalizada') {
+                     fim_de_jogo(data, partida);
+                  }
                 }
               }///
 
@@ -1258,7 +1275,7 @@ var salvar_aceite_db = function(data) {
                         partida.contador_aceite = 0;
                                                                        
                         partida.save(function() {
-                          console.log(partida.rodadas);  
+                          //console.log(partida.rodadas);  
                           var id_rodada = null;
                           var id_partida = partida._id;
                           
@@ -1279,7 +1296,9 @@ var salvar_aceite_db = function(data) {
 
 
                 } else {
-                   fim_de_jogo(data, partida);
+                   if (partida.status != 'Finalizada') {
+                     fim_de_jogo(data, partida);
+                  }
                 }
               }///
 
@@ -1292,7 +1311,7 @@ var salvar_aceite_db = function(data) {
         console.log(err);
       }
     });      
-  }, 1000); 
+  }, 1500); 
 };
 
 
@@ -1401,7 +1420,6 @@ var finalizar_round = function(data, partida) {
 
 
 
-
 var fim_de_jogo = function(data, partida) {
    
    var id_partida = partida._id;
@@ -1411,13 +1429,13 @@ var fim_de_jogo = function(data, partida) {
           msg: 'Partida finalizada!',
           msg2: 'Obrigado por participar!'
        }
+
    usuario.id_partida = null;                                                       
    socket.emit('fim_de_jogo', final_data);
    socket.broadcast.emit('fim_de_jogo', final_data);
    socket.emit('salvar_percentual_ganho', id_partida);
    socket.broadcast.emit('salvar_percentual_ganho', id_partida);
    finalizar_partida(id_partida);
-
 };
 //////////////////////////////////////////////////////// salvar aceites
 
@@ -1606,7 +1624,7 @@ var fim_de_jogo = function(data, partida) {
                            var status = 'Jogador manipulado é cooperativo mas negou doar 15% dos seus ganhos';
 
                         }                           
-                        console.log(rC[i]);   
+                        //console.log(rC[i]);   
                         var resultado = {
                              id_partida: rC[i].id_partida,
                              id_jogador: rC[i].id_jogador,
@@ -1636,7 +1654,357 @@ var fim_de_jogo = function(data, partida) {
 
        });
      //persuasao//////////////////////////////////////////////////////////////////////
+  
+
+
+
+
+//chat perfil
+
+
+socket.on('buscar_chat', function(data) {
+     
+    var data_ = {
+         flag: false,
+         data_chat: null   
+    };
+
+    Usuario.findById(data.meu_id).exec(function(err, usuario) {
+       if (usuario) {
+        var length = usuario.ids_de_chats_salvos.length;
+        
+         console.log('1');
+        
+          for(var i = 0; i < length; i++) {
+             
+             var id_chat = usuario.ids_de_chats_salvos[i];
+             
+             Chat.findById(id_chat).exec(function(err, chat) {
+                if(chat) {
+                   
+                   if(data.meu_id == chat.id_emissor && data.id_outro == chat.id_receptor) {
+                    console.log('2');
+                    var messages = "";
+                                        
+                     for(var m = 0; m < chat.historico.length; m++) {
+                        messages += chat.historico[m].msg+'ص';
+                     }
+
+                      data_.flag = true;
+                      data_.data_chat = messages;
+                      //socket.emit('historico_chat', data_);
+                   }
+
+                } else {
+                  console.log(err);
+                }
+             });
+              
+          }
+
+          setTimeout(function() {
+             socket.emit('historico_chat', data_);
+          }, 5000);
+
+
+       } else {
+        console.log(err);
+       }
+    });
+});
+
+
+
+
+ socket.on('send-server-perfil', function(data) {
+   
+   var id_emissor = data.meu_id_painel_adversario;
+   var id_receptor = data.id_destinatario; 
+   var chat_existe_emissor = false;
+   var chat_existe_receptor = false;
+
+   var message = "<li id="+"'del'" +"class="+"'left clearfix'"+"><span class="+
+                       "'chat-img pull-left'"+">"+
+                 "<div class="+"'chat-body clearfix'"+">"+
+                   "<div class="+"'header'"+">"+
+                    "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                     "<small class="+"'pull-left text-muted'"+">"+
+                   "</div>"+
+                     "<p>"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                  "</div>"+
+                 "</li>";
+
+    Usuario.findById(id_emissor).exec(function(err, usuario) {
+      if(usuario) {
+        
+        var length = usuario.ids_de_chats_salvos.length;
+        
+          for(var i = 0; i < length; i++) {
+             
+             var id_chat = usuario.ids_de_chats_salvos[i];
+             
+             Chat.findById(id_chat).exec(function(err, chat) {
+                if(chat) {
+                  
+                 if(chat.id_emissor == id_emissor && chat.id_receptor == id_receptor) {
+                  
+                  chat_existe_emissor = true;
+
+                  
+                  var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
+                      "<div class="+"'chat-body clearfix'"+">"+
+                       "<div class="+"'header'"+">"+
+                        "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                         "<small class="+"'pull-right text-muted'"+">"+
+                       "</div>"+
+                         "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                      "</div>"+''
+                     "</li>";
+                  
+                  var message_emissor = {
+                       data: new Date(),
+                       msg: msg
+                  };
+
+
+                   chat.historico.push(message_emissor);
+                   chat.save();
+
+                 }
+                 
+                } else {
+                  console.log(err);
+                }
+             });
+          }
+
+      } else {
+        console.log(err);
+      }
+    }); 
+
+ //verificar se existe historico em caso exista busar e incrementar msg nova
+ //caso nao criar historico inserir primeira msg
+
+    Usuario.findById(id_receptor).exec(function(err, usuario) {
+      if(usuario) {
+        
+        var length = usuario.ids_de_chats_salvos.length;
+        
+        var data_ = {
+             flag: false,
+             data_chat: null   
+        };  
+          
+
+          for(var i = 0; i < length; i++) {
+             
+             var id_chat = usuario.ids_de_chats_salvos[i];
+             
+             Chat.findById(id_chat).exec(function(err, chat) {
+                if(chat) {
+                  
+              if(chat.id_emissor == id_receptor && chat.id_receptor == id_emissor) {
+                  // console.log('2');
+                  
+               chat_existe_receptor = true;
+               
+
+
+               var msg =  "<li id="+"'del'" +"class="+"'left clearfix'"+"><span class="+
+                       "'chat-img pull-left'"+">"+
+                 "<div class="+"'chat-body clearfix'"+">"+
+                   "<div class="+"'header'"+">"+
+                    "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                     "<small class="+"'pull-left text-muted'"+">"+
+                   "</div>"+
+                     "<p>"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                  "</div>"+
+                 "</li>";
+
+
+               var message_receptor = {
+                            data: new Date(),
+                            msg: msg
+               };
+
+
+                chat.historico.push(message_receptor);
+                chat.save();
+                message = ""; 
+                for(var m = 0; m < chat.historico.length; m++) {
+                      message += chat.historico[m];
+                   }
+               }
+                 
+                } else {
+                  console.log(err);
+                }
+             });
+          }
+
+      } else {
+        console.log(err);
+      }
+    });
+
+
+    setTimeout(function() {
+       if(chat_existe_emissor == false) {        
+                 
+                 var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
+                     "<div class="+"'chat-body clearfix'"+">"+
+                      "<div class="+"'header'"+">"+
+                       "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                        "<small class="+"'pull-right text-muted'"+">"+
+                      "</div>"+
+                        "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                     "</div>"+''
+                    "</li>"; 
+
+                 criar_historico_no_emissor(id_emissor, id_receptor, msg);
+       }
+    }, 5000);
+
+    setTimeout(function() {
+      if(chat_existe_receptor == false) {
+          
+          var msg =  "<li id="+"'del'" +"class="+"'left clearfix'"+"><span class="+
+                  "'chat-img pull-left'"+">"+
+            "<div class="+"'chat-body clearfix'"+">"+
+              "<div class="+"'header'"+">"+
+               "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                "<small class="+"'pull-left text-muted'"+">"+
+              "</div>"+
+                "<p>"+"<strong>"+data.msg+"</strong>"+"</p>"+
+             "</div>"+
+            "</li>";
+
+          criar_historico_no_receptor(id_receptor, id_emissor, msg);
+      }
+    }, 5000);
+
+
+      var message_ = {
+         id_destinatario: data.id_destinatario,
+         nome: data.nome,
+         meu_id_painel_adversario: data.meu_id_painel_adversario,     
+         msg: message
+      };
+
+
+      socket.emit('send-client-perfil', message_);
+      socket.broadcast.emit('send-client-perfil', message_);
+
+ });
+
+
+
+
+
+
+
+ var criar_historico_no_emissor = function(id_emissor, id_receptor, msg) {
+  
+  console.log('uauauauauaua');
+  
+  var historico = [];
+
+  var message = {
+      data: new Date(),
+      msg: msg
+  };
+
+  historico.push(message);
+  
+  var chat = new Chat({
+            id_emissor: id_emissor,
+            id_receptor: id_receptor,
+            historico: historico
   });
+  
+  Chat.create(chat, function(err, chat) {
+    if (err) {
+      console.log(err);
+    } else {
+      Usuario.findById(id_emissor).exec(function(err, usuario) {
+        if(usuario) {
+           usuario.ids_de_chats_salvos.push(chat._id);
+           usuario.save();  
+        } else {
+          console.log(err);
+        }
+      });
+    }
+  });
+
+ };
+
+
+var criar_historico_no_receptor = function(id_receptor, id_emissor, msg) {
+  console.log('kkkkkkkkkkkkkkkkk');
+  var historico = [];
+
+  var message = {
+      data: new Date(),
+      msg: msg
+  };
+
+  historico.push(message);
+
+
+  var chat = new Chat({
+            id_emissor: id_receptor,
+            id_receptor: id_emissor,
+            historico: historico
+  });
+  
+  Chat.create(chat, function(err, chat) {
+    if (err) {
+      console.log(err);
+    } else {
+      Usuario.findById(id_receptor).exec(function(err, usuario) {
+        if(usuario) {
+           usuario.ids_de_chats_salvos.push(chat._id);
+           usuario.save();  
+        } else {
+          console.log(err);
+        }
+      });
+    }
+  });
+
+ };
+//chat perfil
+
+
+
+socket.on('pesquisar_perfil', function(nome) {
+    Usuario.find().exec(function(err, usuarios) {
+      if(usuarios) {
+        var users = [];
+       
+        for (var i = 0; i < usuarios.length; i++) {
+          if(usuarios[i].nome == nome) {
+           var data = { 
+               nome: usuarios[i].nome+' '+usuarios[i].sobrenome,
+               id_usuario: usuarios[i]._id            
+           }; 
+           
+            users.push(data);
+
+          }
+        }
+
+        socket.emit('retorno_perfil_pesquisado', users);
+      } else {
+        console.log(err);
+      }
+    });
+});
+
+
+});
 //socket.io
 
 

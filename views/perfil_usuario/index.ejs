@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href="stylesheets/menu-jogador.css" rel="stylesheet"> 
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<link href="stylesheets/chat.css" rel="stylesheet">
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>	
+
+<style>
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  #chat_id {
+       width: 17em;
+       height: 9em;
+       line-height: 1.5em;
+       border: 2px solid #ccc;
+       padding: 0;
+       margin: 0;
+       overflow: auto;
+       overflow-x: hidden;
+  }
+
+  #texto_chat {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      font-size: 15px;
+  }
+
+
+  #bloco {
+    text-align: center;
+  }
+
+  #esquerda {
+  	margin-top: 50px
+    background-color: #FFFFFF;    
+  }
+
+  #esquerda a {
+    color: #FF4500;
+  }
+
+  #centro {
+    
+  }
+  #direita {
+  	margin-top: 53px;
+    background-color: #FFFFFF;
+  }
+
+  .redondo {
+    width: 120px;
+    height: 120px;
+    background-color: #808080;
+    color: #FFF;
+    padding-top: 65px;
+  
+    /* Agora a mágica */
+    border-radius: 50%;
+   }  
+ 
+   .redondo img {
+    width: 120px;
+    height: 120px;
+    margin-top: -65px;
+    background-color: #808080;
+    color: #FFF;
+    padding-top: 0px;
+  
+    /* Agora a mágica */
+    border-radius: 50%;
+   }
+
+   
+
+   .redondo_usrs img{
+   	width: 40px;
+    height: 40px;
+    background-color: #808080;
+    color: #FFF;
+
+   	border-radius: 50%;
+   }
+
+   .redondo_usrs {
+   	width: 40px;
+    height: 40px;
+    background-color: #808080;
+    color: #FFF;
+
+   	border-radius: 50%;
+   }
+
+   #pesquisar {
+   	margin-top: -100px;
+   	margin-left: 140px;
+   } 
+   footer {
+   	margin-top: 160px;
+   	height: 10px;
+   }
+
+   
+   #lista_chats {
+   	margin-left: 0px;
+   }
+
+   #perfil_config {
+
+   }
+
+   .table-overflow {
+     max-height:400px;
+     overflow-y:auto;
+    }
+
+    #kkk {
+    	border: none;
+    }   
+
+</style>
+<script src="/socket.io/socket.io.js"></script> 
+<script>
+var client = io();
+	$(document).ready(function() {
+  	 if ("<%= foto %>" == '') {
+  	  $('#foto').children().hide();
+  	 } 
+
+  	var table = $('#table_users');
+
+  	table.find('tr').each(function() {
+  		$(this).find('td').each(function() {
+     		if($(this).children().attr('id') == 'foto_usrs') {
+              $(this).children().attr('src');
+  			}
+  		});
+  	});
+  });
+
+
+function novo_chat(id_usuario, nome_usuario) {
+    var flag = false;
+
+       $('#lista_de_chats').find('li').each(function() {
+           if($(this).attr('id') == id_usuario) {
+             flag = true;
+           	}   	  
+       });
+ 
+          if(flag == false) {
+             	      
+                     var data = {
+                     	 meu_id: '<%- meu_id %>',
+                     	 id_outro: id_usuario
+                     }	
+                    
+                    client.emit('buscar_chat', data);
+                      
+                    client.on('historico_chat', function(data_) {
+                       
+                       if(data_.flag == true) {
+                             
+                             var msg = data_.data_chat;
+                             //alert(data_.data_chat);
+
+                         	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
+                                           "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
+                         	                     
+                                            "<div class="+"'row'"+">"+
+                         	                     
+                         	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                         	                     
+                         	                   "<div class="+"'panel panel-primary'"+">"+
+
+                         	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                         	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
+                         	                          "<div class="+"'btn-group pull-right'"+">"+
+                         	                           
+                         	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+
+                         	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                         	                           "</a>"+
+                         	                          "</div>"+
+                         	                         "</div>"+
+
+                         	                         "<div class="+"'panel-collapse collapse'"+">"+
+                         	                          "<div class="+"'panel-body'"+">"+ 
+                         	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                         	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
+                         	                           "</div>"+
+                         	                           "</div>"+  
+
+                         	                            "<div class="+"'panel-footer'"+">"+  
+                         	                             "<div class="+"'input-group'"+">"+
+                         	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                         	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                         	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                         	                              	"</button>"+
+                         	                              "</span>"+
+                         	                             "</div>"+
+                         	                            "</div>"+
+                         	                          "</div>"+
+                         	                         "</div>"+
+                         	                     "</div>"+
+                                                "</div>"+
+                                                "</div>"+
+                                               "</div>"+
+                         	                 "</li>";
+                          
+                        $('#lista_de_chats').append(chat);
+
+                        var campo_leitura_msg = $('#lista_de_chats').children().children().children().children().children().children().next().children().children().children();
+
+                        var temp = msg.split('ص');
+
+                        for(var i = 0; i < temp.length; i++) {
+                          
+                          campo_leitura_msg.append(temp[i]);
+                          
+                          campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+
+                          var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                             x.each(function() {
+                                if($(this).attr('id') == 'flag') {
+                                   $(this).children().each(function() {
+                                      if($(this).attr('id') == 'del') {
+                                         $(this).remove();
+                                      }
+                                   });
+                                }
+                             });
+
+                        }
+
+                       }
+
+                       if(data_.flag == false) {
+                         	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
+                                           "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
+                         	                     
+                                            "<div class="+"'row'"+">"+
+                         	                     
+                         	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                         	                     
+                         	                   "<div class="+"'panel panel-primary'"+">"+
+
+                         	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                         	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
+                         	                          "<div class="+"'btn-group pull-right'"+">"+
+                         	                           
+                         	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"xdata-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+
+                         	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                         	                           "</a>"+
+                         	                          "</div>"+
+                         	                         "</div>"+
+
+                         	                         "<div class="+"'panel-collapse collapse'"+">"+
+                         	                          "<div class="+"'panel-body'"+">"+ 
+                         	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                         	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+
+                         	                               "</ul>"+
+                         	                           "</div>"+
+                         	                           "</div>"+  
+
+                         	                            "<div class="+"'panel-footer'"+">"+  
+                         	                             "<div class="+"'input-group'"+">"+
+                         	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                         	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                         	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                         	                              	"</button>"+
+                         	                              "</span>"+
+                         	                             "</div>"+
+                         	                            "</div>"+
+                         	                          "</div>"+
+                         	                         "</div>"+
+                         	                     "</div>"+
+                                                "</div>"+
+                                                "</div>"+
+                                               "</div>"+
+                         	                 "</li>"; 
+
+                         $('#lista_de_chats').append(chat);     
+                       }
+                       
+                    }); 
+
+          }         
+
+};
+
+
+    function atualizar_click_aberto(tags, index_chat) {
+        tags[index_chat].click = 1; 
+    };
+
+    function atualizar_click_fechado(tags, index_chat) {
+        tags[index_chat].click = 0; 
+    };
+
+
+
+
+    var tags = [];
+    var click = null;
+
+  	var abrir_chat = function() {
+  	 $('#lista_de_chats').on('click',"#drop_down", function() {
+                        
+     var index_chat = 0;
+     var flag = false;
+     var nome_chat = "";
+     var id_chat = $(this).parent().parent().parent().parent().parent().parent().parent().attr('id');  
+    
+        for(var i = 0; i < tags.length; i++) {
+            if(tags[i].id_chat == id_chat) {
+               flag = true;
+               index_chat = i;
+               nome_chat = tags[i].nome_chat;
+               click = tags[i].click;  
+            }
+        }
+
+
+        if (flag == true) {
+
+          if(click == 0) {           
+            //alert('here');
+            var e = $(this).parent().parent();   
+            var x = $(this).parent().parent().children().next();
+            var aux = x.text().split('-'); 
+            var tamanho = aux.length;
+            
+
+            if(tamanho > 1) {
+             e.children().each(function() {
+             	if(aux[1] == 'Nova mensagem!' && $(this).attr('id') == 'lb') {
+             		$(this).text(nome_chat);
+             	}
+             });	
+            }  
+
+            $(this).parent().parent().next().collapse('show');
+            atualizar_click_aberto(tags, index_chat);
+          }
+          
+          if(click == 1) {
+            //alert('here2');
+            var e = $(this).parent().parent();   
+            var x = $(this).parent().parent().children().next();
+            var aux = x.text().split('-'); 
+            var tamanho = aux.length;
+            
+            
+            if(tamanho == 1) {
+             e.children().each(function() {
+             	if(aux[0] == 'Nova mensagem!' && $(this).attr('id') == 'lb') {
+             		$(this).text(nome_chat);
+             	}
+             });	
+            }             
+
+
+            if(tamanho > 1) {
+             e.children().each(function() {
+             	if(aux[1] == 'Nova mensagem!' && $(this).attr('id') == 'lb') {
+             		$(this).text(nome_chat);
+             	}
+             });	
+            }  
+
+            $(this).parent().parent().next().collapse('hide');
+            atualizar_click_fechado(tags, index_chat);
+          }
+
+        }
+
+        if(flag == false) {
+
+        	var tag = {
+                id_chat: id_chat,
+                nome_chat: $(this).parent().parent().parent().parent().parent().parent().attr('id'),
+                click: 1
+            }; 
+               
+            var e = $(this).parent().parent();   
+            var x = $(this).parent().parent().children().next();;
+            var aux = x.text().split('-'); 
+            var tamanho = aux.length;
+
+            if(tamanho > 1) {
+             e.children().each(function() {
+             	if(aux[1] == 'Nova mensagem!' && $(this).attr('id') == 'lb') {
+             		$(this).text(tag.nome_chat);
+             	}
+             });	
+            } 
+              
+
+        	tags.push(tag);
+        	$(this).parent().parent().next().collapse('show');
+        }
+
+  	 $('#lista_de_chats').on('click','#btn-chat').off();    
+  	 }); 
+  	};
+
+
+    var mensagem = '';	
+      var enviar_msg_chat = function() {     
+                
+         $('#lista_de_chats').on('click','#btn-chat', function(event) {
+                      
+              if($(this).html() == 'Send') {
+                alert('deeec');
+
+                 var id_usuario_chat = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr('id'); 
+
+                 var campo_leitura_msg = $(this).parent().parent().parent().parent().children().children().children();
+
+                 var campo_escrita_msg = $(this).parent().parent().children();
+
+                 var id_usuario_chat_aux = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent().attr('id');
+                 
+                if(id_usuario_chat != id_usuario_chat_aux && id_usuario_chat_aux != "lista_de_chats") {
+                   id_usuario_chat = id_usuario_chat_aux; 
+                }
+
+                if(campo_leitura_msg.attr('class') == 'form-control input-sm'){
+                	campo_leitura_msg = $(this).parent().parent().parent().parent().parent().children().children().children();
+                }
+
+                //if(campo_leitura_msg.attr('class') != 'msg') {
+              //  	alert($(this).parent().parent().parent().parent().parent().children().children().children().attr('class'));
+                //} 
+
+                 var mensagem = campo_escrita_msg.val();
+                 var _msg = "";
+                 
+                 if(mensagem.length > 30) {
+                     var m = mensagem.split(" ");
+                     if(m.length > 1) {
+                       for(var i = 0; i < m.length; i++) {
+                        if(i > 0 && i % 3 == 0) {
+                          if(m[i].length < 30) {
+                               _msg += m[i]+"<br>"; 
+                          } else {
+                               var s = m[i];
+                                for(var j = 0; j < s.length; j++) {
+                                 if(j > 0 && j % 15 == 0) {
+                                  _msg += s.substring(j,j+1);
+                                  _msg += '\n';          
+                                 } else {
+                                  _msg += s.substring(j,j+1);
+                                 }
+                               }
+                               _msg + "<br>";        
+                          }
+                        } else {
+                              if(m[i].length < 15) {
+                                _msg += m[i]+" ";   
+                              } else {
+                                var s = m[i];
+                                 for(var j = 0; j < s.length; j++) {
+                                  if(j > 0 && j % 15 == 0) {
+                                   _msg += s.substring(j,j+1);
+                                   _msg += '\n';          
+                                  } else {
+                                   _msg += s.substring(j,j+1);
+                                  }
+                                }
+                                _msg + "<br>";  
+                              }
+                             
+                           }
+                       }
+                     } else {
+
+                      var s = m[0];
+                       for(var j = 0; j < s.length; j++) {
+                        if(j > 0 && j % 15 == 0) {
+                          _msg += s.substring(j,j+1);
+                          _msg += '\n';
+                        } else {
+                          _msg += s.substring(j,j+1);
+                        }
+                       }
+                     }   
+
+                 } else {
+                  _msg = mensagem + "<br>";
+                 }
+                  
+                 var data = {
+                     nome: '<%- nome_jogador %>',
+                     id_destinatario: id_usuario_chat,
+ 	                 meu_id_painel_adversario: '<%- meu_id %>',
+                     msg: _msg
+                 };
+
+                 var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
+                     "<div class="+"'chat-body clearfix'"+">"+
+                      "<div class="+"'header'"+">"+
+                       "<strong class="+"'primary-font'"+">"+data.nome+"</strong>"+
+                        "<small class="+"'pull-right text-muted'"+">"+
+                      "</div>"+
+                        "<p id="+"'texto_chat'"+">"+"<strong>"+data.msg+"</strong>"+"</p>"+
+                     "</div>"+''
+                    "</li>";
+               
+
+                campo_leitura_msg.append(msg);
+                campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500); 
+                campo_escrita_msg.val("");
+
+                var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                   x.each(function() {
+                      if($(this).attr('id') == 'flag') {
+                         $(this).children().each(function() {
+                            if($(this).attr('id') == 'del') {
+                               $(this).remove();
+                            }
+                         });
+                      }
+                   });
+                   
+                   client.emit('send-server-perfil', data);
+                   $('#lista_de_chats').on('click','#btn-chat').off();
+
+
+
+
+                /*client.on('send-server-perfil_return', function(message) {
+                   
+                   campo_leitura_msg.append(message);
+                   campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500 
+                   campo_escrita_msg.val("");
+
+                   var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                   x.each(function() {
+                      if($(this).attr('id') == 'flag') {
+                         $(this).children().each(function() {
+                            if($(this).attr('id') == 'del') {
+                               $(this).remove();
+                            }
+                         });
+                      }
+                   });
+                   
+                   $('#lista_de_chats').on('click','#btn-chat').off();
+                });*/
+    
+              }
+         });
+      };
+
+
+      client.on('send-client-perfil', function(message_) {
+                 
+      	 if('<%- meu_id %>' == message_.id_destinatario) {   
+      	    
+            var flag = false;
+
+               $('#lista_de_chats').find('li').each(function() {
+                   //alert($(this).attr('id'));
+                   if($(this).attr('id') == message_.meu_id_painel_adversario) {
+                     flag = true;
+                   }   	  
+               });
+
+                                 
+                  if(flag == false) {
+
+                         var data = {
+                         	 meu_id: '<%- meu_id %>',
+                         	 id_outro: message_.meu_id_painel_adversario
+                         }	
+                        
+                        client.emit('buscar_chat', data);
+                          
+                        client.on('historico_chat', function(data_) {
+
+                        if(data_.flag == true) { 
+                           
+                           var msg = data_.data_chat;
+
+                           	      var chat = "<li" + " id="+ message_.meu_id_painel_adversario +" class="+"'list-inline-item'"+">"+
+                                             "<div"+" id="+message_.nome+" class="+"'container-fluid'"+">"+      
+                                              "<div class="+"'row'"+">"+
+                           	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                           	                   "<div class="+"'panel panel-primary'"+">"+
+                           	                        
+                           	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                           	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+message_.nome+'-'+'Nova mensagem!'+"</label>"+ 
+                           	                          "<div class="+"'btn-group pull-right'"+">"+
+                           	                           
+                           	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+
+                           	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                           	                           "</a>"+
+                           	                          "</div>"+
+                           	                         "</div>"+
+
+                           	                         "<div class="+"'panel-collapse collapse'"+">"+
+                           	                          
+                           	                          "<div class="+"'panel-body'"+">"+ 
+                           	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                           	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
+                           	                           "</div>"+
+                           	                           "</div>"+  
+
+                           	                            "<div class="+"'panel-footer'"+">"+  
+                           	                             "<div class="+"'input-group'"+">"+
+                           	                              
+                           	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                           	                              
+                           	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                           	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                           	                              	"</button>"+
+                           	                              "</span>"+
+
+                           	                             "</div>"+
+                           	                            "</div>"+
+
+                           	                          "</div>"+
+                           	                         "</div>"+
+                           	                     "</div>"+
+                                                  "</div>"+
+                                                  "</div>"+
+                                                 "</div>"+
+                           	                 "</li>";
+                                   
+                                   $(document).ready(function() {
+                                      $('#lista_de_chats').append(chat);
+                           
+                                       $('#lista_de_chats').find('li').each(function() {
+                                         if($(this).attr('id') == message_.meu_id_painel_adversario) {
+
+                                            var campo_leitura_msg = $(this).children().children().children().children().children().next().children().children().children();
+                                            
+                                            
+                                            var temp = msg.split('ص');
+
+                                            
+                                            for(var i = 0; i < temp.length; i++) {
+                                              
+                                              campo_leitura_msg.append(temp[i]);
+                                              
+                                              campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+
+                                              var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                                                 x.each(function() {
+                                                    if($(this).attr('id') == 'flag') {
+                                                       $(this).children().each(function() {
+                                                          if($(this).attr('id') == 'del') {
+                                                            $(this).remove();
+                                                          }
+                                                       });
+                                                    }
+                                                 });
+
+                                            }
+
+
+                                             campo_leitura_msg.append(message_.msg);
+                                             campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+                                         }
+                                       });
+                                   });                           
+
+
+                        } 
+
+
+                        if(data_.flag == false) {
+
+                           	      var chat = "<li" + " id="+ message_.meu_id_painel_adversario +" class="+"'list-inline-item'"+">"+
+                                             "<div"+" id="+message_.nome+" class="+"'container-fluid'"+">"+      
+                                              "<div class="+"'row'"+">"+
+                           	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                           	                   "<div class="+"'panel panel-primary'"+">"+
+                           	                        
+                           	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                           	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+message_.nome+'-'+'Nova mensagem!'+"</label>"+ 
+                           	                          "<div class="+"'btn-group pull-right'"+">"+
+                           	                           
+                           	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+
+                           	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                           	                           "</a>"+
+                           	                          "</div>"+
+                           	                         "</div>"+
+
+                           	                         "<div class="+"'panel-collapse collapse'"+">"+
+                           	                          
+                           	                          "<div class="+"'panel-body'"+">"+ 
+                           	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                           	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
+                           	                           "</div>"+
+                           	                           "</div>"+  
+
+                           	                            "<div class="+"'panel-footer'"+">"+  
+                           	                             "<div class="+"'input-group'"+">"+
+                           	                              
+                           	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                           	                              
+                           	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                           	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                           	                              	"</button>"+
+                           	                              "</span>"+
+
+                           	                             "</div>"+
+                           	                            "</div>"+
+
+                           	                          "</div>"+
+                           	                         "</div>"+
+                           	                     "</div>"+
+                                                  "</div>"+
+                                                  "</div>"+
+                                                 "</div>"+
+                           	                 "</li>";
+                                   
+                                   $(document).ready(function() {
+                                      $('#lista_de_chats').append(chat);
+                           
+                                       $('#lista_de_chats').find('li').each(function() {
+                                         if($(this).attr('id') == message_.meu_id_painel_adversario) {
+                                             var campo_escrita_msg = $(this).children().children().children().children().children().next().children().children().children();
+                                             //alert(campo_escrita_msg.attr('id'));
+                                             campo_escrita_msg.append(message_.msg);
+                                             campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+                                         }
+                                       });
+                                   });
+
+                        }
+
+
+                     	      
+                    });                             
+                  } 
+           	
+           if(flag == true) {
+
+             var aux = '#';
+             aux += message_.meu_id_painel_adversario;
+             
+             $('#lista_de_chats').find('li').each(function() {
+               if($(this).attr('id') == message_.meu_id_painel_adversario) {
+
+               var chat_aberto = 0;   
+               
+               for(var i = 0; i < tags.length; i++) {
+                   if(tags[i].id_chat == message_.meu_id_painel_adversario) {
+                       chat_aberto = tags[i].click;
+                   }
+               }
+
+                  //$(this).text('Nova mensagem!');
+                   var id_usuario_chat = $(this).attr('id'); 
+                   
+                   var campo_escrita_msg = $(this).children().children().children().children().children().next().children().children().children();
+
+
+                   //alert(campo_escrita_msg.attr('id'));
+                   campo_escrita_msg.append(message_.msg);
+
+                   campo_escrita_msg.animate({scrollTop: campo_escrita_msg.prop("scrollHeight")}, 500);
+                    
+                   var x = $(this).children().children().children().children().children().children();
+ 
+                   campo_escrita_msg.children().each(function() {
+                      
+                   x.next().each(function() {
+                      if ($(this).attr('id') == 'lb' && chat_aberto == 0) {
+                          $(this).text('Nova mensagem!'); 
+                      }
+                   });
+
+
+                   });
+
+                   var t = x.next().parent().next().children().next().children().children().next();
+                   
+
+                   //alert(t.attr('class'));
+
+                   t.each(function() {
+                      if($(this).attr('id') == 'flag') {
+                         $(this).children().each(function() {
+                            if($(this).attr('id') == 'del') {
+                               $(this).remove();
+                            }
+                         });
+                      }
+                   });
+
+                
+               }  
+             });
+           }
+
+          }
+      });
+
+
+var pesquisar_perfil = function(nome_perfil) {
+
+	if(nome_perfil.value != "") {
+        
+      var nome = nome_perfil.value;
+
+      client.emit('pesquisar_perfil', nome); 
+
+	} else {
+		alert('É necessario um nome');
+	}
+}
+
+
+
+client.on('retorno_perfil_pesquisado', function(users) {
+    
+    $('#lista_pesquisa_perfis').find('li').each(function() {
+    	$(this).remove();
+    });
+
+    if(users.length > 0) {
+            
+        for(var i = 0; i < users.length; i++) { 
+
+          if(users[i].id_usuario != '<%- meu_id %>') {
+
+            var link_user_perfil = "<input "+ "type="+"'hidden'"+" value="+users[i].id_usuario+" name="+'"id_usuario"'+">"+"<a href="+"'/#'"+">"+"<button "+"style="+"'border: none;background-color:white;'"+">"+ users[i].nome+"</button>"+"</a>";
+
+
+            var form = "<form action="+"'/visitar_perfil'"+ "method="+"'POST'"+"class="+"'navbar-form navbar-left'"+"role="+"'search'"+">"+link_user_perfil+"</form>"; 
+
+
+            var user = "<li>"+form+"</li>";
+
+            $('#lista_pesquisa_perfis').append(user);
+
+          }
+   
+        } 
+    }
+});
+
+                 
+
+</script>
+</head>
+<body>
+  <% include ../barraMenu %>
+<div class="container">
+  
+  <div id="bloco" class="row">
+
+<div id="esquerda" class="col-sm-2">
+
+    <ul style="list-style: none;">
+    	<li>
+    	       <form class="navbar-form navbar-left" role="search">
+    	        <div class="form-group">
+    	         <label>Visitar perfil de:</label>
+    	        <div class="form-group">
+    	        	<input type="text" class="form-control" name="nome_perfil" style="width:150px; margin-left: -20px; margin-top: -5px; height: 25px;" placeholder="Pesquisar usuários">
+    	        </div>
+    	        <div class="form-group">      
+    	    		 <input id="bt_pesquisar" onclick="pesquisar_perfil(nome_perfil)" class="btn btn-default" style="margin-left: 0px;
+    	    		 position: absolute; margin-top: -13px; width: 30px; height: 25px;">
+    	    	   </div>    
+    	        </div>		
+    	       </form>		
+    	</li>    	
+    </ul> 
+
+    <ul id="lista_pesquisa_perfis" style="margin-top: 70px;list-style: none;margin-left: -20px;"></ul>
+  </div>
+   
+          
+  <a href="/editar_perfil">Editar perfil</a>
+
+
+  <div id="centro" class="col-sm-8">
+      <fieldset>
+        <legend>Nível do perfil: "<%= nivel_perfil %>"</legend>
+      <div id="left" style="margin-left: 90px;">  
+        <div class="redondo" id="foto">
+            <img src="<%= foto %>" class="redondo">
+      </div>
+      </div>  
+        <div id="pesquisar">
+           <content style="margin-left: 0px;">
+              <ul class="list-inline">
+              	<li class="list-inline-item">
+              		<ul style="list-style: none;">
+              			<li>
+              				<label>Nº de vitórias:</label>
+              			</li>
+              			<li>
+              				<data><%= num_vitorias %></data>
+              			</li>
+              		</ul>
+              	</li>
+              	<li class="list-inline-item">
+              		<ul style="list-style: none;">
+              			<li>
+              				<label>Posição no ranking:</label>
+              			</li>
+              			<li>
+              				<data><%= posicao_ranking %></data>
+              			</li>
+              		</ul>
+              	</li>
+              	<li class="list-inline-item">
+              		<ul style="list-style: none;">
+              			<li>
+              				<label>Pontuação atual:</label>
+              			</li>
+              			<li>
+              				<data><%= pontuacao_total %></data>
+              			</li>
+              		</ul>
+              	</li>
+              </ul>	  
+           </content>
+
+        </div> 
+       </fieldset>
+   </div>
+
+   <div id="direita" class="table-overflow">
+         <table id="table_users">
+           <tbody>
+          <% if(usuarios !== null) {  
+             usuarios.forEach(function(usuario, index) { %>
+             <tr id="<%- usuario.id_usuario %>" style="padding-top: 10px;">
+               <td>
+               	  <div class="redondo_usrs" id="foto_usrs">
+               	    <% if(usuario.foto !== null) {%>
+               	      <img src="<%- usuario.foto %>" class="redondo_usrs">     	      
+               	    <% } else { %>
+               	       <div class="redondo_usrs"></div>
+               	    <% } %>    
+               	  </div>
+               </td> 
+               <td><% if(usuario.foto !== null) {%> &nbsp;&nbsp; <%}%>
+                   <% if(usuario.foto == null) {%> &nbsp;&nbsp;&nbsp; <%}%>
+                   <a href="#" onclick="novo_chat('<%- usuario.id_usuario %>','<%- usuario.nome %>');"><%- usuario.nome %></a>
+               </td>
+             </tr>          
+          <% })
+             } %>
+           </tbody><br>
+         </table>
+   </div>
+
+  </div>
+<!--
+  <dir id="pesq_chat" style="margin-top: 400px; margin-left: 930px;">
+  	<form action="/publicar" method="POST" class="navbar-form navbar-left" role="search" id="pesq_chat">
+  	     <div class="form-group">
+  	      <label></label>
+  	     <div class="form-group">
+  	     	<input type="text" class="form-control" name="pesquisa[data_partida]" style="width:150px; margin-left: -20px; margin-top: -5px; height: 25px;">
+  	     </div>
+  	     <div class="form-group">      
+  	 		 <button type="submit" id="bt_pesquisar" class="btn btn-default" style="margin-left: 0px;
+  	 		 position: absolute; margin-top: -13px; width: 30px; height: 25px;"></button>
+  	 	   </div>    
+  	     </div>		
+  	    </form>
+  </dir>
+-->
+  <footer>
+  	 <ul class="list-inline" id="lista_de_chats">
+  	 </ul>
+  </footer>
+</div>
+
+</body>
+</html>
+
+
+

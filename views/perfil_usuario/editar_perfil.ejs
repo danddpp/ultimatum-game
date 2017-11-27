@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+<link href='/stylesheets/submenu.css' rel='stylesheet'>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>	
+
+<style type="text/css">
+      * {
+       box-sizing: border-box;
+       padding: 0;
+       margin: 0;
+      }
+      .container-fluid {
+        margin-top: -0px;
+        margin-bottom: -10px;
+      }
+      #titulo {
+        margin-bottom: 20px;
+      }
+      #titulo a {
+        text-decoration: none;
+      }
+      #wrapper legend{
+        text-align: center;
+      }
+
+      #wrapper{
+        width: 700px;
+        text-align: center;
+      }
+
+      .redondo {
+        width: 150px;
+        height: 150px;
+        background-color: #808080;
+        color: #FFF;
+        padding-top: 65px;
+ 
+        /* Agora a mágica */
+        border-radius: 50%;
+       }
+       
+       .redondo img {
+        width: 150px;
+        height: 150px;
+        margin-top: -65px;
+        background-color: #808080;
+        color: #FFF;
+        padding-top: 0px;
+ 
+        /* Agora a mágica */
+        border-radius: 50%;
+       } 
+
+      #right {
+      	float: right;
+      	margin-left: 100px;
+      }
+      #left {
+      	margin-bottom: -130px; 
+      } 
+</style>
+
+<script>
+  $(document).ready(function() {
+  	
+  	if ("<%= foto %>" == '') {
+  	  $('#foto').children().hide();
+  	}
+
+  	if("<%= nome_jogador %>" != '') {
+  	  $('#inputNome').prop('value', "<%= nome_jogador %>");
+  	}
+
+  	if("<%= sobrenome %>" != '') {
+  	  $('#inputSobrenome').prop('value', "<%= sobrenome %>");	
+  	}
+
+  	if("<%= email %>" != '') {
+  	  $('#inputEmail').prop('value', "<%= email %>");	
+  	}
+
+  	if("<%= curso %>" != '') {
+  	  $('#inputCurso').prop('value', "<%= curso %>");	
+  	}
+
+  	if("<%= modulo %>" != '') {
+  	 $('#inputModulo').prop('value', "<%= modulo %>");
+  	}
+
+  	if("<%= login %>" != '') {
+  	  $('#inputLogin').prop('value', "<%= login %>");	
+  	}
+
+  	if("<%= senha %>" != '') {
+  	  $('#inputSenha').prop('value', "<%= senha %>");
+  	}
+  	
+  });
+</script>
+
+</head>
+<body>
+
+  <% include ../barraMenu %>
+
+<div id="wrapper" class="container-fluid"> 
+<form class="form-horizontal" action="/salvar_alteracoes" enctype="multipart/form-data" method="POST">
+
+  <fieldset>
+    <legend>Alterar perfil do usuário</legend>
+  <div id="left">  
+    <div class="redondo" id="foto">
+        <img src="<%= foto %>" class="redondo">
+    </div>
+  </div>  
+   <div id="right">
+    <div class="form-group">
+      <label for="inputNome" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputNome" style="width: 304px;" placeholder="Nome" name="nome">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputSobreNome" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputSobrenome" style="width: 304px;" placeholder="Sobrenome" name="sobrenome">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputEmail" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="email" class="form-control" id="inputEmail" style="width: 304px;" placeholder="E-mail" name="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputCurso" class="col-lg-2 control-label" style="margin-left: 70px;">Curso</label>
+        <select class="form-control" id="inputCurso" name="curso" style="width: 249px;">
+          <option>Análise de Sistemas</option>
+          <option>Licenciatura em Matemática</option>
+          <option>Processos Gerênciais</option>
+          <option>Técnico em Edificações</option>
+          <option>Técnico em informática (Web)</option>
+        </select>
+    </div>
+    <div class="form-group">
+      <label for="inputModulo" class="col-lg-2 control-label" style="margin-left: 80px;">Modulo</label>
+      <select class="form-control" id="inputModulo" name="modulo" style="width: 70px;">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="inputLogin" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="inputLogin" style="width: 304px;" placeholder="Login" name="login">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputSenha" class="col-lg-2 control-label"></label>
+      <div class="col-lg-10">
+        <input type="password" class="form-control" id="inputSenha" style="width: 304px;" placeholder="Senha" name="senha">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="inputFoto" class="col-lg-2 control-label" style="margin-left: 200px;">Foto</label>
+      <div class="col-lg-10">
+        <input type="file" class="file-loading" id="inputImage" required="" style="width: 344px;margin-left: 100px;" placeholder="foto" name="foto">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-lg-10 col-lg-offset-2">
+        <!--<button type="reset" class="btn btn-default">Cancel</button>-->
+        <button type="submit" class="btn btn-primary" style="margin-left: -70px;">Salvar alterações</button>
+      </div>
+    </div>
+  </div>  
+  </fieldset>
+</form>
+</div>
+</body>
+</html>
+
+
+<!--
+
+<div class="container-fluid">
+ <div id="kv-avatar-errors-2" class="center-block" style="width:800px;display:none"></div>
+<form class="form form-vertical" action="/avatar_upload.php" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-sm-4 text-center">
+            <div class="kv-avatar">
+                <div class="file-loading">
+                    <input id="avatar-2" name="avatar-2" type="file" required>
+                </div>
+            </div>
+        </div>
+          <div class="form-group">
+            <hr>
+            <div class="text-right"> 
+              <button type="submit" class="btn btn-primary">Carregar foto</button>
+            </div>
+          </div>
+        </div>
+    </div>
+</form>
+
+-->

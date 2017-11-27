@@ -500,7 +500,7 @@ router.post('/visualizar_resultados_por_partida', function(req, res) {
           data: partida_.data,
           num_rodadas: partida_.num_rodadas
         }
-             console.log(dados_partida);
+
         Jogador.find().where('id_partida').equals(query).exec(function(err, jogadores) {
             if(err) {
             	req.next(err);

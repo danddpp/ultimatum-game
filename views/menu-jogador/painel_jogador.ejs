@@ -80,7 +80,7 @@
       <!--Socket.io client-->
       <script src="/socket.io/socket.io.js"></script>
         <script>
-         var client = io(); 
+         var client = io();   
          
        $(document).ready(function() {
         $('#vrTotal').prop('disabled', true);
@@ -125,7 +125,7 @@
              if(index > 0) {
                 $(this).find('td').each(function() {
                     if($(this).attr('id') == 'chat_') {
-                        $(this).hide();
+                        $(this).show();
                     } 
                 }); 
              }
@@ -477,7 +477,7 @@
 
              var x = element.children().children().children().children().children().next().children().next().children();
 
-
+             alert(x.attr('class'));
              x.children().each(function() {
                 if($(this).attr('id') == 'flag') {
                    $(this).children().each(function() {
@@ -619,14 +619,11 @@
                         _msg = mensagem;
                        }
 
-
-
                        var data = {
                            nome: temp[0],
                            id_destinatario: temp[1],
                            meu_id_painel_adversario: '<%- params.eu._id %>',
                            msg: _msg
-
                        };
 
                       var msg =  "<li id="+"'del'" +"class="+"'right clearfix'"+"><span class="+"'chat-img pull-right'"+"style="+"'position:'"+"'right'"+"';'"+">"+
@@ -1196,8 +1193,7 @@
          </progress>  
         </div>
 
-
-
+  
     <h2 id="informar_fim_de_round"></h2>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -1250,16 +1246,17 @@
   <div id="eu">
     <div id="nome_jogador" class="btn-group">
      <a style="width: 130px;" class="btn btn-primary btn-sm"><%- params.eu.nome %></a>
-     <!--<a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
-     <ul class="dropdown-menu">
-      <li><a href="/" style="text-align: left;" onclick="sair_do_jogo()">Sair do jogo</a></li>
-      <li><a href="#" style="text-align: left;">help</a></li>
-    </ul>-->
    </div>
 
    <div id="minha_pontuacao" class="btn-group">
      <a style="width: 130px;" class="btn btn-primary btn-sm">Pontuação: <%- params.minha_pontuacao %></a>
+     <a href="#" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+     <ul class="dropdown-menu">
+      <li><a href="/" style="text-align: left;">Painel de empréstimos</a></li>
+      <li><a href="#" style="text-align: left;">Ajuda</a></li>
+    </ul>
    </div>
+
    <div id="painel_parsuasao">
      <a href="/painel_persuasao" target="blank">Painel de persuasão</a>
    </div>
