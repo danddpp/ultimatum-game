@@ -1683,7 +1683,7 @@ socket.on('buscar_chat', function(data) {
                 if(chat) {
                    
                    if(data.meu_id == chat.id_emissor && data.id_outro == chat.id_receptor) {
-                    console.log('2');
+                    
                     var messages = "";
                                         
                      for(var m = 0; m < chat.historico.length; m++) {
@@ -1692,7 +1692,7 @@ socket.on('buscar_chat', function(data) {
 
                       data_.flag = true;
                       data_.data_chat = messages;
-                      //socket.emit('historico_chat', data_);
+
                    }
 
                 } else {
@@ -1706,6 +1706,56 @@ socket.on('buscar_chat', function(data) {
              socket.emit('historico_chat', data_);
           }, 5000);
 
+
+       } else {
+        console.log(err);
+       }
+    });
+});
+
+
+
+socket.on('buscar_chat2', function(data) {
+     
+    var data_ = {
+         flag: false,
+         data_chat: null   
+    };
+
+    Usuario.findById(data.meu_id).exec(function(err, usuario) {
+       if (usuario) {
+        var length = usuario.ids_de_chats_salvos.length;
+        
+          for(var i = 0; i < length; i++) {
+             
+             var id_chat = usuario.ids_de_chats_salvos[i];
+             
+             Chat.findById(id_chat).exec(function(err, chat) {
+                if(chat) {
+                   
+                   if(data.meu_id == chat.id_emissor && data.id_outro == chat.id_receptor) {
+                                
+                    var messages = "";
+                                        
+                     for(var m = 0; m < chat.historico.length; m++) {
+                        messages += chat.historico[m].msg+'ص';
+                     }
+
+                      data_.flag = true;
+                      data_.data_chat = messages;
+
+                   }
+
+                   setTimeout(function() {
+                      socket.emit('historico_chat2', data_);
+                   }, 2000);
+
+                } else {
+                  console.log(err);
+                }
+             });
+              
+          }
 
        } else {
         console.log(err);
@@ -1783,10 +1833,11 @@ socket.on('buscar_chat', function(data) {
       }
     }); 
 
- //verificar se existe historico em caso exista busar e incrementar msg nova
- //caso nao criar historico inserir primeira msg
-
-    Usuario.findById(id_receptor).exec(function(err, usuario) {
+  //verificar se existe historico em caso exista busar e incrementar msg nova
+  //caso nao criar historico inserir primeira msg
+  
+  Usuario.findById(id_receptor).exec(function(err, usuario) {
+       
       if(usuario) {
         
         var length = usuario.ids_de_chats_salvos.length;
@@ -1848,7 +1899,6 @@ socket.on('buscar_chat', function(data) {
       }
     });
 
-
     setTimeout(function() {
        if(chat_existe_emissor == false) {        
                  
@@ -1906,8 +1956,6 @@ socket.on('buscar_chat', function(data) {
 
  var criar_historico_no_emissor = function(id_emissor, id_receptor, msg) {
   
-  console.log('uauauauauaua');
-  
   var historico = [];
 
   var message = {
@@ -1942,7 +1990,7 @@ socket.on('buscar_chat', function(data) {
 
 
 var criar_historico_no_receptor = function(id_receptor, id_emissor, msg) {
-  console.log('kkkkkkkkkkkkkkkkk');
+
   var historico = [];
 
   var message = {

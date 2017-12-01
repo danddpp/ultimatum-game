@@ -102,8 +102,7 @@
    	margin-left: 140px;
    } 
    footer {
-   	margin-top: 160px;
-   	height: 10px;
+   	margin-top: 40px;
    }
 
    
@@ -166,129 +165,153 @@ function novo_chat(id_usuario, nome_usuario) {
                     client.on('historico_chat', function(data_) {
                        
                        if(data_.flag == true) {
-                             
-                             var msg = data_.data_chat;
-                             //alert(data_.data_chat);
+                       
 
-                         	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
-                                           "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
-                         	                     
-                                            "<div class="+"'row'"+">"+
-                         	                     
-                         	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
-                         	                     
-                         	                   "<div class="+"'panel panel-primary'"+">"+
+                        var aux_flag_ = false;
 
-                         	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
-                         	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
-                         	                          "<div class="+"'btn-group pull-right'"+">"+
-                         	                           
-                         	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+                        $('#lista_de_chats').find('li').each(function() {
+                            if($(this).attr('id') == id_usuario) {
+                              aux_flag_ = true;
+                            }   	  
+                        });   
 
-                         	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
-                         	                           "</a>"+
-                         	                          "</div>"+
-                         	                         "</div>"+
+                        if(aux_flag_ == false) {
+                        	     var msg = data_.data_chat;
+                        	     //alert(data_.data_chat);
 
-                         	                         "<div class="+"'panel-collapse collapse'"+">"+
-                         	                          "<div class="+"'panel-body'"+">"+ 
-                         	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
-                         	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
-                         	                           "</div>"+
-                         	                           "</div>"+  
+                        	 	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
+                        	                   "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
+                        	 	                     
+                        	                    "<div class="+"'row'"+">"+
+                        	 	                     
+                        	 	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                        	 	                     
+                        	 	                   "<div class="+"'panel panel-primary'"+">"+
 
-                         	                            "<div class="+"'panel-footer'"+">"+  
-                         	                             "<div class="+"'input-group'"+">"+
-                         	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
-                         	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
-                         	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
-                         	                              	"</button>"+
-                         	                              "</span>"+
-                         	                             "</div>"+
-                         	                            "</div>"+
-                         	                          "</div>"+
-                         	                         "</div>"+
-                         	                     "</div>"+
-                                                "</div>"+
-                                                "</div>"+
-                                               "</div>"+
-                         	                 "</li>";
-                          
-                        $('#lista_de_chats').append(chat);
+                        	 	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                        	 	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
+                        	 	                          "<div class="+"'btn-group pull-right'"+">"+
+                        	 	                           
+                        	 	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
 
-                        var campo_leitura_msg = $('#lista_de_chats').children().children().children().children().children().children().next().children().children().children();
+                        	 	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                        	 	                           "</a>"+
+                        	 	                          "</div>"+
+                        	 	                         "</div>"+
 
-                        var temp = msg.split('ص');
+                        	 	                         "<div class="+"'panel-collapse collapse'"+">"+
+                        	 	                          "<div class="+"'panel-body'"+">"+ 
+                        	 	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                        	 	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
+                        	 	                           "</div>"+
+                        	 	                           "</div>"+  
 
-                        for(var i = 0; i < temp.length; i++) {
-                          
-                          campo_leitura_msg.append(temp[i]);
-                          
-                          campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+                        	 	                            "<div class="+"'panel-footer'"+">"+  
+                        	 	                             "<div class="+"'input-group'"+">"+
+                        	 	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                        	 	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                        	 	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                        	 	                              	"</button>"+
+                        	 	                              "</span>"+
+                        	 	                             "</div>"+
+                        	 	                            "</div>"+
+                        	 	                          "</div>"+
+                        	 	                         "</div>"+
+                        	 	                     "</div>"+
+                        	                        "</div>"+
+                        	                        "</div>"+
+                        	                       "</div>"+
+                        	 	                 "</li>";
+                        	  
+                        	$('#lista_de_chats').append(chat);
 
-                          var x = campo_leitura_msg.parent().parent().next().children().children().next();
+                        	var campo_leitura_msg = $('#lista_de_chats').children().children().children().children().children().children().next().children().children().children();
 
-                             x.each(function() {
-                                if($(this).attr('id') == 'flag') {
-                                   $(this).children().each(function() {
-                                      if($(this).attr('id') == 'del') {
-                                         $(this).remove();
-                                      }
-                                   });
-                                }
-                             });
+                        	var temp = msg.split('ص');
 
+                        	for(var i = 0; i < temp.length; i++) {
+                        	  
+                        	  campo_leitura_msg.append(temp[i]);
+                        	  
+                        	  campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+
+                        	  var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                        	     x.each(function() {
+                        	        if($(this).attr('id') == 'flag') {
+                        	           $(this).children().each(function() {
+                        	              if($(this).attr('id') == 'del') {
+                        	                 $(this).remove();
+                        	              }
+                        	           });
+                        	        }
+                        	     });
+
+                        	}
                         }
+
+                             
 
                        }
 
                        if(data_.flag == false) {
-                         	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
-                                           "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
-                         	                     
-                                            "<div class="+"'row'"+">"+
-                         	                     
-                         	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
-                         	                     
-                         	                   "<div class="+"'panel panel-primary'"+">"+
+                         	      
+                          var aux_flag_ = false;
 
-                         	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
-                         	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
-                         	                          "<div class="+"'btn-group pull-right'"+">"+
-                         	                           
-                         	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"xdata-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+                          $('#lista_de_chats').find('li').each(function() {
+                              if($(this).attr('id') == id_usuario) {
+                                aux_flag_ = true;
+                              }   	  
+                          });   
 
-                         	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
-                         	                           "</a>"+
-                         	                          "</div>"+
-                         	                         "</div>"+
+                          if(aux_flag_ == false) {
+                            	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
+                                              "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
+                            	                     
+                                               "<div class="+"'row'"+">"+
+                            	                     
+                            	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                            	                     
+                            	                   "<div class="+"'panel panel-primary'"+">"+
 
-                         	                         "<div class="+"'panel-collapse collapse'"+">"+
-                         	                          "<div class="+"'panel-body'"+">"+ 
-                         	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
-                         	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+
-                         	                               "</ul>"+
-                         	                           "</div>"+
-                         	                           "</div>"+  
+                            	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                            	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+nome_usuario+"</label>"+ 
+                            	                          "<div class="+"'btn-group pull-right'"+">"+
+                            	                           
+                            	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"xdata-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
 
-                         	                            "<div class="+"'panel-footer'"+">"+  
-                         	                             "<div class="+"'input-group'"+">"+
-                         	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
-                         	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
-                         	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
-                         	                              	"</button>"+
-                         	                              "</span>"+
-                         	                             "</div>"+
-                         	                            "</div>"+
-                         	                          "</div>"+
-                         	                         "</div>"+
-                         	                     "</div>"+
-                                                "</div>"+
-                                                "</div>"+
-                                               "</div>"+
-                         	                 "</li>"; 
+                            	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                            	                           "</a>"+
+                            	                          "</div>"+
+                            	                         "</div>"+
 
-                         $('#lista_de_chats').append(chat);     
+                            	                         "<div class="+"'panel-collapse collapse'"+">"+
+                            	                          "<div class="+"'panel-body'"+">"+ 
+                            	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                            	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+
+                            	                               "</ul>"+
+                            	                           "</div>"+
+                            	                           "</div>"+  
+
+                            	                            "<div class="+"'panel-footer'"+">"+  
+                            	                             "<div class="+"'input-group'"+">"+
+                            	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                            	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                            	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                            	                              	"</button>"+
+                            	                              "</span>"+
+                            	                             "</div>"+
+                            	                            "</div>"+
+                            	                          "</div>"+
+                            	                         "</div>"+
+                            	                     "</div>"+
+                                                   "</div>"+
+                                                   "</div>"+
+                                                  "</div>"+
+                            	                 "</li>"; 
+
+                            $('#lista_de_chats').append(chat);
+                          }             
                        }
                        
                     }); 
@@ -420,7 +443,7 @@ function novo_chat(id_usuario, nome_usuario) {
          $('#lista_de_chats').on('click','#btn-chat', function(event) {
                       
               if($(this).html() == 'Send') {
-                alert('deeec');
+                
 
                  var id_usuario_chat = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr('id'); 
 
@@ -437,6 +460,9 @@ function novo_chat(id_usuario, nome_usuario) {
                 if(campo_leitura_msg.attr('class') == 'form-control input-sm'){
                 	campo_leitura_msg = $(this).parent().parent().parent().parent().parent().children().children().children();
                 }
+
+                alert(id_usuario_chat);
+                alert(id_usuario_chat_aux);
 
                 //if(campo_leitura_msg.attr('class') != 'msg') {
               //  	alert($(this).parent().parent().parent().parent().parent().children().children().children().attr('class'));
@@ -536,30 +562,6 @@ function novo_chat(id_usuario, nome_usuario) {
                    client.emit('send-server-perfil', data);
                    $('#lista_de_chats').on('click','#btn-chat').off();
 
-
-
-
-                /*client.on('send-server-perfil_return', function(message) {
-                   
-                   campo_leitura_msg.append(message);
-                   campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500 
-                   campo_escrita_msg.val("");
-
-                   var x = campo_leitura_msg.parent().parent().next().children().children().next();
-
-                   x.each(function() {
-                      if($(this).attr('id') == 'flag') {
-                         $(this).children().each(function() {
-                            if($(this).attr('id') == 'del') {
-                               $(this).remove();
-                            }
-                         });
-                      }
-                   });
-                   
-                   $('#lista_de_chats').on('click','#btn-chat').off();
-                });*/
-    
               }
          });
       };
@@ -572,113 +574,130 @@ function novo_chat(id_usuario, nome_usuario) {
             var flag = false;
 
                $('#lista_de_chats').find('li').each(function() {
-                   //alert($(this).attr('id'));
                    if($(this).attr('id') == message_.meu_id_painel_adversario) {
+                     alert(message_.meu_id_painel_adversario);
                      flag = true;
                    }   	  
                });
 
                                  
                   if(flag == false) {
-
+     
                          var data = {
                          	 meu_id: '<%- meu_id %>',
                          	 id_outro: message_.meu_id_painel_adversario
                          }	
-                        
-                        client.emit('buscar_chat', data);
+                        alert('here ' + data.meu_id);
+                        alert('here2 ' + data.id_outro);
+                        client.emit('buscar_chat2', data);
                           
-                        client.on('historico_chat', function(data_) {
-
+                        client.on('historico_chat2', function(data_) {
+                         
                         if(data_.flag == true) { 
+                         
+
                            
-                           var msg = data_.data_chat;
+                           var aux_flag = false;
 
-                           	      var chat = "<li" + " id="+ message_.meu_id_painel_adversario +" class="+"'list-inline-item'"+">"+
-                                             "<div"+" id="+message_.nome+" class="+"'container-fluid'"+">"+      
-                                              "<div class="+"'row'"+">"+
-                           	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
-                           	                   "<div class="+"'panel panel-primary'"+">"+
-                           	                        
-                           	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
-                           	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+message_.nome+'-'+'Nova mensagem!'+"</label>"+ 
-                           	                          "<div class="+"'btn-group pull-right'"+">"+
-                           	                           
-                           	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
+                           $('#lista_de_chats').find('li').each(function() {
+                               if($(this).attr('id') == message_.meu_id_painel_adversario) {
+                                 aux_flag = true;
+                               }   	  
+                           });  
 
-                           	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
-                           	                           "</a>"+
-                           	                          "</div>"+
-                           	                         "</div>"+
+                          if(aux_flag == false) {
+                            var msg = data_.data_chat;
 
-                           	                         "<div class="+"'panel-collapse collapse'"+">"+
-                           	                          
-                           	                          "<div class="+"'panel-body'"+">"+ 
-                           	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
-                           	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
-                           	                           "</div>"+
-                           	                           "</div>"+  
+                            	      var chat = "<li" + " id="+ message_.meu_id_painel_adversario +" class="+"'list-inline-item'"+">"+
+                                              "<div"+" id="+message_.nome+" class="+"'container-fluid'"+">"+      
+                                               "<div class="+"'row'"+">"+
+                            	                  "<div class="+"'col-md-5'" + "style="+"'width: 300px;'"+">"+ 
+                            	                   "<div class="+"'panel panel-primary'"+">"+
+                            	                        
+                            	                        "<div class="+"'panel-heading'" + "id="+"'accordion'" + "style="+"'height:40px;'"+">"+
+                            	                         "<span class="+"'glyphicon glyphicon-comment'"+">"+"</span>"+"&nbsp;<label id="+"'lb'"+">"+message_.nome+'-'+'Nova mensagem!'+"</label>"+ 
+                            	                          "<div class="+"'btn-group pull-right'"+">"+
+                            	                           
+                            	                           "<a type="+"'button'" + "onclick="+"'abrir_chat()'"+"class="+"'btn btn-default btn-xs'"+ "data-toggle="+"'collapse'" +"data-parent="+"'#accordion'" +"id="+"'drop_down'"+"href="+"'#collapseOne'"+">"+
 
-                           	                            "<div class="+"'panel-footer'"+">"+  
-                           	                             "<div class="+"'input-group'"+">"+
-                           	                              
-                           	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
-                           	                              
-                           	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
-                           	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
-                           	                              	"</button>"+
-                           	                              "</span>"+
+                            	                            "<span class="+"'glyphicon glyphicon-chevron-down'"+">"+"</span>"+
+                            	                           "</a>"+
+                            	                          "</div>"+
+                            	                         "</div>"+
 
-                           	                             "</div>"+
-                           	                            "</div>"+
+                            	                         "<div class="+"'panel-collapse collapse'"+">"+
+                            	                          
+                            	                          "<div class="+"'panel-body'"+">"+ 
+                            	                           "<div class="+"'panel'"+"style="+"'height:100px;'"+">"+
+                            	                               "<ul id="+"'chat_id'"+"class="+"'chat'"+">"+"</ul>"+
+                            	                           "</div>"+
+                            	                           "</div>"+  
 
-                           	                          "</div>"+
-                           	                         "</div>"+
-                           	                     "</div>"+
+                            	                            "<div class="+"'panel-footer'"+">"+  
+                            	                             "<div class="+"'input-group'"+">"+
+                            	                              
+                            	                              "<input id="+"'msg'"+"type="+"'text'"+"class="+"'form-control input-sm'"+"placeholder="+"'Type your"+"	 message here...'"+"style="+"'width:170px; border:"+"2px solid #ccc;'"+"/>"+
+                            	                              
+                            	                              "<span class="+"'input-group-btn'"+"id="+"'flag'"+">"+
+                            	                              "<button onclick="+"'enviar_msg_chat()'"+"class="+"'btn"+" btn-warning btn-sm'"+"id="+"'btn-chat'"+">"+"Send"+
+                            	                              	"</button>"+
+                            	                              "</span>"+
+
+                            	                             "</div>"+
+                            	                            "</div>"+
+
+                            	                          "</div>"+
+                            	                         "</div>"+
+                            	                     "</div>"+
+                                                   "</div>"+
+                                                   "</div>"+
                                                   "</div>"+
-                                                  "</div>"+
-                                                 "</div>"+
-                           	                 "</li>";
-                                   
-                                   $(document).ready(function() {
-                                      $('#lista_de_chats').append(chat);
-                           
-                                       $('#lista_de_chats').find('li').each(function() {
-                                         if($(this).attr('id') == message_.meu_id_painel_adversario) {
+                            	                 "</li>";
+                                    
 
-                                            var campo_leitura_msg = $(this).children().children().children().children().children().next().children().children().children();
-                                            
-                                            
-                                            var temp = msg.split('ص');
 
-                                            
-                                            for(var i = 0; i < temp.length; i++) {
+                                    $(document).ready(function() {
+                                       alert('11111111111 ' + chat);
+                                       $('#lista_de_chats').append(chat);
+                                        
+                                        $('#lista_de_chats').find('li').each(function() {
+                                          if($(this).attr('id') == message_.meu_id_painel_adversario) {
                                               
-                                              campo_leitura_msg.append(temp[i]);
-                                              
+                                              alert(message_.meu_id_painel_adversario);
+
+                                             var campo_leitura_msg = $(this).children().children().children().children().children().next().children().children().children();
+                                             
+                                             
+                                             var temp = msg.split('ص');
+
+                                             
+                                             for(var i = 0; i < temp.length; i++) {
+                                               
+                                               campo_leitura_msg.append(temp[i]);
+                                               
+                                               campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+
+                                               var x = campo_leitura_msg.parent().parent().next().children().children().next();
+
+                                                  x.each(function() {
+                                                     if($(this).attr('id') == 'flag') {
+                                                        $(this).children().each(function() {
+                                                           if($(this).attr('id') == 'del') {
+                                                             $(this).remove();
+                                                           }
+                                                        });
+                                                     }
+                                                  });
+
+                                             }
+
+
+                                              campo_leitura_msg.append(message_.msg);
                                               campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
-
-                                              var x = campo_leitura_msg.parent().parent().next().children().children().next();
-
-                                                 x.each(function() {
-                                                    if($(this).attr('id') == 'flag') {
-                                                       $(this).children().each(function() {
-                                                          if($(this).attr('id') == 'del') {
-                                                            $(this).remove();
-                                                          }
-                                                       });
-                                                    }
-                                                 });
-
-                                            }
-
-
-                                             campo_leitura_msg.append(message_.msg);
-                                             campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
-                                         }
-                                       });
-                                   });                           
-
+                                          }
+                                        });
+                                    });
+                          }
 
                         } 
 
