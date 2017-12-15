@@ -99,8 +99,9 @@
 
    #pesquisar {
    	margin-top: -100px;
-   	margin-left: 140px;
+    margin-left: 140px;
    } 
+
    footer {
    	margin-top: 40px;
    }
@@ -361,8 +362,7 @@ function novo_chat(id_usuario, nome_usuario) {
             var x = $(this).parent().parent().children().next();
             var aux = x.text().split('-'); 
             var tamanho = aux.length;
-            
-
+          
             if(tamanho > 1) {
              e.children().each(function() {
              	if(aux[1] == 'Nova mensagem!' && $(this).attr('id') == 'lb') {
@@ -895,11 +895,12 @@ client.on('retorno_perfil_pesquisado', function(users) {
     	        <div class="form-group">
     	         <label>Visitar perfil de:</label>
     	        <div class="form-group">
-    	        	<input type="text" class="form-control" name="nome_perfil" style="width:150px; margin-left: -20px; margin-top: -5px; height: 25px;" placeholder="Pesquisar usuários">
+    	        	<input type="text" class="form-control" name="nome_perfil" style="width:150px; margin-left: -20px; margin-top: 0px; height: 30px;" placeholder="Pesquisar usuários">
     	        </div>
-    	        <div class="form-group">      
-    	    		 <input id="bt_pesquisar" onclick="pesquisar_perfil(nome_perfil)" class="btn btn-default" style="margin-left: 0px;
-    	    		 position: absolute; margin-top: -13px; width: 30px; height: 25px;">
+    	        <div class="form-group">
+              <button type="button"  onclick="pesquisar_perfil(nome_perfil)" class="btn btn-default btn-sm" style="margin-left: 0px; position: absolute; margin-top: -13.6px;">
+                       <span class="glyphicon glyphicon-search"></span> Search 
+              </button>      
     	    	   </div>    
     	        </div>		
     	       </form>		

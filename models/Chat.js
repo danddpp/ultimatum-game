@@ -12,7 +12,9 @@ var message = {
 var Chat = new Schema({
   id_emissor: String,
   id_receptor: String,
-  historico: [message] 
+  historico: [message],
+  qtde_msg_env: Number,
+  qtde_msg_rec: Number
 });
 
 

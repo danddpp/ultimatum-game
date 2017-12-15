@@ -88,6 +88,7 @@ app.post('/visualizar_resultados_por_partida', routesPesquisar);
 
 //config rotas persuasao
 app.get('/painel_persuasao', routesPersuasao);
+app.get('/painel_afinidades', routesPersuasao);
 
 
 //rotas perfil usuario
@@ -1653,6 +1654,195 @@ var fim_de_jogo = function(data, partida) {
           });
 
        });
+ 
+
+       socket.on('salvar_opcao_afinidade1', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+
+                 var resultado = {
+                      id_partida: data.id_partida,
+                      nome_jogador_manipulado: data.nome_jogador_manipulado,
+                      resposta_afinidade: null,
+                      resposta_controle1: null,
+                      resposta_controle2: data.resposta_controle2,
+                      tipo: 'afinidade',
+                      success: null,
+                      status: null
+                    };
+
+                      var id_resultados = partida.id_resultados;
+                      
+                      Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
+                         if(err) {
+                           console.log(err);
+                         } else {
+
+                           resultados.afinidade_resultado.push(resultado);
+                           resultados.save();
+                         } 
+                      });
+
+              } else {
+                 console.log(err);
+              }
+          });          
+       });
+
+
+       socket.on('salvar_ap_social', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+
+               var id_resultados = partida.id_resultados;
+               console.log(id_resultados);
+               Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+
+                  var aux_success = '';
+                  var aux_status = '';
+
+                  if(data.resposta == 'sim') {
+                     aux_success = true;
+                     aux_status = 'Jogador aceitou a oferta para doar parte de sua pontuação para um suposto' + 
+                     'sorteio mediante a a informação de que a maioria havia aceitado';
+                  }
+
+
+                  if(data.resposta == 'nao') {
+                     aux_success = false;
+                     aux_status = 'Jogador nao aceitou a oferta para doar parte de sua pontuação para um suposto' + 
+                     'sorteio mediante a a informação de que a maioria havia aceitado';
+                  }
+
+                      var resultado = {
+                        id_partida: data.id_partida,
+                        nome_jogador_manipulado: data.nome_jogador_manipulado,
+                        resposta_ap_social: data.resposta,
+                        tipo: 'afinidade',
+                        success: aux_success,
+                        status: aux_status
+                      };
+
+                    resultados.aprovacao_social_resultado.push(resultado);
+                    resultados.save();
+
+                  } 
+               });
+
+              } else {
+                 console.log(err);
+              }
+          });
+
+       });
+       
+
+       socket.on('salvar_opcao_afinidade2', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+
+               var id_resultados = partida.id_resultados;
+               console.log(id_resultados);
+               Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+
+                    for(var i = 0; i < resultados.afinidade_resultado.length; i++) {
+                     //  console.log('erroooooooooooooooooooooooooooooooooooooooooo');
+                       if(resultados.afinidade_resultado[i].id_partida == data.id_partida) {
+                         console.log('err');
+                         var resultado = {
+                              id_partida: resultados.afinidade_resultado[i].id_partida,
+                              nome_jogador_manipulado: resultados.afinidade_resultado[i].nome_jogador_manipulado,
+                              resposta_afinidade: null,
+                              resposta_controle1: data.resposta_controle1,
+                              resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
+                              tipo: 'afinidade',
+                              success: null,
+                              status: null
+                            };
+
+                         resultados.afinidade_resultado[i] = resultado;
+                         resultados.save();
+                       }
+                    }
+
+                  } 
+               });
+
+              } else {
+                 console.log(err);
+              }
+          });          
+       });
+
+
+       socket.on('salvar_opcao_afinidade3', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+
+               var id_resultados = partida.id_resultados;
+               
+               Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+
+                    for(var i = 0; i < resultados.afinidade_resultado.length; i++) {
+                     //  console.log('erroooooooooooooooooooooooooooooooooooooooooo');
+                       if(resultados.afinidade_resultado[i].id_partida == data.id_partida) {
+                         var aux_success = '';
+                         var aux_status = '';
+                         if(data.resposta_afinidade == 'sim' &&
+                            resultados.afinidade_resultado[i].resposta_controle1 == 'nao' &&
+                              resultados.afinidade_resultado[i].resposta_controle2 == 'nao') {
+                                aux_success = true;
+                                aux_status = 'Jogador manipulado aceitou proposta da afinidade e recusou ofertas do' +
+                                'controle 1 e controle 2';
+
+                         } else {
+                             aux_success = false;
+                             aux_status = 'Método afinidade falhou';
+                         }
+
+
+                         var resultado = {
+                              id_partida: resultados.afinidade_resultado[i].id_partida,
+                              nome_jogador_manipulado: resultados.afinidade_resultado[i].nome_jogador_manipulado,
+                              resposta_afinidade: data.resposta_afinidade,
+                              resposta_controle1: resultados.afinidade_resultado[i].resposta_controle1,
+                              resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
+                              tipo: 'afinidade',
+                              success: aux_success,
+                              status: aux_status
+                            };
+
+                         resultados.afinidade_resultado[i] = resultado;
+                         resultados.save();
+                       }
+                    }
+
+                  } 
+               });
+
+              } else {
+                 console.log(err);
+              }
+          });          
+       });
+
      //persuasao//////////////////////////////////////////////////////////////////////
   
 
@@ -1660,8 +1850,6 @@ var fim_de_jogo = function(data, partida) {
 
 
 //chat perfil
-
-
 socket.on('buscar_chat', function(data) {
      
     var data_ = {
@@ -1816,6 +2004,8 @@ socket.on('buscar_chat2', function(data) {
                        msg: msg
                   };
 
+                  chat.qtde_msg_env++;
+
 
                    chat.historico.push(message_emissor);
                    chat.save();
@@ -1878,6 +2068,8 @@ socket.on('buscar_chat2', function(data) {
                             data: new Date(),
                             msg: msg
                };
+
+                chat.qtde_msg_rec++;
 
 
                 chat.historico.push(message_receptor);
@@ -1968,7 +2160,9 @@ socket.on('buscar_chat2', function(data) {
   var chat = new Chat({
             id_emissor: id_emissor,
             id_receptor: id_receptor,
-            historico: historico
+            historico: historico,
+            qtde_msg_env: 1,
+            qtde_msg_rec: 0 
   });
   
   Chat.create(chat, function(err, chat) {
@@ -2004,7 +2198,9 @@ var criar_historico_no_receptor = function(id_receptor, id_emissor, msg) {
   var chat = new Chat({
             id_emissor: id_receptor,
             id_receptor: id_emissor,
-            historico: historico
+            historico: historico,
+            qtde_msg_env: 0,
+            qtde_msg_rec: 1
   });
   
   Chat.create(chat, function(err, chat) {

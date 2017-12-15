@@ -125,11 +125,12 @@
              if(index > 0) {
                 $(this).find('td').each(function() {
                     if($(this).attr('id') == 'chat_') {
-                        $(this).show();
+                        $(this).hide( );
                     } 
                 }); 
              }
           });
+
         } else {
           $('#header_chat').show();
           $('#tabela').find('tr').each(function(index) {
@@ -151,7 +152,7 @@
 
           
 
-           //caso o jogador atualize a pagina apos partida terminar
+          //caso o jogador atualize a pagina apos partida terminar
           if('<%- params.status_partida %>' == 'Finalizada') {
             $(document).ready(function() {
               $('.container').hide();
@@ -191,9 +192,6 @@
                    $('#myModalR').modal();
                 }
                }
-
-               
-
 
                //coerencia
                if(tipo == 'Coerência') {
@@ -273,11 +271,24 @@
                }
 
                if(tipo == 'Afinidade') {
-                
+                   setTimeout(function() {
+                     var msg = temp[6]+' diz: '+'\n'+temp[1];
+                     var campo = $('#myModalAfinidade').children().children().children().next().children();
+
+                     if(campo.attr('id') == 'msg') {
+                       campo.text(msg);
+                       $('.modal-footer').children().text('Aceito');
+                       $('.modal-footer').children().next().text('Não aceito');  
+                     }
+
+                     if('<%- params.eu._id %>' == temp[3]) {
+                         $('#myModalAfinidade').modal();
+                     }
+                   }, 5000);
                }
 
                if(tipo == 'Autoridade') {
-                
+                  
                }
 
                if(tipo == 'Escassez') {
@@ -286,9 +297,6 @@
 
           }
        });
-
-      
-
 
 
 
@@ -359,8 +367,6 @@
          //reciprocidade 
               
               
-
-
               //functions coerencia
               var individualista = function() {
                  $('#myModalC').modal('hide');
@@ -391,7 +397,7 @@
 
 
               var aceito = function() {
-                  
+                  $('#myModalC2').modal('hide');
                   var data = {
                       id_partida: '<%- params.id_partida %>',
                       id_jogador: '<%- params.eu._id %>',
@@ -405,7 +411,7 @@
               };
 
               var nao_aceito = function() {
-                   
+                   $('#myModalC2').modal('hide');
                    var data = {
                        id_partida: '<%- params.id_partida %>',
                        id_jogador: '<%- params.eu._id %>',
@@ -415,12 +421,184 @@
                        resposta2: 'nao_aceito'
                    };  
 
-                  client.emit('salvar_coerencia_2', data);
+                   client.emit('salvar_coerencia_2', data);
 
               };
-
         //coerencia
+        
+        
+        //aprovacao social
+         var aceito_ap_social = function() {
+            $('#myModalAP_Social').modal('hide');
 
+            var data = {
+                id_partida: '<%- params.id_partida %>',
+                nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
+                resposta: 'sim'
+            };  
+
+            client.emit('salvar_ap_social', data);
+         };
+
+         var nao_aceito_ap_social = function() {
+           $('#myModalAP_Social').modal('hide');
+           var data = {
+               id_partida: '<%- params.id_partida %>',
+               nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
+               resposta: 'nao'
+           };  
+
+           client.emit('salvar_ap_social', data); 
+         };
+        //aprovacao social
+
+
+
+        //afinidade
+        var contador_afinidade = 0;
+        var indice_nome = 6;
+        var persuasao_padrao = '<%- params.persuasao_padrao %>';
+        var temp = persuasao_padrao.split(';'); 
+
+          var aceito_afinidde = function() {
+              $('#myModalAfinidade').modal('hide');
+
+                 if(indice_nome == 6) {
+                   
+                   var data = {
+                       id_partida: '<%- params.id_partida %>',
+                       nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
+                       resposta_controle2: 'sim'  
+                   };
+
+                   client.emit('salvar_opcao_afinidade1', data);
+                 
+                 }
+                 
+                 if(indice_nome == 5) {
+                   
+                   var data = {
+                       id_partida: '<%- params.id_partida %>',
+                       resposta_controle1: 'sim'  
+                   };
+
+                   client.emit('salvar_opcao_afinidade2', data); 
+
+                 }
+              
+              
+                 if(indice_nome == 4) {
+                                      
+                   var data = {
+                       id_partida: '<%- params.id_partida %>',
+                       resposta_afinidade: 'sim'  
+                   };
+
+                   client.emit('salvar_opcao_afinidade3', data);
+                 
+                 }
+              
+              if(contador_afinidade <= 2) {
+                 contador_afinidade++;
+                 indice_nome--;
+                 afinidade_aux(indice_nome);
+              }
+
+          };
+
+          var nao_aceito_afinidade = function() {
+              $('#myModalAfinidade').modal('hide');
+              
+                 if(indice_nome == 6) {
+                   
+                   var data = {
+                       id_partida: '<%- params.id_partida %>',
+                       nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
+                       resposta_controle2: 'nao'  
+                   };
+
+                   client.emit('salvar_opcao_afinidade1', data);     
+
+                 }
+                 
+                 if(indice_nome == 5) {
+                   var data = {
+                       id_partida: '<%- params.id_partida %>',
+                       resposta_controle1: 'nao'  
+                   };
+
+                   client.emit('salvar_opcao_afinidade2', data);
+                 }
+
+                 
+                 if(indice_nome == 4) {
+                 
+                    var data = {
+                        id_partida: '<%- params.id_partida %>',
+                        resposta_afinidade: 'nao'  
+                    };
+
+                    client.emit('salvar_opcao_afinidade3', data);
+                 
+                 }
+
+              if(contador_afinidade <= 2) {
+                 contador_afinidade++;
+                 indice_nome--;
+                 afinidade_aux(indice_nome);
+              }
+          };
+
+          var afinidade_aux = function(indice_nome) {
+              if(indice_nome == 5) { 
+
+                var persuasao_padrao = '<%- params.persuasao_padrao %>';
+                var temp = persuasao_padrao.split(';');
+
+                setTimeout(function() {
+                  var msg = temp[indice_nome]+' diz: '+'\n'+temp[1];
+                  var campo = $('#myModalAfinidade').children().children().children().next().children();
+
+                  if(campo.attr('id') == 'msg') {
+                    campo.text(msg);
+                    $('.modal-footer').children().text('Aceito');
+                    $('.modal-footer').children().next().text('Não aceito');  
+                  }
+
+                  if('<%- params.eu._id %>' == temp[3]) {
+                      $('#myModalAfinidade').modal();
+                  }
+                }, 10000);
+              }
+
+              if(indice_nome == 4) {
+
+                var persuasao_padrao =   '<%- params.persuasao_padrao %>';
+                var temp = persuasao_padrao.split(';');
+
+                setTimeout(function() {
+                  var msg = temp[indice_nome]+' diz: '+'\n'+temp[1];
+                  var campo = $('#myModalAfinidade').children().children().children().next().children();
+
+                  if(campo.attr('id') == 'msg') {
+                    campo.text(msg);
+                    $('.modal-footer').children().text('Aceito');
+                    $('.modal-footer').children().next().text('Não aceito');  
+                  }
+
+                  if('<%- params.eu._id %>' == temp[3]) {
+                      $('#myModalAfinidade').modal();
+                  }
+
+                  //escrever função para deletar persuasao padrao para se o jogador atualizar a pagina
+                  //não exiba o modal de persuasao novamente
+                }, 5000);
+              }
+
+
+          }
+
+        //afinidade
 
       var notify = function(data) {
          var id = data.id;
@@ -477,7 +655,7 @@
 
              var x = element.children().children().children().children().children().next().children().next().children();
 
-             alert(x.attr('class'));
+            
              x.children().each(function() {
                 if($(this).attr('id') == 'flag') {
                    $(this).children().each(function() {
@@ -1487,14 +1665,36 @@
               <label id="msg">Some text in the modal.</label>
             </div>
             <div class="modal-footer">
-               <button type="button" onclick="aceito_ap()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="button" onclick="nao_aceito_ap()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
+               <button type="button" onclick="aceito_ap_social()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" onclick="nao_aceito_ap_social()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+
+    <!-- Modal ApSocial 1 -->
+      <div id="myModalAfinidade" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- ModalR content-->
+          <div class="modal-content" id="test">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">???</h4>
+            </div>
+            <div class="modal-body">
+              <label id="msg">Some text in the modal.</label>
+            </div>
+            <div class="modal-footer">
+               <button type="button" onclick="aceito_afinidde()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" onclick="nao_aceito_afinidade()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
 

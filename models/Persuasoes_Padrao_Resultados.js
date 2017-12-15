@@ -31,11 +31,26 @@ var coerencia_resultado = {
     status: String
 };
 
+var aprovacao_social_resultado = {
+    id_partida: String,
+    nome_jogador_manipulado: String,
+    resposta_ap_social: String,
+    tipo: String,
+    success: Boolean,
+    status: String
+};
 
+var afinidade_resultado = {
+    id_partida: String,
+    nome_jogador_manipulado: String,
+    resposta_afinidade: String,
+    resposta_controle1: String,
+    resposta_controle2: String,
+    tipo: String,    
+    success: Boolean,
+    status: String
+};
 
-var aprovacao_social_resultado = {};
-
-var afinidade_resultado = {};
 
 var autoridade_resultado = {};
 

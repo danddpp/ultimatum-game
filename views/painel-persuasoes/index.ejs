@@ -506,9 +506,16 @@
         var rodada_afinidade = $('#select_rodada_afinidade').val();
         var round_afinidade = $('#select_round_afinidade').val();
         var opcao_afinidade = $('#check_afinidade').prop('checked');
-        var id_destinatario_afinidade = $('#sel_jogadores_afinidade')
+        var id_destinatario_afinidade = $('#sel_destinatario_afinidade')
                                                               .find(':selected').attr('id');
+        var nome_afinidade_afinidade = $('#sel_afinidades_afinidade')
+                                                              .find(':selected').val();
+        var nome_controle1_afinidade = $('#sel_controle1_afinidade')
+                                                              .find(':selected').val();
+        var nome_controle2_afinidade = $('#sel_controle2_afinidade')
+                                                              .find(':selected').val();
 
+ 
         var rodada_autoridade = $('#select_rodada_autoridade').val();
         var round_autoridade = $('#select_round_autoridade').val();
         var opcao_autoridade = $('#check_autoridade').prop('checked');
@@ -560,6 +567,7 @@
                   status: null
                 }               
             };
+
             var aprovacao_social = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
@@ -572,17 +580,20 @@
                 resposta: null               
             };
 
-
             var afinidade = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
                 tipo: 'Afinidade',
                 id_destinatario: id_destinatario_afinidade,
+                nome_afinidade: nome_afinidade_afinidade,
+                nome_controle1: nome_controle1_afinidade,
+                nome_controle2: nome_controle2_afinidade,
                 rodada: rodada_afinidade, 
                 round: round_afinidade,
                 opcao: opcao_afinidade,
-                msg: 'Texto persuasivo utilizando o método da afinidade.'              
+                msg: 'Ei, td bem? Será que vc poderia me emprestar uns 200 pontos para eu melhorara minha colocação =)?'
             }
+
             var autoridade = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
@@ -593,6 +604,7 @@
                 opcao: opcao_autoridade,
                 msg: 'Texto persuasivo utilizando o método da autoridade.'              
             };
+
             var escassez = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
@@ -924,20 +936,58 @@
                      <div class="form-group">
                       <label for="inputEmail" class="col-lg-2 control-label">Descrição:</label>
                       <div class="col-lg-10">
-                       <span class="help-block">Preferimos acatar pedidos de pessoas que conhecemos e de que gostamos.</span>
+                       <span class="help-block">Preferimos acatar pedidos de pessoas que conhecemos e de que gostamos.</span><label><a href="/painel_afinidades" target="_blank">Clique aqui para consultar níveis de afinidade</a></label>
                        </div>
                       </div>
                       <br><br>
                       <div class="form-group">
                        <label for="select" class="col-lg-2 control-label">Destinatário</label>
                         <div class="col-lg-10">
-                         <select class="form-control" id="sel_jogadores_afinidade" style="width:160px;">
+                         <select class="form-control" id="sel_destinatario_afinidade" style="width:160px;">
                           <% if(jogadores !== null) { 
                               jogadores.forEach(function(jogador, index) { %>
                                <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
                             <% })
                                 } %>
-                                <option id="todos" selected="todos">todos</option>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Afinidade</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_afinidades_afinidade" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
+                      <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Controle 1</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_controle1_afinidade" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
+                         </select>
+                        </div>
+                       </div>
+                       <br><br>
+                       <div class="form-group">
+                       <label for="select" class="col-lg-2 control-label">Controle 2</label>
+                        <div class="col-lg-10">
+                         <select class="form-control" id="sel_controle2_afinidade" style="width:160px;">
+                          <% if(jogadores !== null) { 
+                              jogadores.forEach(function(jogador, index) { %>
+                               <option id="<%- jogador.id_usuario %>"><%- jogador.nome_usuario %></option>
+                            <% })
+                                } %>
                          </select>
                         </div>
                        </div>

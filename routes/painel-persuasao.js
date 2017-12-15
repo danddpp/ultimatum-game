@@ -1,6 +1,7 @@
 var router = require('express').Router();
 var Partida = require('./../models/Partida');
 var Jogador = require('./../models/Jogador');
+var buscar_afinidades = require('./../functions/buscar_afinidades');
 
 router.get('/painel_persuasao', function(req, res) {
     if(req.isAuthenticated()) {
@@ -30,7 +31,7 @@ router.get('/painel_persuasao', function(req, res) {
                       for(var k = 0; k < temp.length; k++) {
                          var user = {
                             id_usuario: temp[k].usuario._id,
-                            nome_usuario: temp[k].usuario.nome 
+                            nome_usuario: temp[k].usuario.nome+" "+temp[k].usuario.sobrenome 
                          };
 
                          adversarios.push(user);
@@ -65,6 +66,26 @@ router.get('/painel_persuasao', function(req, res) {
     } else {
     	res.redirect('/');
     }
+});
+
+
+router.get('/painel_afinidades', function(req, res) {
+   if(req.isAuthenticated()) {
+
+    var id_usuario_manipulador = req.user._id;
+
+    Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
+       if (partidas) {
+           
+         buscar_afinidades(id_usuario_manipulador, partidas, req, res);
+
+       } else {
+        res.redirect('/painel_persuasao');
+       }      
+    });
+   } else {
+    res.redirect('/');
+   }
 });
 
 

@@ -6,7 +6,7 @@ module.exports = function(id_jogador_deduzir) {
      if (Jogador) {
          var pontuacao = jogador.pontuacao_max;
          if(pontuacao > 0) {
-           pontuacao = (pontuacao * 0.85);
+           pontuacao = Math.floor((pontuacao * 0.85));
          }
          jogador.pontuacao_max = pontuacao;
          jogador.save();
