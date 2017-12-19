@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 
 var desempenho_geral = {
-	num_de_partidas: Number,
+  	num_de_partidas: Number,
     pontuacao_geral: Number,
     numero_de_vitorias: Number,
     nivel_de_experiencia: Number// a cada 5 partidas um usuário ganha um ponto no nível de exp

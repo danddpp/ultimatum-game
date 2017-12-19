@@ -31,7 +31,7 @@ module.exports = function(jogador) {
 
        Usuario.findById(id_usuario).exec(function(err, usuario) {
            if(usuario) {
-              
+
               if(percentual == percentual_vencedor) {
                 usuario.desempenho_geral.numero_de_vitorias++;                  	
               }

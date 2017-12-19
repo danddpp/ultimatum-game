@@ -6,6 +6,16 @@
 <link href='/stylesheets/submenu.css' rel='stylesheet'>
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+<script src="https://unpkg.com/blip-chat-web" type="text/javascript"></script>
+<script>
+    (function () {
+        window.onload = function () {
+            new BlipWebSDK.ChatBuilder()
+                .withApiKey('6315ad3e-22ed-4949-a6d5-0f93434e2b88')
+                .build();
+        }
+    })();
+</script>
 </head>
 <body>
 <% include ../barraMenu %>

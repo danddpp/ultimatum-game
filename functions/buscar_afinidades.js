@@ -12,7 +12,9 @@ module.exports = function(id_usuario_manipulador, partidas,req, res) {
 
    var response = res;
    var request = req;
-   buscar_usuarios(jogadores, temp, request, response);
+   if(jogadores) {
+      buscar_usuarios(jogadores, temp, request, response);
+   }
 };
 
 
@@ -66,7 +68,6 @@ var estruturarAfinidades = function(usuarios, request_, response_) {
                  var aux = chats[k]._id.toString();      
                  id_chat = id_chat.toString();
                  if(id_chat == aux) {   
-                   console.log('4');
                    aux_chats.push(chats[k]);
                  }
 

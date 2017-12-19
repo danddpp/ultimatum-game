@@ -8,7 +8,16 @@
 <link href="stylesheets/chat.css" rel="stylesheet">
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>	
-
+<script src="https://unpkg.com/blip-chat-web" type="text/javascript"></script>
+<script>
+    (function () {
+        window.onload = function () {
+            new BlipWebSDK.ChatBuilder()
+                .withApiKey('6315ad3e-22ed-4949-a6d5-0f93434e2b88')
+                .build();
+        }
+    })();
+</script>
 <style>
 * {
     box-sizing: border-box;
@@ -860,7 +869,7 @@ client.on('retorno_perfil_pesquisado', function(users) {
         for(var i = 0; i < users.length; i++) { 
 
           if(users[i].id_usuario != '<%- meu_id %>') {
-
+           alert('ijdoejd');
             var link_user_perfil = "<input "+ "type="+"'hidden'"+" value="+users[i].id_usuario+" name="+'"id_usuario"'+">"+"<a href="+"'/#'"+">"+"<button "+"style="+"'border: none;background-color:white;'"+">"+ users[i].nome+"</button>"+"</a>";
 
 

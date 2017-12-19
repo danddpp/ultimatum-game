@@ -2,6 +2,8 @@ var router = require('express').Router();
 var Usuario = require('./../models/Usuario');
 var formidable = require('formidable');
 var fs = require('fs');
+var buscar_posicao_ranking = require('.././functions/buscar_posicao_ranking');
+var buscar_posicao_ranking_outro_perfil = require('.././functions/buscar_posicao_ranking_outro_perfil');
 
 router.get('/perfil_usuario', function(req, res) {
   if(req.isAuthenticated()) {
@@ -12,9 +14,8 @@ router.get('/perfil_usuario', function(req, res) {
     Usuario.findById(req.user._id).exec(function(err, usuario) {
      	if(usuario) {
      	 
-     	 var foto = usuario.foto;
+     	   var foto = usuario.foto;
          var num_vitorias = usuario.desempenho_geral.numero_de_vitorias;
-         var posicao_ranking = 0;//criar função para ranqueamento dos usuarios e chamar aqui
          var pontuacao_total = usuario.desempenho_geral.pontuacao_geral;
 
          if(foto != null) {
@@ -44,19 +45,23 @@ router.get('/perfil_usuario', function(req, res) {
              }  
 
              var num_vitorias = usuario.desempenho_geral.numero_de_vitorias;
-             var posicao_ranking = 0;//criar função para ranqueamento dos usuarios e chamar aqui
              var pontuacao_total = usuario.desempenho_geral.pontuacao_geral;
+            
+
+             var temp = { meu_id: req.user._id, 
+                          nome_jogador: nome_jogador,
+                          nivel_usuario: nivel,
+                          nivel_perfil: req.user.nivel_perfil,
+                          foto: foto,
+                          usuarios: users,
+                          num_vitorias: num_vitorias,
+                          posicao_ranking: '',
+                          pontuacao_total: pontuacao_total
+                        }; 
+
              
-             res.render('perfil_usuario/index', { meu_id: req.user._id, 
-             	                                  nome_jogador: nome_jogador,
-                                                  nivel_usuario: nivel,
-                                                  nivel_perfil: req.user.nivel_perfil,
-                                                  foto: foto,
-                                                  usuarios: users,
-                                                  num_vitorias: num_vitorias,
-                                                  posicao_ranking: posicao_ranking,
-                                                  pontuacao_total: pontuacao_total
-                                                   });  
+            buscar_posicao_ranking(req, res, temp);
+               
 
             } else {
             	console.log(err);
@@ -150,8 +155,7 @@ router.post('/salvar_alteracoes', function(req, res) {
 
 router.post('/visitar_perfil', function(req, res) {
    var id_user = req.body.id_usuario;
-
-      console.log(req.body.id_usuario);
+   
    if(req.isAuthenticated()) {
 
       Usuario.findById(id_user).exec(function(err, usuario) {
@@ -159,7 +163,6 @@ router.post('/visitar_perfil', function(req, res) {
        	 //dados do perfil visitado
        	 var foto = usuario.foto;
          var num_vitorias = usuario.desempenho_geral.numero_de_vitorias;
-         var posicao_ranking = 0;//criar função para ranqueamento dos usuarios e chamar aqui
          var pontuacao_total = usuario.desempenho_geral.pontuacao_geral; 
         
 
@@ -193,21 +196,22 @@ router.post('/visitar_perfil', function(req, res) {
                     } else {
                        nome_jogador = usuarios[i].nome; 
                     }
-               }  
+               }
+
+                var temp = { meu_id: req.user._id, 
+                             nome_jogador: nome_jogador,
+                             nivel_usuario: req.user.nivel,
+                             nivel_perfil: nivel,
+                             foto: foto,
+                             usuarios: users,
+                             num_vitorias: num_vitorias,
+                             posicao_ranking: '',
+                             pontuacao_total: pontuacao_total
+                           }; 
+
+                
+               buscar_posicao_ranking_outro_perfil(req, res, temp, id_user);  
                
-
-               res.render('perfil_usuario/index', { meu_id: req.user._id, 
-               	                                    nome_jogador: nome_jogador,
-                                                    nivel_usuario: nivel,
-                                                    nivel_perfil: req.user.nivel_perfil,
-                                                    foto: foto,
-                                                    usuarios: users,
-                                                    num_vitorias: num_vitorias,
-                                                    posicao_ranking: posicao_ranking,
-                                                    pontuacao_total: pontuacao_total
-                                                   });  
-
-
               } else {
               	console.log(err);
               }

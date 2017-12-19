@@ -181,16 +181,15 @@ passport.use(new LocalStrategy({
   
   var onlines = {};//armazena jogadores online
   //var partida = null;
-
-
   
+
   io.sockets.on('connection', function(socket) {
      //console.log('notify-onlines');
      //armazena a sessao do usuario compartilhada com o socket
      var session = socket.handshake.session;
      //armazena os dados do jogador (vindos da sessao/socket )que acabou de se conectar ao socket
      var usuario = session.passport.user;
-
+     
      //console.log(usuario.sala);
      
      //vetor que armazena os jogadores conectados ao socket
@@ -1717,8 +1716,8 @@ var fim_de_jogo = function(data, partida) {
 
                   if(data.resposta == 'nao') {
                      aux_success = false;
-                     aux_status = 'Jogador nao aceitou a oferta para doar parte de sua pontuação para um suposto' + 
-                     'sorteio mediante a a informação de que a maioria havia aceitado';
+                     aux_status = 'Jogador nao aceitou a oferta para doar parte de sua pontuação para um suposto ' + 
+                     'sorteio mediante a informação de que a maioria havia aceitado';
                   }
 
                       var resultado = {
@@ -2251,6 +2250,52 @@ socket.on('pesquisar_perfil', function(nome) {
 });
 //socket.io
 
+
+
+
+
+
+
+
+//chatbot
+let MessagingHub = require('messaginghub-client');
+let WebSocketTransport = require('lime-transport-websocket');
+let Lime = require('lime-js');
+
+let client = new MessagingHub.ClientBuilder()
+    .withIdentifier('nodesampleultimatum')
+    .withAccessKey('WXJDV2s0ekFEUHhHeHIwWnVmUHQ=')
+    .withTransportFactory(() => new WebSocketTransport())
+    .build();
+
+
+client.addMessageReceiver(function (message) {
+  
+  var session = expressSession.Cookie();
+  console.log(session);
+
+
+  return message.content == 'Olá' || message.content == 'olá' || message.content == 'Ola' || message.content == 'ola'
+  || message.content == 'Oi' || message.content == 'oi' || message.content == 'Hello' || message.content == 'hello'
+  || message.content == 'Oie' || message.content == 'oie';
+}, function(message) {
+   // send a "received" notification to some user
+   var resposta = "Olá!";
+   var msg = { type: "text/plain", content: resposta, to: message.from, id: Lime.Guid() };
+   client.sendNotification(msg);
+});
+
+
+      
+
+client.connect()
+    .then(function (session) {
+        console.log('Connectado');
+    })
+    .catch(function (err) {
+        console.log(err);
+    });
+//chatbot
 
 
 //initialize server
