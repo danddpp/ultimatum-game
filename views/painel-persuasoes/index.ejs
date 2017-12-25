@@ -544,8 +544,10 @@
                   id_jogador: null,
                   nome_jogador: null,
                   status: null
-                }              
+                },
+                realizado: false              
             };
+            
             var coerencia = {
                 jogador: '<%-nome_jogador%>',
                 id_usuario: '<%- id_usuario %>',
@@ -564,7 +566,9 @@
                   id_partida: null,
                   id_jogador: null,
                   nome_jogador: null,
-                  status: null
+                  status: null,
+                  realizado_1: false,
+                  realizado_2: false
                 }               
             };
 
@@ -577,7 +581,8 @@
                 round: round_ap_social,
                 opcao: opcao_ap_social,
                 msg: 'Olá!! O que vc acha de participar de um sorteio ao final da rodada?? Para que o sorteio ocorra é necessário que cada jogador contribua com 10% da sua pontuação. Até esse momento 90% dos jogadores já aceitaram. Vamos nessa??',
-                resposta: null               
+                resposta: null,
+                realizado: false                               
             };
 
             var afinidade = {
@@ -591,7 +596,10 @@
                 rodada: rodada_afinidade, 
                 round: round_afinidade,
                 opcao: opcao_afinidade,
-                msg: 'Ei, td bem? Será que vc poderia me emprestar uns 200 pontos para eu melhorara minha colocação =)?'
+                msg: 'Ei, td bem? Será que vc poderia me emprestar uns 200 pontos para eu melhorara minha colocação =)?',
+                realizado_1: false,
+                realizado_2: false,
+                realizado_3: false
             }
 
             var autoridade = {

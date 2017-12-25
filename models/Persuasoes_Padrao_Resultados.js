@@ -12,7 +12,8 @@ var reciprocidade_resultado = {
     tipo: String,
     nome_jogador_manipulado: String,
     success: Boolean,
-    status: String
+    status: String,
+    realizado: Boolean
 };
 
 
@@ -28,7 +29,9 @@ var coerencia_resultado = {
     resposta_quiz1: String,
     resposta_quiz2: String,
     success: Boolean,
-    status: String
+    status: String,
+    realizado_1: Boolean,
+    realizado_2: Boolean
 };
 
 var aprovacao_social_resultado = {
@@ -37,7 +40,8 @@ var aprovacao_social_resultado = {
     resposta_ap_social: String,
     tipo: String,
     success: Boolean,
-    status: String
+    status: String,
+    realizado: Boolean
 };
 
 var afinidade_resultado = {
@@ -48,7 +52,10 @@ var afinidade_resultado = {
     resposta_controle2: String,
     tipo: String,    
     success: Boolean,
-    status: String
+    status: String,
+    realizado_1: Boolean,
+    realizado_2: Boolean,
+    realizado_3: Boolean
 };
 
 

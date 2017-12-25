@@ -196,7 +196,8 @@ router.post('/iniciar_partida', function(req, res) {
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg2;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].jogador;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
-                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;   
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado;   
                                     }
 
                                     if(partida.persuasoes_padrao[i].tipo == 'Coerência') {
@@ -209,8 +210,9 @@ router.post('/iniciar_partida', function(req, res) {
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg_quiz2;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].opcao_coerencia;
                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
-                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;   
-                                      
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_1;
+                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_2;                                      
                                       }  
 
                                     }
@@ -220,6 +222,7 @@ router.post('/iniciar_partida', function(req, res) {
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg;
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado;
                                     }
 
                                     if(partida.persuasoes_padrao[i].tipo == 'Afinidade') {
@@ -230,6 +233,9 @@ router.post('/iniciar_partida', function(req, res) {
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_afinidade;
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_controle1;
                                         persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_controle2;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_1;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_2;
+                                        persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_3;
                                     }
 
                                  }
@@ -296,7 +302,8 @@ router.post('/iniciar_partida', function(req, res) {
                                    persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg2;
                                    persuasao_padrao += ';'+partida.persuasoes_padrao[0].jogador;
                                    persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
-                                   persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;   
+                                   persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;
+                                   persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado;   
                                   } 
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Coerência') {
@@ -310,7 +317,8 @@ router.post('/iniciar_partida', function(req, res) {
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[0].opcao_coerencia;
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;   
-                                      
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado_1;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado_2;
                                     }
 
                                  }
@@ -319,7 +327,8 @@ router.post('/iniciar_partida', function(req, res) {
                                      persuasao_padrao = partida.persuasoes_padrao[0].tipo;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
-                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario; 
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado; 
                                  }
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Afinidade') {
@@ -330,6 +339,9 @@ router.post('/iniciar_partida', function(req, res) {
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].nome_afinidade;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].nome_controle1;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[0].nome_controle2;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado_1;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado_2;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado_3;
                                  }
 
                                  if(partida.persuasoes_padrao[0].tipo == 'Autoridade') {
@@ -453,6 +465,7 @@ router.post('/iniciar_partida', function(req, res) {
                                     persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                    persuasao_padrao += ';'+persuasoes_padrao[k].realizado;
                                    } 
 
                                    if(persuasoes_padrao[k].tipo == 'Coerência') {
@@ -466,7 +479,8 @@ router.post('/iniciar_partida', function(req, res) {
                                       persuasao_padrao += ';'+persuasoes_padrao[k].opcao_coerencia;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
-                                      
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;
                                     }
 
                                  }
@@ -475,7 +489,8 @@ router.post('/iniciar_partida', function(req, res) {
                                      persuasao_padrao = persuasoes_padrao[k].tipo;
                                      persuasao_padrao += ';'+persuasoes_padrao[k].msg;
                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
+                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                     persuasao_padrao += ';'+persuasoes_padrao[k].realizado; 
                                  }
 
                                    if(persuasoes_padrao[k].tipo == 'Afinidade') {
@@ -486,6 +501,9 @@ router.post('/iniciar_partida', function(req, res) {
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_afinidade;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle1;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle2;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_3;
                                    }
 
                                    if(persuasoes_padrao[k].tipo == 'Autoridade') {
@@ -683,7 +701,8 @@ router.post('/iniciar_novoRound', function(req, res) {
                                     persuasao_padrao += ';'+persuasoes_padrao[k].msg2;
                                     persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
                                     persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                    persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
+                                    persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                    persuasao_padrao += ';'+persuasoes_padrao[k].realizado;   
                                    } 
 
                                    if(persuasoes_padrao[k].tipo == 'Coerência') {
@@ -696,7 +715,9 @@ router.post('/iniciar_novoRound', function(req, res) {
                                       persuasao_padrao += ';'+persuasoes_padrao[k].round;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz1;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;   
                                                                                                    
                                     } 
 
@@ -709,6 +730,8 @@ router.post('/iniciar_novoRound', function(req, res) {
                                           persuasao_padrao += ';'+persuasoes_padrao[k].msg_quiz2;
                                           persuasao_padrao += ';'+persuasoes_padrao[k].rodada_2;
                                           persuasao_padrao += ';'+persuasoes_padrao[k].round_2;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                          persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;
 
                                     } 
 
@@ -718,7 +741,8 @@ router.post('/iniciar_novoRound', function(req, res) {
                                        persuasao_padrao = persuasoes_padrao[k].tipo;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].msg;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado; 
                                    }
 
                                    if(persuasoes_padrao[k].tipo == 'Afinidade') {
@@ -729,6 +753,9 @@ router.post('/iniciar_novoRound', function(req, res) {
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_afinidade;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle1;
                                        persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle2;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;
+                                       persuasao_padrao += ';'+persuasoes_padrao[k].realizado_3;
                                    }
 
                                    if(persuasoes_padrao[k].tipo == 'Autoridade') {
@@ -924,7 +951,8 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                       persuasao_padrao += ';'+persuasoes_padrao[k].msg2;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
                                       persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;   
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                      persuasao_padrao += ';'+persuasoes_padrao[k].realizado;   
                                      } 
 
                                      if(persuasoes_padrao[k].tipo == 'Coerência') {
@@ -933,7 +961,9 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                         persuasao_padrao += ';'+persuasoes_padrao[k].msg;
                                         persuasao_padrao += ';'+persuasoes_padrao[k].jogador;
                                         persuasao_padrao += ';'+persuasoes_padrao[k].resposta;
-                                        persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;   
+                                        persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
+                                        persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                        persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;   
                                       } 
                                      }
 
@@ -941,7 +971,8 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                          persuasao_padrao = persuasoes_padrao[k].tipo;
                                          persuasao_padrao += ';'+persuasoes_padrao[k].msg;
                                          persuasao_padrao += ';'+persuasoes_padrao[k].id_usuario;
-                                         persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario; 
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].id_destinatario;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].realizado; 
                                      }
 
                                      if(persuasoes_padrao[k].tipo == 'Afinidade') {
@@ -952,6 +983,9 @@ router.post('/iniciar_novaRodada', mudar_rodada_painel, function(req, res) {
                                          persuasao_padrao += ';'+persuasoes_padrao[k].nome_afinidade;
                                          persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle1;
                                          persuasao_padrao += ';'+persuasoes_padrao[k].nome_controle2;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].realizado_1;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].realizado_2;
+                                         persuasao_padrao += ';'+persuasoes_padrao[k].realizado_3;
                                      }
 
                                      if(persuasoes_padrao[k].tipo == 'Autoridade') {
@@ -1162,7 +1196,8 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg2;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].jogador;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
-                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;   
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado;
                                   }
 
                                   if(partida.persuasoes_padrao[i].tipo == 'Coerência' && 
@@ -1173,6 +1208,8 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].quiz_respondido;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_1;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_2;
                                   }
 
                                   if(partida.persuasoes_padrao[i].tipo == 'Aprovação social') {
@@ -1180,6 +1217,7 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].msg;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_usuario;
                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].id_destinatario;
+                                     persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado;
                                   }
 
                                   if(partida.persuasoes_padrao[i].tipo == 'Afinidade') {
@@ -1190,6 +1228,9 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_afinidade;
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_controle1;
                                       persuasao_padrao += ';'+partida.persuasoes_padrao[i].nome_controle2;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_1;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_2;
+                                      persuasao_padrao += ';'+partida.persuasoes_padrao[i].realizado_3;
                                   }
 
                                   if(partida.persuasoes_padrao[i].tipo == 'Autoridade') {
@@ -1262,7 +1303,8 @@ router.get('/retornar_ao_jogo', function(req, res) {
                                  persuasao_padrao += ';'+partida.persuasoes_padrao[0].msg2;
                                  persuasao_padrao += ';'+partida.persuasoes_padrao[0].jogador;
                                  persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_usuario;
-                                 persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;   
+                                 persuasao_padrao += ';'+partida.persuasoes_padrao[0].id_destinatario;
+                                 persuasao_padrao += ';'+partida.persuasoes_padrao[0].realizado;   
                                 } 
 
                                if(partida.persuasoes_padrao[0].tipo == 'Coerência') {

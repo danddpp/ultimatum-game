@@ -169,28 +169,31 @@
             var persuasao_padrao = '<%- params.persuasao_padrao %>';
             var temp = persuasao_padrao.split(';');
             var tipo = temp[0];
-         
-
-
+            var realizado = temp[6];
           //reciprocidade 
                if(tipo == 'Reciprocidade') {      
                 var msg = temp[3]+' diz: '+'\n'+temp[1];
-                 var campo = $('#myModalR').children().children().children().next().children();
-                 if(campo.attr('id') == 'msg') {
-                   campo.text(msg);
-                   $('.modal-footer').children().text('Sim');
-                   $('.modal-footer').children().next().text('Não');
-                   //alert(campo.attr('id'));
+                var campo = $('#myModalR').children().children().children().next().children();
+                var realizado = temp[6];
+                 alert(realizado);
+                 if(realizado == 'false') {
+                   if(campo.attr('id') == 'msg') {
+                     campo.text(msg);
+                     $('.modal-footer').children().text('Sim');
+                     $('.modal-footer').children().next().text('Não');
+                     //alert(campo.attr('id'));
+                   }
+                  if(temp[5] == 'todos') {
+                    if(temp[4] != '<%- params.eu._id %>') {
+                     $('#myModalR').modal(); 
+                   } 
+                  }
+                  //aqui params.eu._id é o painel e id do destinatario
+                   else if(temp[5] == '<%- params.eu._id %>') {
+                     $('#myModalR').modal();
+                   }  
                  }
-                if(temp[5] == 'todos') {
-                  if(temp[4] != '<%- params.eu._id %>') {
-                   $('#myModalR').modal(); 
-                 } 
-                }
-                //aqui params.eu._id é o painel e id do destinatario
-                else if(temp[5] == '<%- params.eu._id %>') {
-                   $('#myModalR').modal();
-                }
+                 
                }
 
                //coerencia

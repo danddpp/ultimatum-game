@@ -52,7 +52,6 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
          }
 
          
-
          res.render('perfil_usuario/index', { meu_id: temp_.meu_id, 
                                               nome_jogador: temp_.nome_jogador,
                                               nivel_usuario: temp_.nivel_usuario,
@@ -61,7 +60,8 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
                                               usuarios: temp_.usuarios,
                                               num_vitorias: temp_.num_vitorias,
                                               posicao_ranking: usuario_retorno.p_ranking,
-                                              pontuacao_total: temp_.pontuacao_total });
+                                              pontuacao_total: temp_.pontuacao_total,
+                                              nome_perfil: temp_.nome_perfil });
       
      } else {
         console.log(err);

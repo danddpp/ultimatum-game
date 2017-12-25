@@ -46,15 +46,12 @@ module.exports = function(req, res, temp_) {
          }
           
          for(var l = 0; l < ranking.length; l++) {
-            console.log(id_usuario +' '+ ranking[l].id_usuario);
             if(id_usuario == ranking[l].id_usuario) {
                usuario_retorno = ranking[l];
-               console.log(usuario_retorno);
             }
          }
 
          
-         console.log(temp_);
 
          res.render('perfil_usuario/index', { meu_id: temp_.meu_id, 
                                               nome_jogador: temp_.nome_jogador,
@@ -64,7 +61,8 @@ module.exports = function(req, res, temp_) {
                                               usuarios: temp_.usuarios,
                                               num_vitorias: temp_.num_vitorias,
                                               posicao_ranking: usuario_retorno.p_ranking,
-                                              pontuacao_total: temp_.pontuacao_total });
+                                              pontuacao_total: temp_.pontuacao_total,
+                                              nome_perfil: temp_.nome_perfil });
       
      } else {
         console.log(err);

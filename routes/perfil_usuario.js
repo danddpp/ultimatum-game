@@ -46,7 +46,7 @@ router.get('/perfil_usuario', function(req, res) {
 
              var num_vitorias = usuario.desempenho_geral.numero_de_vitorias;
              var pontuacao_total = usuario.desempenho_geral.pontuacao_geral;
-            
+             var nome_perfil = nome_jogador + ' ' + req.user.sobrenome;            
 
              var temp = { meu_id: req.user._id, 
                           nome_jogador: nome_jogador,
@@ -56,7 +56,8 @@ router.get('/perfil_usuario', function(req, res) {
                           usuarios: users,
                           num_vitorias: num_vitorias,
                           posicao_ranking: '',
-                          pontuacao_total: pontuacao_total
+                          pontuacao_total: pontuacao_total,
+                          nome_perfil: nome_perfil
                         }; 
 
              
@@ -164,7 +165,7 @@ router.post('/visitar_perfil', function(req, res) {
        	 var foto = usuario.foto;
          var num_vitorias = usuario.desempenho_geral.numero_de_vitorias;
          var pontuacao_total = usuario.desempenho_geral.pontuacao_geral; 
-        
+         var nome_perfil = usuario.nome + ' ' + usuario.sobrenome;
 
          //dado do visitante
          var nivel = usuario.nivel_perfil;
@@ -206,7 +207,8 @@ router.post('/visitar_perfil', function(req, res) {
                              usuarios: users,
                              num_vitorias: num_vitorias,
                              posicao_ranking: '',
-                             pontuacao_total: pontuacao_total
+                             pontuacao_total: pontuacao_total,
+                             nome_perfil: nome_perfil
                            }; 
 
                 

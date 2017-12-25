@@ -72,7 +72,6 @@ app.post('/criar_partida', routesMenuPartida);
 
 
 //config rotas menu-jogador
-
 app.get('/jogo_do_ultimato', routesMenuJogador);
 app.post('/iniciar_partida', routesMenuJogador);
 app.get('/retornar_ao_jogo', routesMenuJogador);
@@ -1480,7 +1479,8 @@ var fim_de_jogo = function(data, partida) {
                         tipo: 'reciprocidade',
                         nome_jogador: data.nome_jogador,
                         success: true,
-                        status: 'aceitou após manipulador baixar oferta'
+                        status: 'aceitou após manipulador baixar oferta',
+                        realizado: true
                    };
                       
                var id_resultados = partida.id_resultados;
@@ -1516,7 +1516,8 @@ var fim_de_jogo = function(data, partida) {
                     tipo: 'reciprocidade',
                     nome_jogador: data.nome_jogador,
                     success: false,
-                    status: 'não aceitou após manipulador baixar oferta'
+                    status: 'não aceitou após manipulador baixar oferta',
+                    realizado: true
                    };
 
                 var id_resultados = partida.id_resultados;
@@ -1553,7 +1554,9 @@ var fim_de_jogo = function(data, partida) {
                       resposta_quiz1: data.resposta,
                       resposta_quiz2:null,
                       success: null,
-                      status: null
+                      status: null,
+                      realizado_1: true,
+                      realizado_2: false
                     };
 
 
@@ -1637,7 +1640,9 @@ var fim_de_jogo = function(data, partida) {
                              resposta_quiz1: rC[i].resposta_quiz1,
                              resposta_quiz2: data.resposta2,
                              success: success,
-                             status: status
+                             status: status,
+                             realizado_1: rC[i].realizado_1,
+                             realizado_2: true
                         };   
                         resultados.coerencia_resultado[i] = resultado;
                         resultados.save();   
@@ -1669,7 +1674,10 @@ var fim_de_jogo = function(data, partida) {
                       resposta_controle2: data.resposta_controle2,
                       tipo: 'afinidade',
                       success: null,
-                      status: null
+                      status: null,
+                      realizado_1: true,
+                      realizado_2: false,
+                      realizado_3: false,
                     };
 
                       var id_resultados = partida.id_resultados;
@@ -1726,7 +1734,8 @@ var fim_de_jogo = function(data, partida) {
                         resposta_ap_social: data.resposta,
                         tipo: 'afinidade',
                         success: aux_success,
-                        status: aux_status
+                        status: aux_status,
+                        realizado: true
                       };
 
                     resultados.aprovacao_social_resultado.push(resultado);
@@ -1768,7 +1777,10 @@ var fim_de_jogo = function(data, partida) {
                               resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
                               tipo: 'afinidade',
                               success: null,
-                              status: null
+                              status: null,
+                              realizado_1: resultados.afinidade_resultado[i].realizado_1,
+                              realizado_2: true,
+                              realizado_3: resultados.afinidade_resultado[i].realizado_3
                             };
 
                          resultados.afinidade_resultado[i] = resultado;
@@ -1825,7 +1837,10 @@ var fim_de_jogo = function(data, partida) {
                               resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
                               tipo: 'afinidade',
                               success: aux_success,
-                              status: aux_status
+                              status: aux_status,
+                              realizado_1: resultados.afinidade_resultado[i].realizado_1,
+                              realizado_2: resultados.afinidade_resultado[i].realizado_2,
+                              realizado_3: true
                             };
 
                          resultados.afinidade_resultado[i] = resultado;
@@ -1853,6 +1868,7 @@ socket.on('buscar_chat', function(data) {
      
     var data_ = {
          flag: false,
+         id_outro: data.id_outro,
          data_chat: null   
     };
 

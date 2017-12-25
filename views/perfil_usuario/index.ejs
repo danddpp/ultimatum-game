@@ -187,7 +187,7 @@ function novo_chat(id_usuario, nome_usuario) {
 
                         if(aux_flag_ == false) {
                         	     var msg = data_.data_chat;
-                        	     //alert(data_.data_chat);
+                        	     
 
                         	 	      var chat = "<li" + " id="+ id_usuario +" class="+"'list-inline-item'"+">"+
                         	                   "<div"+" id="+nome_usuario+" class="+"'container-fluid'"+">"+
@@ -235,29 +235,35 @@ function novo_chat(id_usuario, nome_usuario) {
                         	  
                         	$('#lista_de_chats').append(chat);
 
-                        	var campo_leitura_msg = $('#lista_de_chats').children().children().children().children().children().children().next().children().children().children();
+                          $('#lista_de_chats').find('li').each(function() {
+                              if($(this).attr('id') == data.id_outro) {
+                                 var campo_leitura_msg = $(this).children().children().children().children().children().next().children().children().children();
 
-                        	var temp = msg.split('ص');
+                                 var temp = msg.split('ص');
 
-                        	for(var i = 0; i < temp.length; i++) {
-                        	  
-                        	  campo_leitura_msg.append(temp[i]);
-                        	  
-                        	  campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
+                                 for(var i = 0; i < temp.length; i++) {
 
-                        	  var x = campo_leitura_msg.parent().parent().next().children().children().next();
+                                   campo_leitura_msg.append(temp[i]);
+                                   
+                                   campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
 
-                        	     x.each(function() {
-                        	        if($(this).attr('id') == 'flag') {
-                        	           $(this).children().each(function() {
-                        	              if($(this).attr('id') == 'del') {
-                        	                 $(this).remove();
-                        	              }
-                        	           });
-                        	        }
-                        	     });
+                                   var x = campo_leitura_msg.parent().parent().next().children().children().next();
 
-                        	}
+                                      x.each(function() {
+                                         if($(this).attr('id') == 'flag') {
+                                            $(this).children().each(function() {
+                                               if($(this).attr('id') == 'del') {
+                                                  $(this).remove();
+                                               }
+                                            });
+                                         }
+                                      });
+
+                                 }  
+                              }       
+                          });
+
+                        	
                         }
 
                              
@@ -366,7 +372,7 @@ function novo_chat(id_usuario, nome_usuario) {
         if (flag == true) {
 
           if(click == 0) {           
-            //alert('here');
+            
             var e = $(this).parent().parent();   
             var x = $(this).parent().parent().children().next();
             var aux = x.text().split('-'); 
@@ -470,12 +476,6 @@ function novo_chat(id_usuario, nome_usuario) {
                 	campo_leitura_msg = $(this).parent().parent().parent().parent().parent().children().children().children();
                 }
 
-                alert(id_usuario_chat);
-                alert(id_usuario_chat_aux);
-
-                //if(campo_leitura_msg.attr('class') != 'msg') {
-              //  	alert($(this).parent().parent().parent().parent().parent().children().children().children().attr('class'));
-                //} 
 
                  var mensagem = campo_escrita_msg.val();
                  var _msg = "";
@@ -596,8 +596,7 @@ function novo_chat(id_usuario, nome_usuario) {
                          	 meu_id: '<%- meu_id %>',
                          	 id_outro: message_.meu_id_painel_adversario
                          }	
-                        alert('here ' + data.meu_id);
-                        alert('here2 ' + data.id_outro);
+
                         client.emit('buscar_chat2', data);
                           
                         client.on('historico_chat2', function(data_) {
@@ -666,7 +665,7 @@ function novo_chat(id_usuario, nome_usuario) {
 
 
                                     $(document).ready(function() {
-                                       alert('11111111111 ' + chat);
+
                                        $('#lista_de_chats').append(chat);
                                         
                                         $('#lista_de_chats').find('li').each(function() {
@@ -765,7 +764,7 @@ function novo_chat(id_usuario, nome_usuario) {
                                        $('#lista_de_chats').find('li').each(function() {
                                          if($(this).attr('id') == message_.meu_id_painel_adversario) {
                                              var campo_escrita_msg = $(this).children().children().children().children().children().next().children().children().children();
-                                             //alert(campo_escrita_msg.attr('id'));
+
                                              campo_escrita_msg.append(message_.msg);
                                              campo_leitura_msg.animate({scrollTop: campo_leitura_msg.prop("scrollHeight")}, 500);
                                          }
@@ -795,13 +794,11 @@ function novo_chat(id_usuario, nome_usuario) {
                    }
                }
 
-                  //$(this).text('Nova mensagem!');
+
                    var id_usuario_chat = $(this).attr('id'); 
                    
                    var campo_escrita_msg = $(this).children().children().children().children().children().next().children().children().children();
 
-
-                   //alert(campo_escrita_msg.attr('id'));
                    campo_escrita_msg.append(message_.msg);
 
                    campo_escrita_msg.animate({scrollTop: campo_escrita_msg.prop("scrollHeight")}, 500);
@@ -820,9 +817,6 @@ function novo_chat(id_usuario, nome_usuario) {
                    });
 
                    var t = x.next().parent().next().children().next().children().children().next();
-                   
-
-                   //alert(t.attr('class'));
 
                    t.each(function() {
                       if($(this).attr('id') == 'flag') {
@@ -869,7 +863,7 @@ client.on('retorno_perfil_pesquisado', function(users) {
         for(var i = 0; i < users.length; i++) { 
 
           if(users[i].id_usuario != '<%- meu_id %>') {
-           alert('ijdoejd');
+
             var link_user_perfil = "<input "+ "type="+"'hidden'"+" value="+users[i].id_usuario+" name="+'"id_usuario"'+">"+"<a href="+"'/#'"+">"+"<button "+"style="+"'border: none;background-color:white;'"+">"+ users[i].nome+"</button>"+"</a>";
 
 
@@ -925,7 +919,8 @@ client.on('retorno_perfil_pesquisado', function(users) {
 
   <div id="centro" class="col-sm-8">
       <fieldset>
-        <legend>Nível do perfil: "<%= nivel_perfil %>"</legend>
+        <legend><h2><%= nome_perfil %></h2></legend>
+        <h4>Nível do perfil: "<%= nivel_perfil %>"</h4>
       <div id="left" style="margin-left: 90px;">  
         <div class="redondo" id="foto">
             <img src="<%= foto %>" class="redondo">
@@ -998,22 +993,7 @@ client.on('retorno_perfil_pesquisado', function(users) {
    </div>
 
   </div>
-<!--
-  <dir id="pesq_chat" style="margin-top: 400px; margin-left: 930px;">
-  	<form action="/publicar" method="POST" class="navbar-form navbar-left" role="search" id="pesq_chat">
-  	     <div class="form-group">
-  	      <label></label>
-  	     <div class="form-group">
-  	     	<input type="text" class="form-control" name="pesquisa[data_partida]" style="width:150px; margin-left: -20px; margin-top: -5px; height: 25px;">
-  	     </div>
-  	     <div class="form-group">      
-  	 		 <button type="submit" id="bt_pesquisar" class="btn btn-default" style="margin-left: 0px;
-  	 		 position: absolute; margin-top: -13px; width: 30px; height: 25px;"></button>
-  	 	   </div>    
-  	     </div>		
-  	    </form>
-  </dir>
--->
+
   <footer>
   	 <ul class="list-inline" id="lista_de_chats">
   	 </ul>
