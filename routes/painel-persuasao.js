@@ -10,61 +10,89 @@ router.get('/painel_persuasao', function(req, res) {
        var id_ = req.user._id;
 
     Partida.find().where('status').equals('Em andamento').exec(function(err, partidas) {
-    	 if(err) {
-    	 	req.next(err);
-    	 } else { 
+       if(err) {
+        req.next(err);
+       } else { 
 
-         var partida = null;
-         var jogadores = null;
-         
+         var partida = [];
+         var jogadores_ = [];
+         var flag = false;
+
+
            if(partidas.length > 0) {
-           	
+            
              for(var i = 0; i < partidas.length; i++) {
+                
                 var jogadores = partidas[i].jogadores;
+                
                 for(var j = 0; j < jogadores.length; j++) {
+                  
                    if(jogadores[j].usuario._id == id_) {
-                      partida = partidas[i];
-                      var adversarios = [];
-                      var temp = [];
-                      temp = jogadores;
-
-                      for(var k = 0; k < temp.length; k++) {
-                         var user = {
-                            id_usuario: temp[k].usuario._id,
-                            nome_usuario: temp[k].usuario.nome+" "+temp[k].usuario.sobrenome 
-                         };
-
-                         adversarios.push(user);
-                      }
-                          res.render('painel-persuasoes/index', 
-                      	                            {nome_jogador: nome_jogador,
-                      	                             id_usuario: id_, 
-                      	                             mensagem:'',
-                      	                             nivel_usuario: nivel,
-                      	                             partida: partida,
-                      	                             jogadores: adversarios
-                      	                         });
-
+                     flag = true;
+                     jogadores_ = jogadores;
+                     partida = partidas[i];
                    }
+
                 }
              }
+
+
+             if(flag == true) {
+               
+               var adversarios = [];
+               var temp = [];
+               temp = jogadores_;
+
+               for(var k = 0; k < temp.length; k++) {
+                  
+                 if (temp[k].usuario._id != id_) {
+                    var user = {
+                       id_usuario: temp[k].usuario._id,
+                       nome_usuario: temp[k].usuario.nome+" "+temp[k].usuario.sobrenome 
+                    };
+                     
+                    adversarios.push(user);
+                 } 
+                  
+               }
+                   res.render('painel-persuasoes/index', 
+                                             {nome_jogador: nome_jogador,
+                                              id_usuario: id_, 
+                                              mensagem:'',
+                                              nivel_usuario: nivel,
+                                              partida: partida,
+                                              jogadores: adversarios
+                                          });
+             } else {
+
+                res.render('painel-persuasoes/index',{nome_jogador: nome_jogador,
+                                                      id_usuario: id_, 
+                                                      mensagem:'Você não está participando de nenhuma partida',
+                                                      nivel_usuario: nivel,
+                                                      partida: partida,
+                                                      jogadores: jogadores_
+                                                     });
+             
+             }
+
+
            } else {
 
                  res.render('painel-persuasoes/index', 
-             	                            {nome_jogador: nome_jogador,
-             	                             id_usuario: id_, 
-             	                             mensagem:'',
-             	                             nivel_usuario: nivel,
-             	                             partida: partida,
-             	                             jogadores: jogadores
-             	                         });                 
+                                          {nome_jogador: nome_jogador,
+                                           id_usuario: id_, 
+                                           mensagem:'Não há partidas em andamento',
+                                           nivel_usuario: nivel,
+                                           partida: partida,
+                                           jogadores: jogadores_
+                                       });                 
            }
          
-    	 }
+       }
     });
 
     } else {
-    	res.redirect('/');
+      res.redirect('/');
     }
 });
 

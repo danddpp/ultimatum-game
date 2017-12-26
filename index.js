@@ -1907,7 +1907,7 @@ socket.on('buscar_chat', function(data) {
 
           setTimeout(function() {
              socket.emit('historico_chat', data_);
-          }, 5000);
+          }, 2000);
 
 
        } else {
