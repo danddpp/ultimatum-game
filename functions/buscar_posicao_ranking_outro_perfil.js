@@ -10,7 +10,7 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
         for(var i = 0; i < usuarios.length-1; i++) {
             for(var j = i+1; j < usuarios.length; j++ ) {
                 if(usuarios[j].desempenho_geral.numero_de_vitorias > 
-                                        usuarios[j].desempenho_geral.numero_de_vitorias) {
+                                        usuarios[i].desempenho_geral.numero_de_vitorias) {
                    var temp = usuarios[j];
                    usuarios[j] = usuarios[i];
                    usuarios[i] = temp;
@@ -18,7 +18,7 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
             }          
         }
            
-         var ranking = [];
+         var ranking = [];  
          for(var k = 0; k < usuarios.length; k++) {
             if(k == 0) {
               var posicao = {
@@ -34,9 +34,22 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
                      id_usuario: usuarios[k]._id
                  }
                  ranking.push(posicao);
-              } else {
+              } 
+
+              if(usuarios[k].desempenho_geral.numero_de_vitorias < 
+                                          usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
                 var posicao = {
                      p_ranking: ranking[k-1].p_ranking+1,
+                     id_usuario: usuarios[k]._id
+                 }
+                 ranking.push(posicao);
+              }
+
+
+              if(usuarios[k].desempenho_geral.numero_de_vitorias > 
+                                          usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
+                var posicao = {
+                     p_ranking: ranking[k-1].p_ranking-1,
                      id_usuario: usuarios[k]._id
                  }
                  ranking.push(posicao);
@@ -50,7 +63,6 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
                usuario_retorno = ranking[l];
             }
          }
-
          
          res.render('perfil_usuario/index', { meu_id: temp_.meu_id, 
                                               nome_jogador: temp_.nome_jogador,

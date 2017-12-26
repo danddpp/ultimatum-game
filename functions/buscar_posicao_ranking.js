@@ -10,7 +10,7 @@ module.exports = function(req, res, temp_) {
         for(var i = 0; i < usuarios.length-1; i++) {
             for(var j = i+1; j < usuarios.length; j++ ) {
                 if(usuarios[j].desempenho_geral.numero_de_vitorias > 
-                                        usuarios[j].desempenho_geral.numero_de_vitorias) {
+                                        usuarios[i].desempenho_geral.numero_de_vitorias) {
                    var temp = usuarios[j];
                    usuarios[j] = usuarios[i];
                    usuarios[i] = temp;
@@ -28,15 +28,29 @@ module.exports = function(req, res, temp_) {
               ranking.push(posicao);
             } else {
               
-              if(usuarios[k].desempenho_geral.numero_de_vitorias == usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
+              if(usuarios[k].desempenho_geral.numero_de_vitorias == 
+                                          usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
                  var posicao = {
                      p_ranking: ranking[k-1].p_ranking,
                      id_usuario: usuarios[k]._id
                  }
                  ranking.push(posicao);
-              } else {
+              } 
+
+              if(usuarios[k].desempenho_geral.numero_de_vitorias < 
+                                          usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
                 var posicao = {
                      p_ranking: ranking[k-1].p_ranking+1,
+                     id_usuario: usuarios[k]._id
+                 }
+                 ranking.push(posicao);
+              }
+
+
+              if(usuarios[k].desempenho_geral.numero_de_vitorias > 
+                                          usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
+                var posicao = {
+                     p_ranking: ranking[k-1].p_ranking-1,
                      id_usuario: usuarios[k]._id
                  }
                  ranking.push(posicao);

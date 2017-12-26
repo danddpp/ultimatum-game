@@ -10,13 +10,13 @@
 <script type="text/javascript" src="javascripts/bootstrap.min.js"></script>	
 <script src="https://unpkg.com/blip-chat-web" type="text/javascript"></script>
 <script>
-    (function () {
+    /*(function () {
         window.onload = function () {
             new BlipWebSDK.ChatBuilder()
                 .withApiKey('6315ad3e-22ed-4949-a6d5-0f93434e2b88')
                 .build();
         }
-    })();
+    })();*/
 </script>
 <style>
 * {
@@ -919,7 +919,7 @@ client.on('retorno_perfil_pesquisado', function(users) {
 
   <div id="centro" class="col-sm-8">
       <fieldset>
-        <legend><h2><%= nome_perfil %></h2></legend>
+        <h2><%= nome_perfil %></h2>
         <h4>Nível do perfil: "<%= nivel_perfil %>"</h4>
       <div id="left" style="margin-left: 90px;">  
         <div class="redondo" id="foto">
