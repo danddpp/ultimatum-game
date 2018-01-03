@@ -175,7 +175,7 @@
                 var msg = temp[3]+' diz: '+'\n'+temp[1];
                 var campo = $('#myModalR').children().children().children().next().children();
                 var realizado = temp[6];
-                 alert(realizado);
+
                  if(realizado == 'false') {
                    if(campo.attr('id') == 'msg') {
                      campo.text(msg);
@@ -198,54 +198,64 @@
 
                //coerencia
                if(tipo == 'Coerência') {
+                 
+                 setTimeout(function() {
+                     if(temp[1] == '<%- params.num_rodada%>' &&
+                                            temp[2] == '<%- params.num_round%>') {//quiz nao respondido
 
-                   if(temp[1] == '<%- params.num_rodada%>' &&
-                                          temp[2] == '<%- params.num_round%>') {//quiz nao respondido
+                        var msg = temp[3];
+                        var campo = $('#myModalC').children().children().children().next().children();
+                         if(campo.attr('id') == 'msg') {
+                          campo.text(msg);
+                          $('.modal-footer').children().text('Individualista');
+                          $('.modal-footer').children().next().text('Cooperativo');  
+                         }
 
-                      var msg = temp[3];
-                      var campo = $('#myModalC').children().children().children().next().children();
-                       if(campo.attr('id') == 'msg') {
-                        campo.text(msg);
-                        $('.modal-footer').children().text('Individualista');
-                        $('.modal-footer').children().next().text('Cooperativo');  
-                       }
+                        if(temp[5] == 'todos') {
 
-                      if(temp[5] == 'todos') {
+                          if(temp[4] != '<%- params.eu._id %>') {
+                             if(temp[6] == 'false') {
+                                $('#myModalC').modal();
+                             }   
+                          }
 
-                        if(temp[4] != '<%- params.eu._id %>') {
-                           $('#myModalC').modal();   
+                        }
+                        //aqui params.eu._id é o painel e id do destinatario
+                        else if(temp[5] == '<%- params.eu._id %>') {   
+                         if(temp[6] == 'false') {
+                           $('#myModalC').modal();
+                         } 
+                        } 
+
+                     } else if(temp[4] == '<%- params.num_rodada%>' &&
+                                            temp[5] == '<%- params.num_round%>') {                      
+                       var msg = temp[3];
+                       var campo = $('#myModalC2').children().children().children().next().children();
+                        if(campo.attr('id') == 'msg') {
+                         campo.text(msg);
+                         $('.modal-footer').children().text('Aceito');
+                         $('.modal-footer').children().next().text('Não aceito');  
                         }
 
-                      }
-                      //aqui params.eu._id é o painel e id do destinatario
-                      else if(temp[5] == '<%- params.eu._id %>') {  
-                        $('#myModalC').modal(); 
-                      } 
+                       if(temp[2] == 'todos') {
 
-                   } else if(temp[4] == '<%- params.num_rodada%>' &&
-                                          temp[5] == '<%- params.num_round%>') {
-                                           
-                     var msg = temp[3];
-                     var campo = $('#myModalC2').children().children().children().next().children();
-                      if(campo.attr('id') == 'msg') {
-                       campo.text(msg);
-                       $('.modal-footer').children().text('Aceito');
-                       $('.modal-footer').children().next().text('Não aceito');  
-                      }
+                         if(temp[1] != '<%- params.eu._id %>') {
+                            if(temp[7] == 'false') {
+                              $('#myModalC2').modal();
+                            }   
+                         }
 
-                     if(temp[2] == 'todos') {
-
-                       if(temp[1] != '<%- params.eu._id %>') {
-                          $('#myModalC2').modal();   
                        }
+                       //aqui params.eu._id é o painel e id do destinatario
+                       else if(temp[2] == '<%- params.eu._id %>') {  
+                           if(temp[7] == 'false') {
+                             $('#myModalC2').modal();
+                           } 
+                       } 
 
                      }
-                     //aqui params.eu._id é o painel e id do destinatario
-                     else if(temp[2] == '<%- params.eu._id %>') {  
-                       $('#myModalC2').modal(); 
-                     } 
-
-                   }
+                 }, 8000); 
+                   
                }
 
 
@@ -253,6 +263,7 @@
                   
                   var msg = temp[1];
                   var campo = $('#myModalAP_Social').children().children().children().next().children();
+                   
                    if(campo.attr('id') == 'msg') {
                     campo.text(msg);
                     $('.modal-footer').children().text('Aceito');
@@ -262,32 +273,87 @@
                   if(temp[3] == 'todos') {
 
                     if(temp[2] != '<%- params.eu._id %>') {
-                       $('#myModalAP_Social').modal();   
+                       if(temp[4] == 'false') {
+                         $('#myModalAP_Social').modal();
+                       }   
                     }
 
                   }
                   //aqui params.eu._id é o painel e id do destinatario
                   else if(temp[3] == '<%- params.eu._id %>') {  
-                    $('#myModalAP_Social').modal(); 
+                    if(temp[4] == 'false') {
+                      $('#myModalAP_Social').modal();
+                    } 
                   }
 
                }
 
                if(tipo == 'Afinidade') {
-                   setTimeout(function() {
-                     var msg = temp[6]+' diz: '+'\n'+temp[1];
-                     var campo = $('#myModalAfinidade').children().children().children().next().children();
+                   //alert(temp[12]);
+                  if(temp[10] == '<%- params.num_rodada%>' &&
+                                       temp[11] == '<%- params.num_round%>') {//quiz nao respondido
+                         
+                      setTimeout(function() { 
+                         var msg = temp[6]+' diz: '+'\n'+temp[1];
+                         var campo = $('#myModalAfinidade1').children().children().children().next().children();
 
-                     if(campo.attr('id') == 'msg') {
-                       campo.text(msg);
-                       $('.modal-footer').children().text('Aceito');
-                       $('.modal-footer').children().next().text('Não aceito');  
-                     }
+                         if(campo.attr('id') == 'msg') {
+                           campo.text(msg);
+                           $('.modal-footer').children().text('Aceito');
+                           $('.modal-footer').children().next().text('Não aceito');  
+                         }
 
-                     if('<%- params.eu._id %>' == temp[3]) {
-                         $('#myModalAfinidade').modal();
-                     }
-                   }, 5000);
+                         if('<%- params.eu._id %>' == temp[3]) {
+                            if(temp[7] == 'false') {
+                               $('#myModalAfinidade1').modal();
+                            } 
+                         } 
+
+                      },8000);
+                   }
+       
+                   
+                   else if(temp[12] == '<%- params.num_rodada%>' &&
+                                          temp[13] == '<%- params.num_round%>') {
+                                                
+                         setTimeout(function() {
+                           var msg = temp[5]+' diz: '+'\n'+temp[1];
+                           var campo = $('#myModalAfinidade2').children().children().children().next().children();
+
+                           if(campo.attr('id') == 'msg') {
+                             campo.text(msg);
+                             $('.modal-footer').children().text('Aceito');
+                             $('.modal-footer').children().next().text('Não aceito');  
+                           }
+
+                           if('<%- params.eu._id %>' == temp[3]) {
+                               $('#myModalAfinidade2').modal();
+                           }
+                         }, 8000);
+
+
+                   }
+
+                    else if(temp[14] == '<%- params.num_rodada%>' &&
+                                              temp[15] == '<%- params.num_round%>') {
+                          
+                          setTimeout(function() {
+                            var msg = temp[4]+' diz: '+'\n'+temp[1];
+                            var campo = $('#myModalAfinidade3').children().children().children().next().children();
+
+                            if(campo.attr('id') == 'msg') {
+                              campo.text(msg);
+                              $('.modal-footer').children().text('Aceito');
+                              $('.modal-footer').children().next().text('Não aceito');  
+                            }
+
+                            if('<%- params.eu._id %>' == temp[3]) {
+                                $('#myModalAfinidade3').modal();
+                            }
+                          }, 8000);
+
+                    }  
+
                }
 
                if(tipo == 'Autoridade') {
@@ -324,37 +390,55 @@
              client.emit('salvar_reciprocidade_ok', data);
 
            } else {
-            $('#minha_oferta').val(99);
-            $('#bt_envOferta').click();
+            
+            if(temp[6] == 'false') {
+              $('#minha_oferta').val(99);
+              $('#bt_envOferta').click();
+              
+               var id_partida = '<%- params.id_partida %>';
+
+              client.emit('salvar_reciprocidade_pergunta1_sim', id_partida);
+            }
+
            }
           
          };
          
          function no() {
              $('#myModalR').modal('hide');
-           if(cont == 0) {
-              setTimeout(function(){
-                if('<%- params.persuasao_padrao %>' != '') {
-                   cont++;
-                   var persuasao_padrao = '<%- params.persuasao_padrao %>';
-                   var temp = persuasao_padrao.split(';');
-                   var tipo = temp[0];
-                      
-                      if(tipo == 'Reciprocidade') {
-                       var msg = temp[3]+' diz: '+'\n'+temp[2];
-                        var campo = $('#myModalR').children().children().children().next().children();
-                        if(campo.attr('id') == 'msg') {
-                          campo.text(msg);
-                          $('.modal-footer').children().text('Sim');
-                          $('.modal-footer').children().next().text('Não');
-                          //alert(campo.attr('id'));
+             var persuasao_padrao = '<%- params.persuasao_padrao %>';
+             var temp = persuasao_padrao.split(';');
+            if(cont == 0) {
+               
+              if(temp[6] == 'false') {
+
+                var id_partida = '<%- params.id_partida %>'; 
+
+                client.emit('salvar_reciprocidade_pergunta1_nao', id_partida);
+                
+                setTimeout(function(){
+                  if('<%- params.persuasao_padrao %>' != '') {
+                     cont++;
+                     var persuasao_padrao = '<%- params.persuasao_padrao %>';
+                     var tipo = temp[0];
+                        
+                        if(tipo == 'Reciprocidade') {
+                         var msg = temp[3]+' diz: '+'\n'+temp[2];
+                          var campo = $('#myModalR').children().children().children().next().children();
+                          if(campo.attr('id') == 'msg') {
+                            campo.text(msg);
+                            $('.modal-footer').children().text('Sim');
+                            $('.modal-footer').children().next().text('Não');
+                            //alert(campo.attr('id'));
+                          }
+                          if(temp[4] != '<%- params.eu._id %>') {
+                             $('#myModalR').modal(); 
+                          }
                         }
-                        if(temp[4] != '<%- params.eu._id %>') {
-                           $('#myModalR').modal(); 
-                        }
-                      }
-                }
-              },10000); 
+                  }
+                },10000);
+              }
+               
             } else {
                 $('#myModalR').modal('hide');
                 var data = {
@@ -457,62 +541,53 @@
 
 
 
+
         //afinidade
-        var contador_afinidade = 0;
-        var indice_nome = 6;
-        var persuasao_padrao = '<%- params.persuasao_padrao %>';
-        var temp = persuasao_padrao.split(';'); 
+          var aceito_afinidde1 = function() {
+             
+             $('#myModalAfinidade1').modal('hide');
 
-          var aceito_afinidde = function() {
-              $('#myModalAfinidade').modal('hide');
+             var data = {
+                  id_partida: '<%- params.id_partida %>',
+                  nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
+                  resposta_controle2: 'sim'  
+             };
 
-                 if(indice_nome == 6) {
-                   
-                   var data = {
-                       id_partida: '<%- params.id_partida %>',
-                       nome_jogador_manipulado: '<%- params.eu.nome %>'+' '+'<%- params.eu.sobrenome %>',
-                       resposta_controle2: 'sim'  
-                   };
-
-                   client.emit('salvar_opcao_afinidade1', data);
-                 
-                 }
-                 
-                 if(indice_nome == 5) {
-                   
-                   var data = {
-                       id_partida: '<%- params.id_partida %>',
-                       resposta_controle1: 'sim'  
-                   };
-
-                   client.emit('salvar_opcao_afinidade2', data); 
-
-                 }
-              
-              
-                 if(indice_nome == 4) {
-                                      
-                   var data = {
-                       id_partida: '<%- params.id_partida %>',
-                       resposta_afinidade: 'sim'  
-                   };
-
-                   client.emit('salvar_opcao_afinidade3', data);
-                 
-                 }
-              
-              if(contador_afinidade <= 2) {
-                 contador_afinidade++;
-                 indice_nome--;
-                 afinidade_aux(indice_nome);
-              }
+               client.emit('salvar_opcao_afinidade1', data);
 
           };
 
-          var nao_aceito_afinidade = function() {
-              $('#myModalAfinidade').modal('hide');
-              
-                 if(indice_nome == 6) {
+          var aceito_afinidde2 = function() {
+             
+             $('#myModalAfinidade2').modal('hide');
+
+               var data = {
+                    id_partida: '<%- params.id_partida %>',
+                    resposta_controle1: 'sim'  
+               };
+
+               client.emit('salvar_opcao_afinidade2', data);
+
+          };
+
+          var aceito_afinidde3 = function() {
+             
+             $('#myModalAfinidade3').modal('hide');
+
+               var data = {
+                    id_partida: '<%- params.id_partida %>',
+                    resposta_afinidade: 'sim'  
+               };
+
+               client.emit('salvar_opcao_afinidade3', data);
+
+          };
+
+
+
+          var nao_aceito_afinidade1 = function() {
+
+              $('#myModalAfinidade1').modal('hide');
                    
                    var data = {
                        id_partida: '<%- params.id_partida %>',
@@ -522,19 +597,24 @@
 
                    client.emit('salvar_opcao_afinidade1', data);     
 
-                 }
+          };
+
+
+          var nao_aceito_afinidade2 = function() {
+
+              $('#myModalAfinidade2').modal('hide');
                  
-                 if(indice_nome == 5) {
                    var data = {
                        id_partida: '<%- params.id_partida %>',
                        resposta_controle1: 'nao'  
                    };
 
                    client.emit('salvar_opcao_afinidade2', data);
-                 }
+          };
 
-                 
-                 if(indice_nome == 4) {
+          var nao_aceito_afinidade3 = function() {
+
+              $('#myModalAfinidade3').modal('hide');
                  
                     var data = {
                         id_partida: '<%- params.id_partida %>',
@@ -543,65 +623,12 @@
 
                     client.emit('salvar_opcao_afinidade3', data);
                  
-                 }
-
-              if(contador_afinidade <= 2) {
-                 contador_afinidade++;
-                 indice_nome--;
-                 afinidade_aux(indice_nome);
-              }
           };
-
-          var afinidade_aux = function(indice_nome) {
-              if(indice_nome == 5) { 
-
-                var persuasao_padrao = '<%- params.persuasao_padrao %>';
-                var temp = persuasao_padrao.split(';');
-
-                setTimeout(function() {
-                  var msg = temp[indice_nome]+' diz: '+'\n'+temp[1];
-                  var campo = $('#myModalAfinidade').children().children().children().next().children();
-
-                  if(campo.attr('id') == 'msg') {
-                    campo.text(msg);
-                    $('.modal-footer').children().text('Aceito');
-                    $('.modal-footer').children().next().text('Não aceito');  
-                  }
-
-                  if('<%- params.eu._id %>' == temp[3]) {
-                      $('#myModalAfinidade').modal();
-                  }
-                }, 10000);
-              }
-
-              if(indice_nome == 4) {
-
-                var persuasao_padrao =   '<%- params.persuasao_padrao %>';
-                var temp = persuasao_padrao.split(';');
-
-                setTimeout(function() {
-                  var msg = temp[indice_nome]+' diz: '+'\n'+temp[1];
-                  var campo = $('#myModalAfinidade').children().children().children().next().children();
-
-                  if(campo.attr('id') == 'msg') {
-                    campo.text(msg);
-                    $('.modal-footer').children().text('Aceito');
-                    $('.modal-footer').children().next().text('Não aceito');  
-                  }
-
-                  if('<%- params.eu._id %>' == temp[3]) {
-                      $('#myModalAfinidade').modal();
-                  }
-
-                  //escrever função para deletar persuasao padrao para se o jogador atualizar a pagina
-                  //não exiba o modal de persuasao novamente
-                }, 5000);
-              }
-
-
-          }
-
         //afinidade
+
+
+
+
 
       var notify = function(data) {
          var id = data.id;
@@ -1678,7 +1705,7 @@
 
 
     <!-- Modal ApSocial 1 -->
-      <div id="myModalAfinidade" class="modal fade" role="dialog">
+      <div id="myModalAfinidade1" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
           <!-- ModalR content-->
@@ -1691,8 +1718,54 @@
               <label id="msg">Some text in the modal.</label>
             </div>
             <div class="modal-footer">
-               <button type="button" onclick="aceito_afinidde()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="button" onclick="nao_aceito_afinidade()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
+               <button type="button" onclick="aceito_afinidde1()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" onclick="nao_aceito_afinidade1()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modal ApSocial 1 -->
+      <div id="myModalAfinidade2" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- ModalR content-->
+          <div class="modal-content" id="test">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">???</h4>
+            </div>
+            <div class="modal-body">
+              <label id="msg">Some text in the modal.</label>
+            </div>
+            <div class="modal-footer">
+               <button type="button" onclick="aceito_afinidde2()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" onclick="nao_aceito_afinidade2()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modal ApSocial 1 -->
+      <div id="myModalAfinidade3" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- ModalR content-->
+          <div class="modal-content" id="test">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">???</h4>
+            </div>
+            <div class="modal-body">
+              <label id="msg">Some text in the modal.</label>
+            </div>
+            <div class="modal-footer">
+               <button type="button" onclick="aceito_afinidde3()" id="bt_aceito" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" onclick="nao_aceito_afinidade3()" id="bt_nao_aceito" class="btn btn-primary">Save changes</button>
             </div>
           </div>
         </div>

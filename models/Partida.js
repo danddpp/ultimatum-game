@@ -43,7 +43,14 @@ var Partida = new Schema({
   versao: Number,
   contador_aceite: Number,
   contador_prox_round: Number,
-  id_resultados: String
+  id_resultados: String,
+  reciprocidade_pergunta1: Boolean,
+  coerencia_pergunta1: Boolean,
+  coerencia_pergunta2: Boolean,
+  ap_social_pergunta: Boolean,
+  afinidade_pergunta1: Boolean,
+  afinidade_pergunta2: Boolean,
+  afinidade_pergunta3: Boolean
 });
 
 

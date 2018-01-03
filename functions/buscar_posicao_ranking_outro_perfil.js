@@ -18,15 +18,17 @@ module.exports = function(req, res, temp_, id_perfil_a_visitar) {
             }          
         }
            
-         var ranking = [];  
-         for(var k = 0; k < usuarios.length; k++) {
+        var ranking = [];  
+      
+        for(var k = 0; k < usuarios.length; k++) {
+      
             if(k == 0) {
               var posicao = {
                 p_ranking: k+1,
                 id_usuario: usuarios[k]._id
               }
               ranking.push(posicao);
-            } else {
+           } else {
               
               if(usuarios[k].desempenho_geral.numero_de_vitorias == usuarios[k-1].desempenho_geral.numero_de_vitorias ) {
                  var posicao = {

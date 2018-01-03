@@ -17,7 +17,15 @@ var Partida = function(tipo_sala, id_dono, num_rodadas) {
    this.contador_aceite = 0;
    this.contador_prox_round = 0;
    this.id_resultados = '';
-};
+   this.reciprocidade_pergunta1 = false;
+   this.coerencia_pergunta1 = false;
+   this.coerencia_pergunta2 = false;
+   this.ap_social_pergunta = false;
+   this.afinidade_pergunta1 = false;
+   this.afinidade_pergunta2 = false;
+   this.afinidade_pergunta3 = false;
+   };
+
 
 
 module.exports = Partida;

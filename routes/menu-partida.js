@@ -198,7 +198,14 @@ router.post('/criar_partida', function(req, res) {
                         indice_valor: nova_partida.indice_valor,
                         versao: nova_partida.versao,
                         contador_aceite: nova_partida.contador_aceite,
-                        contador_prox_round: nova_partida.contador_prox_round
+                        contador_prox_round: nova_partida.contador_prox_round,
+                        reciprocidade_pergunta1: nova_partida.reciprocidade_pergunta1,
+                        coerencia_pergunta1: nova_partida.coerencia_pergunta1,
+                        coerencia_pergunta2: nova_partida.coerencia_pergunta2,
+                        ap_social_pergunta: nova_partida.ap_social_pergunta,
+                        afinidade_pergunta1: nova_partida.afinidade_pergunta1,
+                        afinidade_pergunta2: nova_partida.afinidade_pergunta2,
+                        afinidade_pergunta3: nova_partida.afinidade_pergunta3
                     });
 
                     var id_partida = null;

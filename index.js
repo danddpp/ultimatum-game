@@ -1457,9 +1457,47 @@ var fim_de_jogo = function(data, partida) {
                 console.log(err);
               } else {
                 partida.persuasoes_padrao = data.configuracoes;
+                partida.reciprocidade_pergunta1 = false;
+                partida.coerencia_pergunta1 = false;
+                partida.coerencia_pergunta2 = false;
+                partida.ap_soacial_pergunta = false;
+                partida.afinidade_pergunta1 = false;
+                partida.afinidade_pergunta2 = false;
+                partida.afinidade_pergunta3 = false;
                 partida.save();
               }
           });
+       });
+
+        
+
+       socket.on('salvar_reciprocidade_pergunta1_sim', function(id_partida) {
+            var query = id_partida;
+            Partida.findById(query).exec(function(err, partida) {
+              if(err) {
+                 console.log(err);
+              } else {
+                   console.log('ioupy');
+                   partida.reciprocidade_pergunta1 = true;
+                   partida.save();
+              }
+            });  
+       });  
+
+
+
+
+       socket.on('salvar_reciprocidade_pergunta1_nao', function(id_partida) {
+            var query = id_partida;
+
+            Partida.findById(query).exec(function(err, partida) {
+              if(err) {
+                 console.log(err);
+              } else {   
+                partida.reciprocidade_pergunta1 = true;
+                partida.save();
+              }
+            });  
        });
 
 
@@ -1554,14 +1592,16 @@ var fim_de_jogo = function(data, partida) {
                       resposta_quiz1: data.resposta,
                       resposta_quiz2:null,
                       success: null,
-                      status: null,
-                      realizado_1: true,
-                      realizado_2: false
+                      status: null
                     };
-
+                       
 
                       var id_resultados = partida.id_resultados;
                       
+                      partida.coerencia_pergunta1 = true;
+
+                      partida.save();
+
                       Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
                          if(err) {
                            console.log(err);
@@ -1587,6 +1627,10 @@ var fim_de_jogo = function(data, partida) {
               if(partida) {
       
                 var id_resultados = partida.id_resultados;
+
+                partida.coerencia_pergunta2 = true;
+
+                partida.save();
                       
                 Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
                   if(err) {
@@ -1640,9 +1684,7 @@ var fim_de_jogo = function(data, partida) {
                              resposta_quiz1: rC[i].resposta_quiz1,
                              resposta_quiz2: data.resposta2,
                              success: success,
-                             status: status,
-                             realizado_1: rC[i].realizado_1,
-                             realizado_2: true
+                             status: status
                         };   
                         resultados.coerencia_resultado[i] = resultado;
                         resultados.save();   
@@ -1660,43 +1702,6 @@ var fim_de_jogo = function(data, partida) {
        });
  
 
-       socket.on('salvar_opcao_afinidade1', function(data) {
-          var query = data.id_partida;
-
-          Partida.findById(query).exec(function(err, partida) {
-              if(partida) {
-
-                 var resultado = {
-                      id_partida: data.id_partida,
-                      nome_jogador_manipulado: data.nome_jogador_manipulado,
-                      resposta_afinidade: null,
-                      resposta_controle1: null,
-                      resposta_controle2: data.resposta_controle2,
-                      tipo: 'afinidade',
-                      success: null,
-                      status: null,
-                      realizado_1: true,
-                      realizado_2: false,
-                      realizado_3: false,
-                    };
-
-                      var id_resultados = partida.id_resultados;
-                      
-                      Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
-                         if(err) {
-                           console.log(err);
-                         } else {
-
-                           resultados.afinidade_resultado.push(resultado);
-                           resultados.save();
-                         } 
-                      });
-
-              } else {
-                 console.log(err);
-              }
-          });          
-       });
 
 
        socket.on('salvar_ap_social', function(data) {
@@ -1706,7 +1711,9 @@ var fim_de_jogo = function(data, partida) {
               if(partida) {
 
                var id_resultados = partida.id_resultados;
-               console.log(id_resultados);
+               partida.ap_social_pergunta = true;
+               partida.save();
+
                Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
                   if(err) {
                     console.log(err);
@@ -1734,8 +1741,7 @@ var fim_de_jogo = function(data, partida) {
                         resposta_ap_social: data.resposta,
                         tipo: 'afinidade',
                         success: aux_success,
-                        status: aux_status,
-                        realizado: true
+                        status: aux_status
                       };
 
                     resultados.aprovacao_social_resultado.push(resultado);
@@ -1750,6 +1756,44 @@ var fim_de_jogo = function(data, partida) {
           });
 
        });
+
+
+       socket.on('salvar_opcao_afinidade1', function(data) {
+          var query = data.id_partida;
+
+          Partida.findById(query).exec(function(err, partida) {
+              if(partida) {
+
+                 var resultado = {
+                      id_partida: data.id_partida,
+                      nome_jogador_manipulado: data.nome_jogador_manipulado,
+                      resposta_afinidade: null,
+                      resposta_controle1: null,
+                      resposta_controle2: data.resposta_controle2,
+                      tipo: 'afinidade',
+                      success: null,
+                      status: null
+                    };
+
+                      var id_resultados = partida.id_resultados;
+                      partida.afinidade_pergunta1 = true;
+                      partida.save();
+
+                      Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
+                         if(err) {
+                           console.log(err);
+                         } else {
+
+                           resultados.afinidade_resultado.push(resultado);
+                           resultados.save();
+                         } 
+                      });
+
+              } else {
+                 console.log(err);
+              }
+          });          
+       });
        
 
        socket.on('salvar_opcao_afinidade2', function(data) {
@@ -1759,7 +1803,9 @@ var fim_de_jogo = function(data, partida) {
               if(partida) {
 
                var id_resultados = partida.id_resultados;
-               console.log(id_resultados);
+               partida.afinidade_pergunta2 = true;
+               partida.save();
+
                Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
                   if(err) {
                     console.log(err);
@@ -1777,10 +1823,7 @@ var fim_de_jogo = function(data, partida) {
                               resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
                               tipo: 'afinidade',
                               success: null,
-                              status: null,
-                              realizado_1: resultados.afinidade_resultado[i].realizado_1,
-                              realizado_2: true,
-                              realizado_3: resultados.afinidade_resultado[i].realizado_3
+                              status: null
                             };
 
                          resultados.afinidade_resultado[i] = resultado;
@@ -1805,6 +1848,8 @@ var fim_de_jogo = function(data, partida) {
               if(partida) {
 
                var id_resultados = partida.id_resultados;
+               partida.afinidade_pergunta3 = true;
+               partida.save();
                
                Persuasoes_Padrao_Resultados.findById(id_resultados).exec(function(err, resultados) {
                   if(err) {
@@ -1837,10 +1882,7 @@ var fim_de_jogo = function(data, partida) {
                               resposta_controle2: resultados.afinidade_resultado[i].resposta_controle2,
                               tipo: 'afinidade',
                               success: aux_success,
-                              status: aux_status,
-                              realizado_1: resultados.afinidade_resultado[i].realizado_1,
-                              realizado_2: resultados.afinidade_resultado[i].realizado_2,
-                              realizado_3: true
+                              status: aux_status
                             };
 
                          resultados.afinidade_resultado[i] = resultado;
@@ -2274,7 +2316,7 @@ socket.on('pesquisar_perfil', function(nome) {
 
 
 //chatbot
-let MessagingHub = require('messaginghub-client');
+/*let MessagingHub = require('messaginghub-client');
 let WebSocketTransport = require('lime-transport-websocket');
 let Lime = require('lime-js');
 
@@ -2310,7 +2352,7 @@ client.connect()
     })
     .catch(function (err) {
         console.log(err);
-    });
+    });*/
 //chatbot
 
 

@@ -14,7 +14,7 @@ router.get('/painel_persuasao', function(req, res) {
         req.next(err);
        } else { 
 
-         var partida = [];
+         var partida = null;
          var jogadores_ = [];
          var flag = false;
 
