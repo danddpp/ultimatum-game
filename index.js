@@ -88,7 +88,7 @@ app.post('/visualizar_resultados_por_partida', routesPesquisar);
 //config rotas persuasao
 app.get('/painel_persuasao', routesPersuasao);
 app.get('/painel_afinidades', routesPersuasao);
-
+app.get('/resultados_persuasao', routesPersuasao);
 
 //rotas perfil usuario
 app.get('/perfil_usuario', routesPerfilUsuario);

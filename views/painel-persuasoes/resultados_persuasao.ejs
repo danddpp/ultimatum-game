@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+	<link href='/stylesheets/submenu.css' rel='stylesheet'>
+	<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+	<script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		var data = {
+		  labels: ['RECIPROCIDADE', 'COERENCIA', 'APROVAÇÃO SOCIAL', 'AFINIDADE'],
+		    series: [
+		    ['<%- reciprocidade_s %>', '<%- coerencia_s %>', '<%- ap_social_s %>', '<%- afinidade_s %>'],//SUCCESS
+		    ['<%- reciprocidade_f %>', '<%- coerencia_f %>', '<%- ap_social_f %>', '<%- afinidade_f %>']//FAILED
+		  ]
+		};
+
+		var options = {
+		  seriesBarDistance: 15
+		};
+
+		var responsiveOptions = [
+		  ['screen and (min-width: 641px) and (max-width: 1024px)', {
+		    seriesBarDistance: 10,
+		    axisX: {
+		      labelInterpolationFnc: function (value) {
+		        return value;
+		      }
+		    }
+		  }],
+		  ['screen and (max-width: 640px)', {
+		    seriesBarDistance: 5,
+		    axisX: {
+		      labelInterpolationFnc: function (value) {
+		        return value[0];
+		      }
+		    }
+		  }]
+		];
+
+		new Chartist.Bar('.ct-chart', data, options, responsiveOptions);
+	});	
+</script>		
+</head>
+<body>
+<% include ../barraMenu %>
+
+<div class="container container-fluid">
+   	    <div class="ct-chart ct-golden-section">    	
+   	    </div>
+</div>
+
+</body>
+</html>
